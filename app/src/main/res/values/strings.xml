@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Sipuada Android Client</string>
+    <string name="domain">Domain</string>
+    <string name="user">User</string>
+    <string name="register">Register</string>
+    <string name="contact_domain">Contact domain</string>
+    <string name="contact">Contact</string>
+    <string name="call">Call</string>
+    <string name="password">Password</string>
+</resources>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context="org.github.sipuada.android.client.view.MainActivity">
+
+        <TextView
+                android:id="@+id/tv_domain"
+                android:text="@string/domain"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        <EditText
+                android:id="@+id/et_domain"
+                android:inputType="text"
+                android:text="192.168.130.207"
+                android:layout_below="@+id/tv_domain"
+                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/tv_user"
+                android:text="@string/user"
+                android:layout_below="@+id/et_domain"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_alignParentStart="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+
+        <EditText
+                android:id="@+id/et_user"
+                android:inputType="text"
+                android:text="bruno"
+                android:layout_below="@+id/tv_user"
+                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/tv_password"
+                android:text="@string/password"
+                android:layout_below="@+id/et_user"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_alignParentStart="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+
+        <EditText
+                android:id="@+id/et_password"
+                android:inputType="text"
+                android:text="bruno"
+                android:layout_below="@+id/tv_password"
+                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <Button
+                android:id="@+id/bt_register"
+                android:text="@string/register"
+                android:layout_below="@+id/et_password"
+                android:layout_centerHorizontal="true"
+                android:layout_height="wrap_content"
+                android:layout_width="120dp" />
+
+        <TextView
+                android:id="@+id/tv_contact_domain"
+                android:text="@string/contact_domain"
+                android:layout_below="@+id/bt_register"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        <EditText
+                android:id="@+id/et_contact_domain"
+                android:inputType="numberDecimal"
+                android:layout_below="@+id/tv_contact_domain"
+                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/tv_contact"
+                android:text="@string/contact"
+                android:layout_below="@+id/et_contact_domain"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_alignParentStart="true"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+
+        <EditText
+                android:id="@+id/et_contact"
+                android:inputType="text"
+                android:layout_below="@+id/tv_contact"
+                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <Button
+                android:id="@+id/bt_call"
+                android:text="@string/call"
+                android:layout_below="@+id/et_contact"
+                android:layout_centerHorizontal="true"
+                android:layout_height="wrap_content"
+                android:layout_width="120dp" />
+</RelativeLayout>
