@@ -1,1 +1,1 @@
-include ':app', ':androidaudiosipuadaplugin', ':sipuada'
+include ':app', ':sipuada', ':androidaudioplugin'

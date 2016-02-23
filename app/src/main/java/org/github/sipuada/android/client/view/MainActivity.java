@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, etUser.getText().toString(), etDomain.getText().toString(),etPassword.getText().toString(),localIpAddress + ":55500/TCP");
 
-            androidAudioPlugin = new AndroidAudioSipuadaPlugin(etUser.getText().toString(),localIpAddress);
+            androidAudioPlugin = new AndroidAudioSipuadaPlugin(etUser.getText().toString(),localIpAddress, this);
             boolean pluginRegister = sipuada.registerPlugin(androidAudioPlugin);
             SipuadaLog.info("Plugin register: " + pluginRegister);
         }
@@ -165,13 +165,5 @@ public class MainActivity extends AppCompatActivity {
         }
         SipuadaLog.error("Failure to get IP Address");
         return "";
-    }
-
-    public void updateCallButtonState() {
-        if (isRegistered) {
-            btCall.setEnabled(true);
-        } else {
-            btCall.setEnabled(false);
-        }
     }
 }
