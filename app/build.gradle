@@ -29,10 +29,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.jakewharton:butterknife:7.0.1'
-    compile project(':sipuada')
     compile project(':androidaudiosipuadaplugin')
+    compile project(':sipuada')
+    compile files('libs/guava-19.0.jar')
+    compile files('libs/log4j-1.2.16.jar')
+    compile files('libs/mockito-all-1.10.19.jar')
+    compile files('libs/slf4j-api-1.7.13.jar')
+    compile files('libs/slf4j-log4j12-1.7.14.jar')
 }

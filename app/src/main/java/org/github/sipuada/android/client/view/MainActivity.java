@@ -1,17 +1,16 @@
 package org.github.sipuada.android.client.view;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import org.github.sipuada.android.client.R;
-import org.github.sipuada.android.client.utils.SipuadaLog;
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
+import org.github.sipuada.android.client.R;
+import org.github.sipuada.android.client.utils.SipuadaLog;
 import org.github.sipuada.plugin.android.audio.AndroidAudioSipuadaPlugin;
 
 import java.net.InetAddress;
@@ -34,84 +33,58 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.bt_call)
     public void call() {
+        SipuadaLog.info("Calling: " + etContact.getText().toString() + ", " + etContactDomain.getText().toString());
         sipuada.inviteToCall(etContact.getText().toString(), etContactDomain.getText().toString(),
                 new SipuadaApi.CallInvitationCallback() {
                     @Override
                     public void onWaitingForCallInvitationAnswer(String callId) {
-
+                        SipuadaLog.info("onWaitingForCallInvitationAnswer");
                     }
 
                     @Override
                     public void onCallInvitationRinging(String callId) {
-
+                        SipuadaLog.info("onCallInvitationRinging");
                     }
 
                     @Override
                     public void onCallInvitationDeclined(String reason) {
-
+                        SipuadaLog.info("onCallInvitationDeclined");
                     }
                 });
     }
 
     @OnClick(R.id.bt_register)
     public void register() {
-        if (sipuada == null) {
-            sipuada = new Sipuada(new SipuadaApi.SipuadaListener() {
-                @Override
-                public boolean onCallInvitationArrived(String s) {
-                    return false;
+        SipuadaLog.info("Register: " + etUser.getText().toString() + ", " + etDomain.getText().toString());
+        Thread thread = new Thread() {
+            public void run() {
+                try {
+                    sipuada.registerCaller(new SipuadaApi.RegistrationCallback() {
+                        @Override
+                        public void onRegistrationSuccess(
+                                List<String> registeredContacts) {
+//                                isRegistered = true;
+//                                updateCallButtonState();
+                            SipuadaLog.info("Successfully Registered");
+                        }
+
+                        @Override
+                        public void onRegistrationRenewed() {
+                            SipuadaLog.info("onRegistrationRenewed");
+                        }
+
+                        @Override
+                        public void onRegistrationFailed(String reason) {
+                            SipuadaLog.error("Failure to register, reason: " + reason);
+                        }
+                    });
+                } catch (Exception e) {
+                    SipuadaLog.error("Failure to register", e);
                 }
+            }
+        };
+        thread.start();
 
-                @Override
-                public void onCallInvitationCanceled(String s, String s1) {
-
-                }
-
-                @Override
-                public void onCallInvitationFailed(String s, String s1) {
-
-                }
-
-                @Override
-                public void onCallEstablished(String s) {
-
-                }
-
-                @Override
-                public void onCallFinished(String s) {
-
-                }
-            }, etUser.getText().toString(), etDomain.getText().toString(),etPassword.getText().toString(),localIpAddress + ":55500/TCP");
-
-            Thread thread = new Thread() {
-                public void run() {
-                    try {
-                        sipuada.register(new SipuadaApi.RegistrationCallback() {
-                            @Override
-                            public void onRegistrationSuccess(
-                                    List<String> registeredContacts) {
-                                isRegistered = true;
-                                updateCallButtonState();
-                                SipuadaLog.info("Successfully Registered");
-                            }
-
-                            @Override
-                            public void onRegistrationRenewed() {
-                                Log.v("TESTE", " Registration Renewed");
-                            }
-
-                            @Override
-                            public void onRegistrationFailed(String reason) {
-                                SipuadaLog.error("Failure to register, reason: " + reason);
-                            }
-                        });
-                    } catch (Exception e) {
-                        SipuadaLog.error("Failure to register", e);
-                    }
-                }
-            };
-            thread.start();
-        }
     }
 
     @Override
@@ -120,7 +93,44 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         localIpAddress = getIPAddress(true);
         ButterKnife.bind(this);
-        updateCallButtonState();
+        setupSipuada();
+//        updateCallButtonState();
+    }
+
+    private void setupSipuada() {
+        if (sipuada == null) {
+            sipuada = new Sipuada(new SipuadaApi.SipuadaListener() {
+                @Override
+                public boolean onCallInvitationArrived(String s) {
+                    SipuadaLog.info("onCallInvitationArrived");
+                    return false;
+                }
+
+                @Override
+                public void onCallInvitationCanceled(String s, String s1) {
+                    SipuadaLog.info("onCallInvitationCanceled");
+                }
+
+                @Override
+                public void onCallInvitationFailed(String s, String s1) {
+                    SipuadaLog.info("onCallInvitationFailed");
+                }
+
+                @Override
+                public void onCallEstablished(String s) {
+                    SipuadaLog.info("onCallEstablished");
+                }
+
+                @Override
+                public void onCallFinished(String s) {
+                    SipuadaLog.info("onCallFinished");
+                }
+            }, etUser.getText().toString(), etDomain.getText().toString(),etPassword.getText().toString(),localIpAddress + ":55500/TCP");
+
+            androidAudioPlugin = new AndroidAudioSipuadaPlugin(etUser.getText().toString(),localIpAddress);
+            boolean pluginRegister = sipuada.registerPlugin(androidAudioPlugin);
+            SipuadaLog.info("Plugin register: " + pluginRegister);
+        }
     }
 
     /**

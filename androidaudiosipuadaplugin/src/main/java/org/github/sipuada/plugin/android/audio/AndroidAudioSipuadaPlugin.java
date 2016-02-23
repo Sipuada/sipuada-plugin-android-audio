@@ -1,31 +1,30 @@
 package org.github.sipuada.plugin.android.audio;
 
-import java.util.Iterator;
-import java.util.Vector;
-
-import org.github.sipuada.Constants.RequestMethod;
-import org.github.sipuada.SipuadaPlugin;
-import org.github.sipuada.UserAgent;
-
 import android.gov.nist.gnjvx.sdp.MediaDescriptionImpl;
-import android.gov.nist.gnjvx.sdp.fields.AttributeField;
-import android.gov.nist.gnjvx.sdp.fields.ConnectionField;
-import android.gov.nist.gnjvx.sdp.fields.MediaField;
-import android.gov.nist.gnjvx.sdp.fields.OriginField;
-import android.gov.nist.gnjvx.sdp.fields.SessionNameField;
+import android.gov.nist.gnjvx.sdp.fields.*;
 import android.javax.sdp.SdpConstants;
 import android.javax.sdp.SdpException;
 import android.javax.sdp.SdpFactory;
 import android.javax.sdp.SessionDescription;
+import org.github.sipuada.Constants.RequestMethod;
+import org.github.sipuada.UserAgent;
+import org.github.sipuada.plugins.SipuadaPlugin;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 	AndroidAudioSipuadaPluginConfig config;
+	// Map<CallId, SessionID>
+	Map<String, String> sessionsIds = new HashMap<>();
 
 	public AndroidAudioSipuadaPlugin(String username, String localAddress) {
 		config = new AndroidAudioSipuadaPluginConfig();
 		config.setUsername(username);
-
+		config.setLocalAddress(localAddress);
 	}
 
 	@Override
@@ -36,13 +35,15 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			 * "s" (session name) = -
 			 * "t" (time) = 0
 			 */
-			SessionDescription sdp = SdpFactory.getInstance().createSessionDescription();
+			SessionDescription sdp = SdpFactory.getInstance().createSessionDescription(config.getLocalAddress());
 
 			// Origin ("o")
 			// o=<user name> <sess-id> <sess-version> <net type> <addr type> <unicast-address> 
 			OriginField originField = new OriginField();
 			originField.setUsername(config.getUsername());
-			originField.setSessionId(callId);
+			String sessionId = Long.toString(System.currentTimeMillis() / 1000L);
+			sessionsIds.put(callId,sessionId);
+			originField.setSessionId(sessionId);
 			originField.setSessVersion(0L);
 			originField.setNetworkType(config.getNetworkType());
 			originField.setAddressType(config.getAddressType());
@@ -82,11 +83,11 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			sendReceive.setValue("sendrecv");
 			audioDescription.addAttribute(sendReceive);
 
-			AttributeField rtcpAttribute = new AttributeField();
-			rtcpAttribute.setName("rtcp");
+//			AttributeField rtcpAttribute = new AttributeField();
+//			rtcpAttribute.setName("rtcp");
 			// TODO generate RTCP port
 			// rtcpAttribute.setValue();
-			audioDescription.addAttribute(rtcpAttribute);
+//			audioDescription.addAttribute(rtcpAttribute);
 
 			mediaDescriptions.add(audioField);
 			mediaDescriptions.add(audioDescription);
@@ -95,12 +96,19 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			sdp.setConnection(connectionField);
 			sdp.setMediaDescriptions(mediaDescriptions);
 
+			return sdp;
+
 		} catch (SdpException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return null;
+	}
+
+	@Override
+	public void receiveAnswerToAcceptedOffer(String callId, SessionDescription answer) {
+		
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -113,7 +121,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			 * "s" (session name) = -
 			 * "t" (time) = 0
 			 */
-			SessionDescription sdp = SdpFactory.getInstance().createSessionDescription();
+			SessionDescription sdp = SdpFactory.getInstance().createSessionDescription(config.getLocalAddress());
 
 			SessionNameField sessionNameField = new SessionNameField();
 			sessionNameField.setSessionName(offer.getSessionName().getValue());
@@ -145,13 +153,13 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			// audioField.setPort();
 
 			audioField.setProtocol(SdpConstants.RTP_AVP);
-			
+
 			// Check if the offer audio format its equal mine
 			Vector offerMediaDescriptions = offer.getMediaDescriptions(false);
 			if (offerMediaDescriptions != null) {
 				Iterator itMediaDescriptions = offerMediaDescriptions.iterator();
 
-				while (itMediaDescriptions.hasNext()) { 
+				while (itMediaDescriptions.hasNext()) {
 					MediaDescriptionImpl offerMediaDescription = (MediaDescriptionImpl) itMediaDescriptions.next();
 					Vector offerFormats = offerMediaDescription.getMediaField().getFormats();
 
@@ -167,7 +175,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 					}
 				}
 			}
-			
+
 			Vector<String> audioFormats = new Vector<>();
 			audioFormats.add(Integer.toString(SdpConstants.PCMA));
 			audioField.setFormats(audioFormats);
@@ -184,11 +192,11 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			sendReceive.setValue("sendrecv");
 			audioDescription.addAttribute(sendReceive);
 
-			AttributeField rtcpAttribute = new AttributeField();
-			rtcpAttribute.setName("rtcp");
+//			AttributeField rtcpAttribute = new AttributeField();
+//			rtcpAttribute.setName("rtcp");
 			// TODO generate RTCP port
 			// rtcpAttribute.setValue();
-			audioDescription.addAttribute(rtcpAttribute);
+//			audioDescription.addAttribute(rtcpAttribute);
 
 			mediaDescriptions.add(audioField);
 			mediaDescriptions.add(audioDescription);
@@ -196,6 +204,8 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			sdp.setOrigin(originField);
 			sdp.setConnection(connectionField);
 			sdp.setMediaDescriptions(mediaDescriptions);
+
+			return sdp;
 
 		} catch (SdpException e) {
 			// TODO Auto-generated catch block
