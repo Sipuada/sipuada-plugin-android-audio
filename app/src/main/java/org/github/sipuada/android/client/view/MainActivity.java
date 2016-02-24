@@ -1,6 +1,10 @@
 package org.github.sipuada.android.client.view;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private String localIpAddress;
     private Boolean isRegistered = false;
     private AndroidAudioSipuadaPlugin androidAudioPlugin;
+    private Context mContext;
 
     @OnClick(R.id.bt_call)
     public void call() {
@@ -55,7 +60,67 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.bt_register)
     public void register() {
-        SipuadaLog.info("Register: " + etUser.getText().toString() + ", " + etDomain.getText().toString());
+        SipuadaLog.info("Register: " + etUser.getText().toString()+"(" + localIpAddress + ")" + ", " + etDomain.getText().toString());
+
+        sipuada = null;
+        sipuada = new Sipuada(new SipuadaApi.SipuadaListener() {
+            @Override
+            public boolean onCallInvitationArrived(String s) {
+                SipuadaLog.info("onCallInvitationArrived");
+                final String callId = s;
+
+                ((Activity)mContext).runOnUiThread(new Runnable() {
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setMessage("Call incoming")
+                                .setCancelable(false)
+                                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        sipuada.acceptCallInvitation(callId);
+                                        dialog.dismiss();
+                                    }
+                                })
+
+                                .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        sipuada.declineCallInvitation(callId);
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                    }
+                });
+                return false;
+            }
+
+            @Override
+            public void onCallInvitationCanceled(String s, String s1) {
+                SipuadaLog.info("onCallInvitationCanceled");
+            }
+
+            @Override
+            public void onCallInvitationFailed(String s, String s1) {
+                SipuadaLog.info("onCallInvitationFailed");
+                SipuadaLog.error("Call failed. Reason: " + s);
+            }
+
+            @Override
+            public void onCallEstablished(String s) {
+                SipuadaLog.info("onCallEstablished");
+            }
+
+            @Override
+            public void onCallFinished(String s) {
+                SipuadaLog.info("onCallFinished");
+            }
+        }, etUser.getText().toString(), etDomain.getText().toString(), etPassword.getText().toString(),localIpAddress + ":55500/TCP");
+
+        androidAudioPlugin = new AndroidAudioSipuadaPlugin(etUser.getText().toString(),localIpAddress, this);
+        boolean pluginRegister = sipuada.registerPlugin(androidAudioPlugin);
+        SipuadaLog.info("Plugin register: " + pluginRegister);
+
         Thread thread = new Thread() {
             public void run() {
                 try {
@@ -93,44 +158,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         localIpAddress = getIPAddress(true);
         ButterKnife.bind(this);
+        mContext = this;
         setupSipuada();
 //        updateCallButtonState();
     }
 
     private void setupSipuada() {
-        if (sipuada == null) {
-            sipuada = new Sipuada(new SipuadaApi.SipuadaListener() {
-                @Override
-                public boolean onCallInvitationArrived(String s) {
-                    SipuadaLog.info("onCallInvitationArrived");
-                    return false;
-                }
-
-                @Override
-                public void onCallInvitationCanceled(String s, String s1) {
-                    SipuadaLog.info("onCallInvitationCanceled");
-                }
-
-                @Override
-                public void onCallInvitationFailed(String s, String s1) {
-                    SipuadaLog.info("onCallInvitationFailed");
-                }
-
-                @Override
-                public void onCallEstablished(String s) {
-                    SipuadaLog.info("onCallEstablished");
-                }
-
-                @Override
-                public void onCallFinished(String s) {
-                    SipuadaLog.info("onCallFinished");
-                }
-            }, etUser.getText().toString(), etDomain.getText().toString(),etPassword.getText().toString(),localIpAddress + ":55500/TCP");
-
-            androidAudioPlugin = new AndroidAudioSipuadaPlugin(etUser.getText().toString(),localIpAddress, this);
-            boolean pluginRegister = sipuada.registerPlugin(androidAudioPlugin);
-            SipuadaLog.info("Plugin register: " + pluginRegister);
-        }
     }
 
     /**

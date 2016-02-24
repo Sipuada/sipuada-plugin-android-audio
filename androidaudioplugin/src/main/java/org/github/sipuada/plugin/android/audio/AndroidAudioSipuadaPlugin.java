@@ -3,18 +3,14 @@ package org.github.sipuada.plugin.android.audio;
 import android.content.Context;
 import android.gov.nist.gnjvx.sdp.MediaDescriptionImpl;
 import android.gov.nist.gnjvx.sdp.fields.*;
-import android.javax.sdp.SdpConstants;
-import android.javax.sdp.SdpException;
-import android.javax.sdp.SdpFactory;
-import android.javax.sdp.SessionDescription;
+import android.gov.nist.gnjvx.sip.header.CallID;
+import android.javax.sdp.*;
 import org.github.sipuada.Constants.RequestMethod;
 import org.github.sipuada.UserAgent;
 import org.github.sipuada.plugin.android.audio.utils.SipuadaLog;
 import org.github.sipuada.plugins.SipuadaPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
@@ -44,6 +40,12 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 		}
 	}
 
+	public enum CallRole {
+		CALLEE,
+		CALLER
+	}
+
+	private final Map<String, CallRole> roles = new HashMap<>();
 	private final Map<String, Record> records = new HashMap<>();
 	private SipuadaAudioManager mSipuadaAudioManager;
 	AndroidAudioSipuadaPluginConfig config;
@@ -62,6 +64,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 	@Override
 	public SessionDescription generateOffer(String callId, RequestMethod method) {
+		roles.put(callId, CallRole.CALLER);
 		try {
 			/* This offer start with:
 			 * "v" (version) = 0
@@ -146,6 +149,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public SessionDescription generateAnswer(String callId, RequestMethod method, SessionDescription offer) {
+		roles.put(callId, CallRole.CALLEE);
 		try {
 			/* This answer start with:
 			 * "v" (version) = 0
@@ -194,8 +198,8 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 					if (offerFormats != null) {
 						for (Object offerFormat : offerFormats) {
-							if (offerFormat != null) {
-								if (!(Integer.parseInt(((String) offerFormat)) == SdpConstants.PCMA)) ;
+							if (!(Integer.parseInt(((String) offerFormat)) == SdpConstants.PCMA)){
+								SipuadaLog.verbose("offer formats null");
 								return null;
 							}
 						}
@@ -244,7 +248,100 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 	public boolean performSessionSetup(String callId, UserAgent userAgent) {
 		Record record = records.get(callId);
 		SessionDescription offer = record.getOffer();
-		SessionDescription answer = record.getAnswer();
+		SessionDescription answer = record.getAnswer();List<String> audioFormats = new ArrayList<>();
+		int audioRtpPort = 5060;
+		int audioRtcpPort;
+
+		switch (roles.get(callId)) {
+			case CALLEE:
+				try {
+					@SuppressWarnings("unchecked")
+					Vector<MediaDescription> answerMediasDescription = offer.getMediaDescriptions(false);
+					SipuadaLog.verbose("Trying to read media descriptions");
+
+					for (MediaDescription item : answerMediasDescription) {
+						if (item.getMedia().getMediaType().contains("audio")) {
+							audioRtpPort = item.getMedia().getMediaPort();
+
+							SipuadaLog.verbose("Media" + item.toString());
+							@SuppressWarnings("unchecked")
+							Vector<Attribute> formats = item.getAttributes(false);
+							if (formats != null) {
+								for (Attribute attribute : formats) {
+									if (attribute.getName() != null && attribute.getName().contains("rtpmap")) {
+										try {
+											audioFormats.add(attribute.getValue());
+										} catch (Exception e) {
+											// not a valid number
+										}
+									} else if (attribute.getName().contains("rtcp")) {
+										try {
+											audioRtcpPort = Integer.parseInt(attribute.getValue());
+										} catch (Exception e) {
+											// not a valid number
+										}
+									}
+								}
+							}
+						}
+					}
+				} catch (SdpException e) {
+					e.printStackTrace();
+					SipuadaLog.error("Failed to extract media from answer.", e);
+				}
+
+				try {
+					mSipuadaAudioManager.startStreaming(audioRtpPort,offer.getConnection().getAddress());
+				} catch (SdpParseException e) {
+					e.printStackTrace();
+					SipuadaLog.error("Failed to start audio streaming.", e);
+				}
+				return true;
+			case CALLER:
+				try {
+					@SuppressWarnings("unchecked")
+					Vector<MediaDescription> answerMediasDescription = answer.getMediaDescriptions(false);
+					SipuadaLog.verbose("Trying to read media descriptions");
+
+					for (MediaDescription item : answerMediasDescription) {
+						if (item.getMedia().getMediaType().contains("audio")) {
+							audioRtpPort = item.getMedia().getMediaPort();
+
+							SipuadaLog.verbose("Media" + item.toString());
+							@SuppressWarnings("unchecked")
+							Vector<Attribute> formats = item.getAttributes(false);
+							if (formats != null) {
+								for (Attribute attribute : formats) {
+									if (attribute.getName() != null && attribute.getName().contains("rtpmap")) {
+										try {
+											audioFormats.add(attribute.getValue());
+										} catch (Exception e) {
+											// not a valid number
+										}
+									} else if (attribute.getName().contains("rtcp")) {
+										try {
+											audioRtcpPort = Integer.parseInt(attribute.getValue());
+										} catch (Exception e) {
+											// not a valid number
+										}
+									}
+								}
+							}
+						}
+					}
+				} catch (SdpException e) {
+					e.printStackTrace();
+					SipuadaLog.error("Failed to extract media from answer.", e);
+				}
+
+				try {
+					mSipuadaAudioManager.startStreaming(audioRtpPort,answer.getConnection().getAddress());
+				} catch (SdpParseException e) {
+					e.printStackTrace();
+					SipuadaLog.error("Failed to start audio streaming.", e);
+				}
+				return true;
+		}
 		return false;
 	}
 
