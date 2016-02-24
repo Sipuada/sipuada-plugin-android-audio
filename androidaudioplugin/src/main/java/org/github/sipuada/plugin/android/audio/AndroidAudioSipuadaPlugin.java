@@ -3,8 +3,8 @@ package org.github.sipuada.plugin.android.audio;
 import android.content.Context;
 import android.gov.nist.gnjvx.sdp.MediaDescriptionImpl;
 import android.gov.nist.gnjvx.sdp.fields.*;
-import android.gov.nist.gnjvx.sip.header.CallID;
 import android.javax.sdp.*;
+import android.util.Pair;
 import org.github.sipuada.Constants.RequestMethod;
 import org.github.sipuada.UserAgent;
 import org.github.sipuada.plugin.android.audio.utils.SipuadaLog;
@@ -48,6 +48,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 	private final Map<String, CallRole> roles = new HashMap<>();
 	private final Map<String, Record> records = new HashMap<>();
 	private SipuadaAudioManager mSipuadaAudioManager;
+	private Pair<String,String>[] myCodecs;
 	AndroidAudioSipuadaPluginConfig config;
 	// Map<CallId, SessionID>
 	Map<String, String> sessionsIds = new HashMap<>();
@@ -56,6 +57,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 		mSipuadaAudioManager = new SipuadaAudioManager(context, localAddress);
 		mSipuadaAudioManager.setupAudioStream();
+		myCodecs = mSipuadaAudioManager.getCodecs();
 
 		config = new AndroidAudioSipuadaPluginConfig();
 		config.setUsername(username);
@@ -95,36 +97,37 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			// Media Descriptions ("m=")
 			// m=<media> <port> <protocol> <fmt> ...
 			// <media> is the media type.  Currently defined media are "audio","video", "text", "application", and "message"
-			MediaField audioField = new MediaField();
-			audioField.setMedia("audio");
-
-			audioField.setPort(mSipuadaAudioManager.getAudioStreamPort());
-
-			audioField.setProtocol(SdpConstants.RTP_AVP);
-
-			Vector<String> audioFormats = new Vector<>();
-			audioFormats.add(Integer.toString(SdpConstants.PCMA));
-			audioField.setFormats(audioFormats);
-
 			Vector<Object> mediaDescriptions = new Vector<>();
-			MediaDescriptionImpl audioDescription = new MediaDescriptionImpl();
 
-			AttributeField attributeField = new AttributeField();
-			attributeField.setName(SdpConstants.RTPMAP);
-			attributeField.setValue(SdpConstants.PCMA + " PCMA/8000");
-			audioDescription.addAttribute(attributeField);
+			for (Pair<String,String> codec : mSipuadaAudioManager.getCodecs()) {
+				MediaDescriptionImpl audioDescription = new MediaDescriptionImpl();
+				AttributeField attributeField = new AttributeField();
+				attributeField.setName(SdpConstants.RTPMAP);
 
-			AttributeField sendReceive = new AttributeField();
-			sendReceive.setValue("sendrecv");
-			audioDescription.addAttribute(sendReceive);
+				MediaField audioField = new MediaField();
+				audioField.setMedia("audio");
+				audioField.setPort(mSipuadaAudioManager.getAudioStreamPort());
+				audioField.setProtocol(SdpConstants.RTP_AVP);
 
-			AttributeField rtcpAttribute = new AttributeField();
-			rtcpAttribute.setName("rtcp");
-			rtcpAttribute.setValue(Integer.toString(mSipuadaAudioManager.getAudioStreamPort()));
-			audioDescription.addAttribute(rtcpAttribute);
+				Vector<String> audioFormats = new Vector<>();
+				audioFormats.add(codec.second);
+				audioField.setFormats(audioFormats);
 
-			mediaDescriptions.add(audioField);
-			mediaDescriptions.add(audioDescription);
+				attributeField.setValue(codec.second + " "+ codec.first);
+				audioDescription.addAttribute(attributeField);
+
+				AttributeField sendReceive = new AttributeField();
+				sendReceive.setValue("sendrecv");
+				audioDescription.addAttribute(sendReceive);
+
+				AttributeField rtcpAttribute = new AttributeField();
+				rtcpAttribute.setName("rtcp");
+				rtcpAttribute.setValue(Integer.toString(mSipuadaAudioManager.getAudioStreamPort()));
+				audioDescription.addAttribute(rtcpAttribute);
+
+				mediaDescriptions.add(audioField);
+				mediaDescriptions.add(audioDescription);
+			}
 
 			offer.setOrigin(originField);
 			offer.setConnection(connectionField);
@@ -178,58 +181,69 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			connectionField.setAddressType(config.getAddressType());
 			connectionField.setAddress(config.getLocalAddress());
 
-			// Media Descriptions ("m=")
-			// m=<media> <port> <protocol> <fmt> ...
-			// <media> is the media type.  Currently defined media are "audio","video", "text", "application", and "message"
-			MediaField audioField = new MediaField();
-			audioField.setMedia("audio");
-
-			audioField.setPort(mSipuadaAudioManager.getAudioStreamPort());
-
-			audioField.setProtocol(SdpConstants.RTP_AVP);
-
+			// Check codecs
+			ArrayList<Pair<String,String>> matchCodecs = new ArrayList<>();
 			// Check if the offer audio format its equal mine
 			Vector offerMediaDescriptions = offer.getMediaDescriptions(false);
-			if (offerMediaDescriptions != null) {
 
-				for (Object offerMediaDescription1 : offerMediaDescriptions) {
-					MediaDescriptionImpl offerMediaDescription = (MediaDescriptionImpl) offerMediaDescription1;
-					Vector offerFormats = offerMediaDescription.getMediaField().getFormats();
+			if (offerMediaDescriptions != null) {
+				for (Object offerMediaDescription : offerMediaDescriptions) {
+					Vector offerFormats = ((MediaDescriptionImpl)offerMediaDescription).getMediaField().getFormats();
 
 					if (offerFormats != null) {
 						for (Object offerFormat : offerFormats) {
-							if (!(Integer.parseInt(((String) offerFormat)) == SdpConstants.PCMA)){
-								SipuadaLog.verbose("offer formats null");
-								return null;
+							for (Pair<String,String> codec : myCodecs) {
+								if (offerFormat.equals(codec.second)) {
+									matchCodecs.add(codec);
+								}
 							}
 						}
+					} else {
+						return null;
 					}
 				}
+			} else {
+				return null;
 			}
 
-			Vector<String> audioFormats = new Vector<>();
-			audioFormats.add(Integer.toString(SdpConstants.PCMA));
-			audioField.setFormats(audioFormats);
+			if (matchCodecs.isEmpty()) {
+				return null;
+			}
 
+			// Media Descriptions ("m=")
+			// m=<media> <port> <protocol> <fmt> ...
+			// <media> is the media type.  Currently defined media are "audio","video", "text", "application", and "message"
 			Vector<Object> mediaDescriptions = new Vector<>();
-			MediaDescriptionImpl audioDescription = new MediaDescriptionImpl();
 
-			AttributeField attributeField = new AttributeField();
-			attributeField.setName(SdpConstants.RTPMAP);
-			attributeField.setValue(SdpConstants.PCMA + " PCMA/8000");
-			audioDescription.addAttribute(attributeField);
+			for (Pair<String,String> codec : matchCodecs) {
+				MediaDescriptionImpl audioDescription = new MediaDescriptionImpl();
+				AttributeField attributeField = new AttributeField();
+				attributeField.setName(SdpConstants.RTPMAP);
 
-			AttributeField sendReceive = new AttributeField();
-			sendReceive.setValue("sendrecv");
-			audioDescription.addAttribute(sendReceive);
+				MediaField audioField = new MediaField();
+				audioField.setMedia("audio");
+				audioField.setPort(mSipuadaAudioManager.getAudioStreamPort());
+				audioField.setProtocol(SdpConstants.RTP_AVP);
 
-			AttributeField rtcpAttribute = new AttributeField();
-			rtcpAttribute.setName("rtcp");
-			rtcpAttribute.setValue(Integer.toString(mSipuadaAudioManager.getAudioStreamPort()));
-			audioDescription.addAttribute(rtcpAttribute);
+				Vector<String> audioFormats = new Vector<>();
+				audioFormats.add(codec.second);
+				audioField.setFormats(audioFormats);
 
-			mediaDescriptions.add(audioField);
-			mediaDescriptions.add(audioDescription);
+				attributeField.setValue(codec.second + " "+ codec.first);
+				audioDescription.addAttribute(attributeField);
+
+				AttributeField sendReceive = new AttributeField();
+				sendReceive.setValue("sendrecv");
+				audioDescription.addAttribute(sendReceive);
+
+				AttributeField rtcpAttribute = new AttributeField();
+				rtcpAttribute.setName("rtcp");
+				rtcpAttribute.setValue(Integer.toString(mSipuadaAudioManager.getAudioStreamPort()));
+				audioDescription.addAttribute(rtcpAttribute);
+
+				mediaDescriptions.add(audioField);
+				mediaDescriptions.add(audioDescription);
+			}
 
 			answer.setOrigin(originField);
 			answer.setConnection(connectionField);
@@ -257,13 +271,11 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 				try {
 					@SuppressWarnings("unchecked")
 					Vector<MediaDescription> answerMediasDescription = offer.getMediaDescriptions(false);
-					SipuadaLog.verbose("Trying to read media descriptions");
 
 					for (MediaDescription item : answerMediasDescription) {
 						if (item.getMedia().getMediaType().contains("audio")) {
 							audioRtpPort = item.getMedia().getMediaPort();
 
-							SipuadaLog.verbose("Media" + item.toString());
 							@SuppressWarnings("unchecked")
 							Vector<Attribute> formats = item.getAttributes(false);
 							if (formats != null) {
@@ -301,13 +313,11 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 				try {
 					@SuppressWarnings("unchecked")
 					Vector<MediaDescription> answerMediasDescription = answer.getMediaDescriptions(false);
-					SipuadaLog.verbose("Trying to read media descriptions");
 
 					for (MediaDescription item : answerMediasDescription) {
 						if (item.getMedia().getMediaType().contains("audio")) {
 							audioRtpPort = item.getMedia().getMediaPort();
 
-							SipuadaLog.verbose("Media" + item.toString());
 							@SuppressWarnings("unchecked")
 							Vector<Attribute> formats = item.getAttributes(false);
 							if (formats != null) {

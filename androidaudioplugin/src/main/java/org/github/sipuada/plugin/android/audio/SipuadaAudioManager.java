@@ -1,6 +1,7 @@
 package org.github.sipuada.plugin.android.audio;
 
 import android.content.Context;
+import android.javax.sdp.SdpConstants;
 import android.media.AudioManager;
 import android.net.rtp.AudioCodec;
 import android.net.rtp.AudioGroup;
@@ -8,6 +9,7 @@ import android.net.rtp.AudioStream;
 import android.net.rtp.RtpStream;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 import org.github.sipuada.plugin.android.audio.utils.SipuadaLog;
 
 import java.net.InetAddress;
@@ -46,18 +48,19 @@ public class SipuadaAudioManager {
         }
     }
 
-    public String[] getCodecs() {
+    public Pair<String,String>[] getCodecs() {
         AudioCodec codecs[] = AudioCodec.getCodecs();
-        String[] availableCodecs = new String[codecs.length];
+        Pair[] availableCodecs = new Pair[codecs.length];
 
-        for (int i = 0; i <= codecs.length -1; i++) {
-            availableCodecs[i] = codecs[i].rtpmap;
+        for (int i = 0; i < codecs.length; i++) {
+            int codecConstant = 0;
+            for (int j = 0; j < SdpConstants.avpTypeNames.length; j++) {
+                if (codecs[i].rtpmap.split("/")[0].equals(SdpConstants.avpTypeNames[j])) {
+                    codecConstant = j;
+                }
+            }
+            availableCodecs[i] = new Pair<>(codecs[i].rtpmap,Integer.toString(codecConstant));
         }
-
-        for (String a : availableCodecs) {
-            SipuadaLog.verbose(a);
-        }
-
         return availableCodecs;
     }
 
