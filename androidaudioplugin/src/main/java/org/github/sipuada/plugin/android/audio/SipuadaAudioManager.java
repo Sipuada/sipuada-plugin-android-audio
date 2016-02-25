@@ -1,7 +1,6 @@
 package org.github.sipuada.plugin.android.audio;
 
 import android.content.Context;
-import android.javax.sdp.SdpConstants;
 import android.media.AudioManager;
 import android.net.rtp.AudioCodec;
 import android.net.rtp.AudioGroup;
@@ -9,7 +8,6 @@ import android.net.rtp.AudioStream;
 import android.net.rtp.RtpStream;
 import android.os.Handler;
 import android.util.Log;
-import android.util.Pair;
 import org.github.sipuada.plugin.android.audio.utils.SipuadaLog;
 
 import java.net.InetAddress;
@@ -48,30 +46,32 @@ public class SipuadaAudioManager {
         }
     }
 
-    public Pair<String,String>[] getCodecs() {
+    public AudioCodec[] getCodecs() {
         AudioCodec codecs[] = AudioCodec.getCodecs();
-        Pair[] availableCodecs = new Pair[codecs.length];
+        AudioCodec[] availableCodecs = new AudioCodec[1];
 
-        for (int i = 0; i < codecs.length; i++) {
-            int codecConstant = 0;
-            for (int j = 0; j < SdpConstants.avpTypeNames.length; j++) {
-                if (codecs[i].rtpmap.split("/")[0].equals(SdpConstants.avpTypeNames[j])) {
-                    codecConstant = j;
-                }
+        for (AudioCodec codec : codecs) {
+//            int codecConstant = 0;
+//            for (int j = 0; j < SdpConstants.avpTypeNames.length; j++) {
+//                if (codec.rtpmap.split("/")[0].equals(SdpConstants.avpTypeNames[j])) {
+//                    codecConstant = j;
+//                }
+//            }
+            // Adds only PCMA
+            if (codec.rtpmap.split("/")[0].equals("PCMU")) {
+                availableCodecs[0] = codec;
             }
-            availableCodecs[i] = new Pair<>(codecs[i].rtpmap,Integer.toString(codecConstant));
         }
+        SipuadaLog.verbose("codecs size:" + availableCodecs.length);
         return availableCodecs;
     }
-
 
     public int getAudioStreamPort() {
         return mAudioStream.getLocalPort();
     }
 
     // Start sending/receiving media
-    public void startStreaming(int remoteRtpPort, String remoteIp) {
-
+    public void startStreaming(int remoteRtpPort, String remoteIp, AudioCodec codec) {
         Log.i(TAG, "Starting streaming: " + remoteIp + "/" + remoteRtpPort);
 
         mAudioManager.setMode(AudioManager.MODE_IN_CALL);
