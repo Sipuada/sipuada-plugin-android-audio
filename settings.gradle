@@ -1,1 +1,1 @@
-include ':app', ':androidaudioplugin'
+include ':example-app', ':library'

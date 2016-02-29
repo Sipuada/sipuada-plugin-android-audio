@@ -38,5 +38,5 @@ dependencies {
     compile files('libs/mockito-all-1.10.19.jar')
     compile files('libs/slf4j-api-1.7.13.jar')
     compile files('libs/slf4j-log4j12-1.7.14.jar')
-    compile project(':androidaudioplugin')
+    compile project(':library')
 }

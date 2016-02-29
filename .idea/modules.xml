@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/androidaudioplugin/androidaudioplugin.iml" filepath="$PROJECT_DIR$/androidaudioplugin/androidaudioplugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/example-app/example-app.iml" filepath="$PROJECT_DIR$/example-app/example-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/sipuada-plugin-android-audio.iml" filepath="$PROJECT_DIR$/sipuada-plugin-android-audio.iml" />
     </modules>
   </component>
