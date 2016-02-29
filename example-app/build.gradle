@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "client.audio.android.sipuada.github.org.sipuadaandroidclient"
         minSdkVersion 19
-        targetSdkVersion 21
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -31,7 +31,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile files('libs/guava-19.0.jar')
     compile files('libs/log4j-1.2.16.jar')

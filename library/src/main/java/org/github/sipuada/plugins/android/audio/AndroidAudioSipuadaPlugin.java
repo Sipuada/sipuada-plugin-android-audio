@@ -1,4 +1,4 @@
-package org.github.sipuada.plugin.android.audio;
+package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
 import android.gov.nist.gnjvx.sdp.MediaDescriptionImpl;
@@ -8,7 +8,7 @@ import android.net.rtp.AudioCodec;
 import android.util.Pair;
 import org.github.sipuada.Constants.RequestMethod;
 import org.github.sipuada.UserAgent;
-import org.github.sipuada.plugin.android.audio.utils.SipuadaLog;
+import org.github.sipuada.plugins.android.audio.utils.SipuadaLog;
 import org.github.sipuada.plugins.SipuadaPlugin;
 
 import java.util.*;

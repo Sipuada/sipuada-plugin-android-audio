@@ -1,4 +1,4 @@
-package org.github.sipuada.plugin.android.audio;
+package org.github.sipuada.plugins.android.audio;
 
 import android.gov.nist.gnjvx.sdp.fields.SDPKeywords;
 

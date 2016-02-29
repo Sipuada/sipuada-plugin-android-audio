@@ -1,4 +1,4 @@
-package org.github.sipuada.plugin.android.audio.utils;
+package org.github.sipuada.plugins.android.audio.utils;
 
 import android.util.Log;
 

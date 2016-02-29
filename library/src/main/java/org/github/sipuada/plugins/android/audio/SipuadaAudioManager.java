@@ -1,4 +1,4 @@
-package org.github.sipuada.plugin.android.audio;
+package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -8,7 +8,7 @@ import android.net.rtp.AudioStream;
 import android.net.rtp.RtpStream;
 import android.os.Handler;
 import android.util.Log;
-import org.github.sipuada.plugin.android.audio.utils.SipuadaLog;
+import org.github.sipuada.plugins.android.audio.utils.SipuadaLog;
 
 import java.net.InetAddress;
 import java.net.SocketException;

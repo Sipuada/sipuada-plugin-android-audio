@@ -15,7 +15,7 @@ import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.android.client.R;
 import org.github.sipuada.android.client.utils.SipuadaLog;
-import org.github.sipuada.plugin.android.audio.AndroidAudioSipuadaPlugin;
+import org.github.sipuada.plugins.android.audio.AndroidAudioSipuadaPlugin;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
