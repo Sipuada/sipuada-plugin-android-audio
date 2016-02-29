@@ -116,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
             public void onCallFinished(String s) {
                 SipuadaLog.info("onCallFinished");
             }
+
+            @Override
+            public void onCallFailure(String reason, String callId) {
+                SipuadaLog.info("onCallFailed");
+            }
+
         }, etUser.getText().toString(), etDomain.getText().toString(), etPassword.getText().toString(),localIpAddress + ":55500/TCP");
 
         androidAudioPlugin = new AndroidAudioSipuadaPlugin(etUser.getText().toString(),localIpAddress, this);
@@ -125,18 +131,13 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread() {
             public void run() {
                 try {
-                    sipuada.registerCaller(new SipuadaApi.RegistrationCallback() {
+                    sipuada.registerAddresses(new SipuadaApi.RegistrationCallback() {
                         @Override
                         public void onRegistrationSuccess(
                                 List<String> registeredContacts) {
 //                                isRegistered = true;
 //                                updateCallButtonState();
                             SipuadaLog.info("Successfully Registered");
-                        }
-
-                        @Override
-                        public void onRegistrationRenewed() {
-                            SipuadaLog.info("onRegistrationRenewed");
                         }
 
                         @Override
