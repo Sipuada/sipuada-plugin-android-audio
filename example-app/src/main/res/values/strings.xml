@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sipuada Android Client</string>
+    <string name="app_name">Sipuada Plugin Android Audio Example</string>
     <string name="domain">Domain</string>
     <string name="user">User</string>
     <string name="register">Register</string>

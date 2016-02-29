@@ -48,12 +48,10 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 	private final Map<String, CallRole> roles = new HashMap<>();
 	private final Map<String, Record> records = new HashMap<>();
-//	private final Map<AudioCodec, Integer> matchCodecs = new HashMap<>();
 	private SipuadaAudioManager mSipuadaAudioManager;
 	private AudioCodec[] myCodecs;
 	private ArrayList<Pair<AudioCodec,Integer>> matchCodecs;
 	AndroidAudioSipuadaPluginConfig config;
-	// Map<CallId, SessionID>
 	Map<String, String> sessionsIds = new HashMap<>();
 
 	public AndroidAudioSipuadaPlugin(String username, String localAddress, Context context) {
