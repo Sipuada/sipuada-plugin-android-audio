@@ -34,9 +34,11 @@ public class SipuadaActivity extends AppCompatActivity {
 
     private static final String TAG = SipuadaActivity.class.toString();
 
-    @Bind(R.id.sipuada_plugins_andrd_audio_ex_register_button) Button registerButton;
+    @Bind(R.id.sipuada_plugins_andrd_audio_ex_register_button_for_bruno) Button brunoRegisterButton;
+    @Bind(R.id.sipuada_plugins_andrd_audio_ex_register_button_for_xibaca) Button xibacaRegisterButton;
 
-    private String mUsername = "bruno";
+    private String mBrunoUsername = "bruno";
+    private String mXibacaUsername = "xibaca";
     private String mPrimaryHost = "192.168.130.207:5060";
 
     private SipuadaService mSipuadaService;
@@ -47,27 +49,41 @@ public class SipuadaActivity extends AppCompatActivity {
             SipuadaService.SipuadaBinder binder = (SipuadaService.SipuadaBinder) service;
             mSipuadaService = binder.getService();
             mBound = true;
-            createUserBindings();
-            registerButton.setEnabled(true);
-            registerButton.setOnClickListener(new View.OnClickListener() {
+
+            mSipuadaService.initialize(createUserBindings());
+
+            final SipuadaApi.RegistrationCallback registerCallback = new SipuadaApi.RegistrationCallback() {
+
+                @Override
+                public void onRegistrationSuccess(List<String> registeredContacts) {
+                    Log.d(TAG, String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
+                            registeredContacts));
+                }
+
+                @Override
+                public void onRegistrationFailed(String reason) {
+                    Log.d(TAG, String.format("[onRegistrationFailed; reason:{%s}]", reason));
+                }
+
+            };
+
+            brunoRegisterButton.setEnabled(true);
+            brunoRegisterButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
-                    Sipuada sipuada = mSipuadaService.getSipuada(mUsername, mPrimaryHost);
-                    sipuada.registerAddresses(new SipuadaApi.RegistrationCallback() {
+                    Sipuada sipuada = mSipuadaService.getSipuada(mBrunoUsername, mPrimaryHost);
+                    sipuada.registerAddresses(registerCallback);
+                }
 
-                        @Override
-                        public void onRegistrationSuccess(List<String> registeredContacts) {
-                            Log.d(TAG, String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
-                                    registeredContacts));
-                        }
+            });
+            xibacaRegisterButton.setEnabled(true);
+            xibacaRegisterButton.setOnClickListener(new View.OnClickListener() {
 
-                        @Override
-                        public void onRegistrationFailed(String reason) {
-                            Log.d(TAG, String.format("[onRegistrationFailed; reason:{%s}]", reason));
-                        }
-
-                    });
+                @Override
+                public void onClick(View view) {
+                    Sipuada sipuada = mSipuadaService.getSipuada(mXibacaUsername, mPrimaryHost);
+                    sipuada.registerAddresses(registerCallback);
                 }
 
             });
@@ -94,8 +110,8 @@ public class SipuadaActivity extends AppCompatActivity {
         super.onStart();
         Intent intent = new Intent(this, SipuadaService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        registerButton.setEnabled(false);
-        registerButton.setOnClickListener(null);
+        brunoRegisterButton.setEnabled(false);
+        brunoRegisterButton.setOnClickListener(null);
     }
 
     @Override
@@ -107,10 +123,9 @@ public class SipuadaActivity extends AppCompatActivity {
         }
     }
 
-    private void createUserBindings() {
+    private List<SipuadaUserBinding> createUserBindings() {
         List<SipuadaUserBinding> usersBindings = new LinkedList<>();
-        usersBindings.add(new SipuadaUserBinding(
-                mUsername, mPrimaryHost, mUsername, new SipuadaApi.SipuadaListener() {
+        SipuadaApi.SipuadaListener listener = new SipuadaApi.SipuadaListener() {
 
             @Override
             public boolean onCallInvitationArrived(String callId) {
@@ -143,8 +158,12 @@ public class SipuadaActivity extends AppCompatActivity {
                 Log.d(TAG, String.format("[onCallFailure; reason:{%s}, callId:{%s}]", reason, callId));
             }
 
-        }, getLocalAddresses()));
-        mSipuadaService.initialize(usersBindings);
+        };
+        usersBindings.add(new SipuadaUserBinding(mBrunoUsername, mPrimaryHost,
+                mBrunoUsername, listener, getLocalAddresses()));
+        usersBindings.add(new SipuadaUserBinding(mXibacaUsername, mPrimaryHost,
+                mXibacaUsername, listener, getLocalAddresses()));
+        return usersBindings;
     }
 
     private String[] getLocalAddresses() {

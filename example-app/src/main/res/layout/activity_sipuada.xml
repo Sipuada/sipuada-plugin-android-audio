@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,14 +7,26 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    android:gravity="center|center_horizontal"
     tools:context="org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity">
 
     <Button
         style="?android:attr/borderlessButtonStyle"
-        android:id="@+id/sipuada_plugins_andrd_audio_ex_register_button"
-        android:layout_width="match_parent"
+        android:id="@+id/sipuada_plugins_andrd_audio_ex_register_button_for_bruno"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/register"/>
+        android:text="REGISTER BRUNO"/>
 
-</RelativeLayout>
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <Button
+        style="?android:attr/borderlessButtonStyle"
+        android:id="@+id/sipuada_plugins_andrd_audio_ex_register_button_for_xibaca"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="REGISTER XIBACA"/>
+
+</LinearLayout>
