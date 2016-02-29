@@ -5,11 +5,12 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "client.audio.android.sipuada.github.org.sipuadaandroidclient"
+        applicationId "org.github.sipuada.plugins.android.audio.example"
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -29,14 +30,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.jakewharton:butterknife:7.0.1'
+    compile project(':library')
+    compile files('libs/slf4j-android-1.6.1-RC1.jar')
     compile files('libs/guava-19.0.jar')
     compile files('libs/log4j-1.2.16.jar')
-    compile files('libs/mockito-all-1.10.19.jar')
-    compile files('libs/slf4j-api-1.7.13.jar')
-    compile files('libs/slf4j-log4j12-1.7.14.jar')
-    compile project(':library')
 }
