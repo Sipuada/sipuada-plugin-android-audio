@@ -108,59 +108,59 @@ public class SipuadaActivity extends AppCompatActivity {
                 }
 
             });
-            xibacaRegisterButton.setEnabled(true);
-            xibacaRegisterButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    Sipuada sipuada = mSipuadaService.getSipuada(mXibacaUsername, mPrimaryHost);
-                    sipuada.registerAddresses(new SipuadaApi.RegistrationCallback() {
-
-                        @Override
-                        public void onRegistrationSuccess(final List<String> registeredContacts) {
-                            Log.d(TAG, String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
-                                    registeredContacts));
-                            runOnUiThread(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    StringBuilder output = new StringBuilder();
-                                    output.append("Success. Registered contacts: ");
-                                    if (registeredContacts.isEmpty()) {
-                                        output.append("none");
-                                    } else {
-                                        output.append(registeredContacts.get(0));
-                                    }
-                                    for (int i = 1; i < registeredContacts.size(); i++) {
-                                        output.append(", ");
-                                        output.append(registeredContacts.get(i));
-                                    }
-                                    output.append(".");
-                                    xibacaRegisterOutput.setText(output.toString());
-                                    xibacaRegisterOutput.setSelected(true);
-                                }
-
-                            });
-                        }
-
-                        @Override
-                        public void onRegistrationFailed(final String reason) {
-                            Log.d(TAG, String.format("[onRegistrationFailed; reason:{%s}]", reason));
-                            runOnUiThread(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    xibacaRegisterOutput.setText(String.format("Failed: %s", reason));
-                                    xibacaRegisterOutput.setSelected(true);
-                                }
-
-                            });
-                        }
-
-                    });
-                }
-
-            });
+//            xibacaRegisterButton.setEnabled(true);
+//            xibacaRegisterButton.setOnClickListener(new View.OnClickListener() {
+//
+//                @Override
+//                public void onClick(View view) {
+//                    Sipuada sipuada = mSipuadaService.getSipuada(mXibacaUsername, mPrimaryHost);
+//                    sipuada.registerAddresses(new SipuadaApi.RegistrationCallback() {
+//
+//                        @Override
+//                        public void onRegistrationSuccess(final List<String> registeredContacts) {
+//                            Log.d(TAG, String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
+//                                    registeredContacts));
+//                            runOnUiThread(new Runnable() {
+//
+//                                @Override
+//                                public void run() {
+//                                    StringBuilder output = new StringBuilder();
+//                                    output.append("Success. Registered contacts: ");
+//                                    if (registeredContacts.isEmpty()) {
+//                                        output.append("none");
+//                                    } else {
+//                                        output.append(registeredContacts.get(0));
+//                                    }
+//                                    for (int i = 1; i < registeredContacts.size(); i++) {
+//                                        output.append(", ");
+//                                        output.append(registeredContacts.get(i));
+//                                    }
+//                                    output.append(".");
+//                                    xibacaRegisterOutput.setText(output.toString());
+//                                    xibacaRegisterOutput.setSelected(true);
+//                                }
+//
+//                            });
+//                        }
+//
+//                        @Override
+//                        public void onRegistrationFailed(final String reason) {
+//                            Log.d(TAG, String.format("[onRegistrationFailed; reason:{%s}]", reason));
+//                            runOnUiThread(new Runnable() {
+//
+//                                @Override
+//                                public void run() {
+//                                    xibacaRegisterOutput.setText(String.format("Failed: %s", reason));
+//                                    xibacaRegisterOutput.setSelected(true);
+//                                }
+//
+//                            });
+//                        }
+//
+//                    });
+//                }
+//
+//            });
         }
 
         @Override
@@ -186,6 +186,8 @@ public class SipuadaActivity extends AppCompatActivity {
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         brunoRegisterButton.setEnabled(false);
         brunoRegisterButton.setOnClickListener(null);
+        xibacaRegisterButton.setEnabled(false);
+        xibacaRegisterButton.setOnClickListener(null);
     }
 
     @Override
@@ -235,8 +237,8 @@ public class SipuadaActivity extends AppCompatActivity {
         };
         usersBindings.add(new SipuadaUserBinding(mBrunoUsername, mPrimaryHost,
                 mBrunoUsername, listener, getLocalAddresses()));
-        usersBindings.add(new SipuadaUserBinding(mXibacaUsername, mPrimaryHost,
-                mXibacaUsername, listener, getLocalAddresses()));
+//        usersBindings.add(new SipuadaUserBinding(mXibacaUsername, mPrimaryHost,
+//                mXibacaUsername, listener, getLocalAddresses()));
         return usersBindings;
     }
 
