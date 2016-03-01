@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
@@ -35,7 +36,9 @@ public class SipuadaActivity extends AppCompatActivity {
     private static final String TAG = SipuadaActivity.class.toString();
 
     @Bind(R.id.sipuada_plugins_andrd_audio_ex_register_button_for_bruno) Button brunoRegisterButton;
+    @Bind(R.id.sipuada_plugins_andrd_audio_ex_register_output_for_bruno) TextView brunoRegisterOutput;
     @Bind(R.id.sipuada_plugins_andrd_audio_ex_register_button_for_xibaca) Button xibacaRegisterButton;
+    @Bind(R.id.sipuada_plugins_andrd_audio_ex_register_output_for_xibaca) TextView xibacaRegisterOutput;
 
     private String mBrunoUsername = "bruno";
     private String mXibacaUsername = "xibaca";
@@ -52,28 +55,56 @@ public class SipuadaActivity extends AppCompatActivity {
 
             mSipuadaService.initialize(createUserBindings());
 
-            final SipuadaApi.RegistrationCallback registerCallback = new SipuadaApi.RegistrationCallback() {
-
-                @Override
-                public void onRegistrationSuccess(List<String> registeredContacts) {
-                    Log.d(TAG, String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
-                            registeredContacts));
-                }
-
-                @Override
-                public void onRegistrationFailed(String reason) {
-                    Log.d(TAG, String.format("[onRegistrationFailed; reason:{%s}]", reason));
-                }
-
-            };
-
             brunoRegisterButton.setEnabled(true);
             brunoRegisterButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
                     Sipuada sipuada = mSipuadaService.getSipuada(mBrunoUsername, mPrimaryHost);
-                    sipuada.registerAddresses(registerCallback);
+                    sipuada.registerAddresses(new SipuadaApi.RegistrationCallback() {
+
+                        @Override
+                        public void onRegistrationSuccess(final List<String> registeredContacts) {
+                            Log.d(TAG, String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
+                                    registeredContacts));
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    StringBuilder output = new StringBuilder();
+                                    output.append("Success. Registered contacts: ");
+                                    if (registeredContacts.isEmpty()) {
+                                        output.append("none");
+                                    } else {
+                                        output.append(registeredContacts.get(0));
+                                    }
+                                    for (int i = 1; i < registeredContacts.size(); i++) {
+                                        output.append(", ");
+                                        output.append(registeredContacts.get(i));
+                                    }
+                                    output.append(".");
+                                    brunoRegisterOutput.setText(output.toString());
+                                    brunoRegisterOutput.setSelected(true);
+                                }
+
+                            });
+                        }
+
+                        @Override
+                        public void onRegistrationFailed(final String reason) {
+                            Log.d(TAG, String.format("[onRegistrationFailed; reason:{%s}]", reason));
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    brunoRegisterOutput.setText(String.format("Failed: %s", reason));
+                                    brunoRegisterOutput.setSelected(true);
+                                }
+
+                            });
+                        }
+
+                    });
                 }
 
             });
@@ -83,7 +114,50 @@ public class SipuadaActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Sipuada sipuada = mSipuadaService.getSipuada(mXibacaUsername, mPrimaryHost);
-                    sipuada.registerAddresses(registerCallback);
+                    sipuada.registerAddresses(new SipuadaApi.RegistrationCallback() {
+
+                        @Override
+                        public void onRegistrationSuccess(final List<String> registeredContacts) {
+                            Log.d(TAG, String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
+                                    registeredContacts));
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    StringBuilder output = new StringBuilder();
+                                    output.append("Success. Registered contacts: ");
+                                    if (registeredContacts.isEmpty()) {
+                                        output.append("none");
+                                    } else {
+                                        output.append(registeredContacts.get(0));
+                                    }
+                                    for (int i = 1; i < registeredContacts.size(); i++) {
+                                        output.append(", ");
+                                        output.append(registeredContacts.get(i));
+                                    }
+                                    output.append(".");
+                                    xibacaRegisterOutput.setText(output.toString());
+                                    xibacaRegisterOutput.setSelected(true);
+                                }
+
+                            });
+                        }
+
+                        @Override
+                        public void onRegistrationFailed(final String reason) {
+                            Log.d(TAG, String.format("[onRegistrationFailed; reason:{%s}]", reason));
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    xibacaRegisterOutput.setText(String.format("Failed: %s", reason));
+                                    xibacaRegisterOutput.setSelected(true);
+                                }
+
+                            });
+                        }
+
+                    });
                 }
 
             });
