@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|center_horizontal">
+
+    <Button
+        style="?android:attr/borderlessButtonStyle"
+        android:id="@+id/sipuada_plugins_andrd_audio_ex_user_operation_entry_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/sipuada_plugins_andrd_audio_ex_user_operation_entry_output"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:ellipsize="marquee"/>
+
+</LinearLayout>
