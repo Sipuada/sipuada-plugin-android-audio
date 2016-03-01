@@ -16,8 +16,8 @@
 *.jar
 !*sipuada.jar
 !*slf4j-android-1.6.1-RC1.jar
-!*slf4j-api-1.7.13.jar
-!*slf4j-log4j12-1.7.14.jar
+!*guava-19.0.jar
+!*log4j-1.2.16.jar
 *.war
 *.ear
 
