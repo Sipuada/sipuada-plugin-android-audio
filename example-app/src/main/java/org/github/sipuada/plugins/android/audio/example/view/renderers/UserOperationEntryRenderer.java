@@ -9,10 +9,10 @@ import android.widget.TextView;
 
 import com.pedrogomez.renderers.Renderer;
 
-import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
+import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
@@ -21,12 +21,10 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class UserOperationEntryRenderer extends Renderer<String> {
+public class UserOperationEntryRenderer extends Renderer<SipuadaUserCredentials> {
 
-    @Bind(R.id.sipuada_plugins_andrd_audio_ex_user_operation_entry_button)
-    Button userOperationEntryButton;
-    @Bind(R.id.sipuada_plugins_andrd_audio_ex_user_operation_entry_output)
-    TextView userOperationEntryOutput;
+    @Bind(R.id.sipuplug_andrdio_example_EntryButton) Button userOperationEntryButton;
+    @Bind(R.id.sipuplug_andrdio_example_EntryTextView) TextView userOperationEntryOutput;
 
     private final SipuadaActivity activity;
 
@@ -42,30 +40,34 @@ public class UserOperationEntryRenderer extends Renderer<String> {
 
     @Override
     protected View inflate(LayoutInflater inflater, ViewGroup parent) {
-        View inflatedView = inflater.inflate(R.layout.user_operation_entry, parent, false);
+        View inflatedView = inflater.inflate(R.layout.item_user_operation_entry, parent, false);
         ButterKnife.bind(this, inflatedView);
         return inflatedView;
     }
 
     @Override
     public void render() {
-        final String username = getContent();
+        SipuadaUserCredentials userCredentials = getContent();
+        final String username = userCredentials.getUsername();
+        final String primaryHost = userCredentials.getPrimaryHost();
         final SipuadaService sipuadaService = activity.getSipuadaService();
         if (sipuadaService == null) {
             userOperationEntryButton.setEnabled(false);
-            userOperationEntryOutput.setText("Binding to SipuadaService...");
+            String statusMessage = "Binding to SipuadaService...";
+            userOperationEntryOutput.setText(statusMessage);
             userOperationEntryButton.setOnClickListener(null);
             return;
         }
         userOperationEntryButton.setText(String.format("REGISTER: {%s}", username));
-        userOperationEntryOutput.setText("Waiting for your command...");
+        String statusMessage = "Waiting for your command...";
+        userOperationEntryOutput.setText(statusMessage);
+        userOperationEntryOutput.setSelected(true);
         userOperationEntryButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                Sipuada sipuada = sipuadaService.getSipuada(username,
-                        SipuadaApplication.PRIMARY_HOST_FROM_DB);
-                sipuada.registerAddresses(new SipuadaApi.RegistrationCallback() {
+                sipuadaService.registerAddresses(username, primaryHost,
+                        new SipuadaApi.RegistrationCallback() {
 
                     @Override
                     public void onRegistrationSuccess(final List<String> registeredContacts) {
@@ -77,7 +79,7 @@ public class UserOperationEntryRenderer extends Renderer<String> {
                             @Override
                             public void run() {
                                 StringBuilder output = new StringBuilder();
-                                output.append("Success. Registered contacts: ");
+                                output.append("Registered contacts: ");
                                 if (registeredContacts.isEmpty()) {
                                     output.append("none");
                                 } else {

@@ -28,10 +28,6 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			return storage.get("offer");
 		}
 
-		public void setOffer(SessionDescription offer) {
-			storage.put("offer", offer);
-		}
-
 		public SessionDescription getAnswer() {
 			return storage.get("answer");
 		}
@@ -307,6 +303,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 	@Override
 	public boolean performSessionTermination(String callId) {
+		mSipuadaAudioManager.stopStreaming();
 		records.remove(callId);
 		return false;
 	}

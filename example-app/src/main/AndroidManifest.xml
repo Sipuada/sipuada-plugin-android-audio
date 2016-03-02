@@ -15,16 +15,32 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".view.SipuadaActivity">
+        <activity
+            android:name=".view.SipuadaActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".view.NewUserCredentialsDialog"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:excludeFromRecents="true"/>
+
         <service
             android:name=".presenter.SipuadaService"
             android:exported="false"/>
+
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="SipuadaPluginAndroidAudio.db"/>
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="1"/>
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="com.github.sipuada.plugins.android.audio.presenter.SipuadaUserCredentials"/>
     </application>
 
 </manifest>

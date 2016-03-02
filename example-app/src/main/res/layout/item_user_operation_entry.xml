@@ -8,12 +8,12 @@
 
     <Button
         style="?android:attr/borderlessButtonStyle"
-        android:id="@+id/sipuada_plugins_andrd_audio_ex_user_operation_entry_button"
+        android:id="@+id/sipuplug_andrdio_example_EntryButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:id="@+id/sipuada_plugins_andrd_audio_ex_user_operation_entry_output"
+        android:id="@+id/sipuplug_andrdio_example_EntryTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
