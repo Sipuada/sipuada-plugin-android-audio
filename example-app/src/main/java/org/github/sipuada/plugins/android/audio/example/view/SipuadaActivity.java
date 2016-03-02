@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,7 +62,7 @@ public class SipuadaActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
             IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-add")
-                    .actionBarSize().colorRes(android.R.color.white);
+                    .actionBarSize().colorRes(android.R.color.darker_gray);
             floatingActionButton.setImageDrawable(iconDrawable);
             floatingActionButton.setEnabled(true);
             floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -88,12 +90,12 @@ public class SipuadaActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(appToolbar);
         appToolbar.setTitle(getTitle());
+        appToolbar.setTitleTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
         adapter = new RVRendererAdapter<>(getLayoutInflater(),
                 new UserOperationEntriesRenderedBuilder(this),
                 new ListAdapteeCollection<>(Arrays.asList(new SipuadaUserCredentials[]{})));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        emptyView.setVisibility(View.VISIBLE);
     }
 
     @Override
