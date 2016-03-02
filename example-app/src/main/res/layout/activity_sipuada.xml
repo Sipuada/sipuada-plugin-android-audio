@@ -22,8 +22,7 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:clipToPadding="false"
-            android:paddingTop="?attr/actionBarSize"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+            android:paddingTop="?attr/actionBarSize"/>
 
         <TextView
             android:id="@+id/sipuplug_andrdio_example_EmptyTextView"

@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,13 +16,16 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+import com.hannesdorfmann.mosby.mvp.MvpActivity;
 import com.joanzapata.iconify.IconDrawable;
 import com.pedrogomez.renderers.ListAdapteeCollection;
 import com.pedrogomez.renderers.RVRendererAdapter;
 
 import org.github.sipuada.plugins.android.audio.example.R;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenter;
+import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
+import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
 import org.github.sipuada.plugins.android.audio.example.view.renderers.UserOperationEntriesRenderedBuilder;
 
 import java.util.Arrays;
@@ -31,7 +34,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class SipuadaActivity extends AppCompatActivity {
+public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresenterApi>
+        implements SipuadaViewApi {
 
     private static final int REQUEST_NEW_USER_CREDENTIALS = 1;
 
@@ -133,6 +137,12 @@ public class SipuadaActivity extends AppCompatActivity {
             unbindService(mConnection);
             mBoundToSipuadaService = false;
         }
+    }
+
+    @NonNull
+    @Override
+    public SipuadaPresenter createPresenter() {
+        return new SipuadaPresenter();
     }
 
 }

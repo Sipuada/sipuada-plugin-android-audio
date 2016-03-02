@@ -93,9 +93,8 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                                 @Override
                                 public void run() {
                                     StringBuilder output = new StringBuilder();
-                                    output.append("Registered contacts: ");
                                     if (registeredContacts.isEmpty()) {
-                                        output.append("none");
+                                        output.append("No registered contacts");
                                     } else {
                                         output.append(registeredContacts.get(0));
                                     }
