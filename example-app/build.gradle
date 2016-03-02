@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
@@ -38,6 +39,11 @@ dependencies {
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.joanzapata.iconify:android-iconify-material:2.0.7'
     compile 'com.github.guilhermesgb:marqueeto:1.1.6'
+    apt 'frankiesardo:icepick-processor:3.0.2'
+    apt 'com.hannesdorfmann.fragmentargs:processor:2.1.0'
+    compile 'com.hannesdorfmann.mosby:core:1.2.0'
+    compile 'com.hannesdorfmann.mosby:mvp:1.2.0'
+    compile 'com.hannesdorfmann.mosby:viewstate:1.2.0'
     compile project(':library')
     compile files('libs/slf4j-android-1.6.1-RC1.jar')
     compile files('libs/guava-19.0.jar')
