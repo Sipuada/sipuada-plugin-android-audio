@@ -3,7 +3,7 @@ package org.github.sipuada.plugins.android.audio.example.view.renderers;
 import com.pedrogomez.renderers.Renderer;
 import com.pedrogomez.renderers.RendererBuilder;
 
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity;
 
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package org.github.sipuada.plugins.android.audio.example.presenter;
+package org.github.sipuada.plugins.android.audio.example.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -22,7 +22,7 @@ import com.pedrogomez.renderers.RVRendererAdapter;
 
 import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.renderers.UserOperationEntriesRenderedBuilder;
 
 import java.util.Arrays;

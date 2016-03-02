@@ -16,6 +16,7 @@ import com.activeandroid.query.Select;
 
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
@@ -205,9 +206,9 @@ public class SipuadaService extends Service {
 //            AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
 //                    new AndroidAudioSipuadaPlugin(userCredentials.username,
 //                            localAddresses[0], getApplicationContext());
-            String username = userCredentials.username;
-            String primaryHost = userCredentials.primaryHost;
-            String password = userCredentials.password;
+            String username = userCredentials.getUsername();
+            String primaryHost = userCredentials.getPrimaryHost();
+            String password = userCredentials.getPassword();
             String[] localAddresses = getLocalAddresses();
             Sipuada sipuada = new Sipuada(sipuadaListener,
                     username, primaryHost, password, localAddresses);

@@ -13,7 +13,7 @@ import com.pedrogomez.renderers.Renderer;
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
