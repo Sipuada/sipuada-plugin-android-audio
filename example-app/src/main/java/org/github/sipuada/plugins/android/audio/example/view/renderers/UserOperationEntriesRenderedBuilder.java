@@ -17,12 +17,12 @@ public class UserOperationEntriesRenderedBuilder extends RendererBuilder<Sipuada
 
     @Override
     protected Class getPrototypeClass(SipuadaUserCredentials content) {
-        return UserOperationEntryRenderer.class;
+        return UserOperationsEntryRenderer.class;
     }
 
     private List<Renderer<SipuadaUserCredentials>> getPrototypes(SipuadaActivity activity) {
         List<Renderer<SipuadaUserCredentials>> prototypes = new LinkedList<>();
-        prototypes.add(new UserOperationEntryRenderer(activity));
+        prototypes.add(new UserOperationsEntryRenderer(activity));
         return prototypes;
     }
 

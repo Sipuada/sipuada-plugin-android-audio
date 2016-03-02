@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:marqueeto="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center|center_horizontal">
+
+    <TextView
+        android:id="@+id/sipuplug_andrdio_example_EntryUsernameAtAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:textSize="20sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:ellipsize="marquee"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/sipuplug_andrdio_example_RegisterButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="Register"
+            android:textAllCaps="true"
+            tools:ignore="HardcodedText"/>
+
+        <TextView
+            android:id="@+id/sipuplug_andrdio_example_RegisterOutput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:gravity="center|top"
+            android:singleLine="true"
+            android:lines="1"
+            android:ellipsize="marquee"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/sipuplug_andrdio_example_InviteButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Invite"
+            android:textAllCaps="true"
+            tools:ignore="HardcodedText"/>
+
+        <com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText
+            android:id="@+id/sipuplug_andrdio_example_InviteUser"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:inputType="text"
+            android:hint="User:"
+            android:textColor="@android:color/darker_gray"
+            marqueeto:mode="edit"
+            tools:ignore="HardcodedText"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sipuplug_andrdio_example_InviteOutput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center|top"
+        android:singleLine="true"
+        android:lines="1"
+        android:ellipsize="marquee"/>
+
+</LinearLayout>

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -62,7 +61,7 @@ public class SipuadaActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
             IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-add")
-                    .actionBarSize().colorRes(android.R.color.darker_gray);
+                    .actionBarSize().colorRes(android.R.color.black);
             floatingActionButton.setImageDrawable(iconDrawable);
             floatingActionButton.setEnabled(true);
             floatingActionButton.setOnClickListener(new View.OnClickListener() {
