@@ -41,6 +41,7 @@ public class SipuadaService extends Service {
     private static final int INITIALIZE_SIPUADAS = 0;
     private static final int ADD_NEW_SIPUADA = 1;
     private static final int REGISTER_ADDRESSES = 2;
+    private static final int INVITE_USER = 3;
 
     private final class SipuadaServiceHandler extends Handler {
 
@@ -59,6 +60,9 @@ public class SipuadaService extends Service {
                     break;
                 case REGISTER_ADDRESSES:
                     doRegisterAddresses((RegisterAddressesOperation) message.obj);
+                    break;
+                case INVITE_USER:
+                    doInviteUser((InviteUserOperation) message.obj);
                     break;
                 default:
                     break;
@@ -144,6 +148,56 @@ public class SipuadaService extends Service {
         serviceHandler.sendMessage(message);
     }
 
+    protected class InviteUserOperation {
+
+        private final String username;
+        private final String primaryHost;
+        private final String remoteUsername;
+        private final String remoteHost;
+        private final SipuadaApi.CallInvitationCallback callback;
+
+        public InviteUserOperation(String username, String primaryHost,
+                                   String remoteUsername, String remoteHost,
+                                   SipuadaApi.CallInvitationCallback callback) {
+            this.username = username;
+            this.primaryHost = primaryHost;
+            this.remoteUsername = remoteUsername;
+            this.remoteHost = remoteHost;
+            this.callback = callback;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPrimaryHost() {
+            return primaryHost;
+        }
+
+        public String getRemoteUsername() {
+            return remoteUsername;
+        }
+
+        public String getRemoteHost() {
+            return remoteHost;
+        }
+
+        public SipuadaApi.CallInvitationCallback getCallback() {
+            return callback;
+        }
+
+    }
+
+    public void inviteAddresses(String username, String primaryHost, String remoteUser,
+                                SipuadaApi.CallInvitationCallback callback) {
+        Message message = serviceHandler.obtainMessage(INVITE_USER);
+        String remoteUsername = remoteUser.split("@")[0];
+        String remoteHost = remoteUser.split("@")[1];
+        message.obj = new InviteUserOperation(username, primaryHost,
+                remoteUsername, remoteHost, callback);
+        serviceHandler.sendMessage(message);
+    }
+
     private void initialize() {
         List<SipuadaUserCredentials> usersCredentials = new Select()
                 .from(SipuadaUserCredentials.class).execute();
@@ -209,6 +263,12 @@ public class SipuadaService extends Service {
     private void doRegisterAddresses(RegisterAddressesOperation operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.registerAddresses(operation.getCallback());
+    }
+
+    private void doInviteUser(InviteUserOperation operation) {
+        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
+        sipuada.inviteToCall(operation.getRemoteUsername(), operation.getRemoteHost(),
+                operation.getCallback());
     }
 
     private Sipuada getSipuada(String username, String primaryHost) {
