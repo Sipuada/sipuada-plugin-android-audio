@@ -2,7 +2,9 @@ package org.github.sipuada.plugins.android.audio.example.presenter;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
@@ -10,10 +12,19 @@ import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
+import java.util.List;
+
 public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
         implements SipuadaPresenterApi {
 
     private SipuadaService mSipuadaService;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    public interface FetchUsersCredentialsCallback {
+
+        void onSuccess(List<SipuadaUserCredentials> usersCredentials);
+
+    }
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -24,6 +35,7 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
             if (isViewAttached()) {
                 //noinspection ConstantConditions
                 getView().sipuadaServiceConnected();
+                fetchCurrentUsersCredentialsThenRefresh();
             }
         }
 
@@ -62,6 +74,7 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
     @Override
     public void createSipuada(String username, String primaryHost, String password) {
         mSipuadaService.createSipuada(new SipuadaUserCredentials(username, primaryHost, password));
+        fetchCurrentUsersCredentialsThenRefresh();
     }
 
     @Override
@@ -74,6 +87,27 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
     public void inviteUser(String username, String primaryHost, String remoteUser,
                            SipuadaApi.CallInvitationCallback callback) {
         mSipuadaService.inviteUser(username, primaryHost, remoteUser, callback);
+    }
+
+    private void fetchCurrentUsersCredentialsThenRefresh() {
+        mSipuadaService.fetchCurrentUsersCredentials(new FetchUsersCredentialsCallback() {
+
+            @Override
+            public void onSuccess(final List<SipuadaUserCredentials> usersCredentials) {
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (isViewAttached()) {
+                            //noinspection ConstantConditions
+                            getView().refreshViewData(usersCredentials);
+                        }
+                    }
+
+                });
+            }
+
+        });
     }
 
 }

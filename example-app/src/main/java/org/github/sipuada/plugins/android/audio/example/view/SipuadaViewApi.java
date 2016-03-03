@@ -4,6 +4,10 @@ import android.content.ServiceConnection;
 
 import com.hannesdorfmann.mosby.mvp.MvpView;
 
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
+
+import java.util.List;
+
 public interface SipuadaViewApi extends MvpView {
 
     boolean doBindToSipuadaService(ServiceConnection serviceConnection);
@@ -13,5 +17,7 @@ public interface SipuadaViewApi extends MvpView {
     void sipuadaServiceDisconnected();
 
     void doUnbindFromSipuadaService(ServiceConnection serviceConnection);
+
+    void refreshViewData(List<SipuadaUserCredentials> usersCredentials);
 
 }

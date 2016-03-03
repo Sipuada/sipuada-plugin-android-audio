@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
             android:inputType="text"
-            android:hint="Remote User (username@host):"
+            android:hint="Remote User @ Host:"
             android:textColor="@android:color/darker_gray"
             marqueeto:mode="edit"
             marqueeto:labelledMarqueeEditTextStyle="@style/OperationsEntryLabelledMarqueeEditTextAppearance"

@@ -40,9 +40,10 @@ public class SipuadaService extends Service {
     private Map<String, Sipuada> sipuadaInstances = new HashMap<>();
 
     private static final int INITIALIZE_SIPUADAS = 0;
-    private static final int ADD_NEW_SIPUADA = 1;
-    private static final int REGISTER_ADDRESSES = 2;
-    private static final int INVITE_USER = 3;
+    private static final int FETCH_USERS_CREDENTIALS = 1;
+    private static final int ADD_NEW_SIPUADA = 2;
+    private static final int REGISTER_ADDRESSES = 3;
+    private static final int INVITE_USER = 4;
 
     private final class SipuadaServiceHandler extends Handler {
 
@@ -55,6 +56,10 @@ public class SipuadaService extends Service {
             switch(message.what) {
                 case INITIALIZE_SIPUADAS:
                     initialize();
+                    break;
+                case FETCH_USERS_CREDENTIALS:
+                    doFetchCurrentUsersCredentials((SipuadaPresenter
+                            .FetchUsersCredentialsCallback) message.obj);
                     break;
                 case ADD_NEW_SIPUADA:
                     doCreateSipuada((SipuadaUserCredentials) message.obj);
@@ -107,6 +112,12 @@ public class SipuadaService extends Service {
             sipuada.destroySipuada();
         }
         super.onDestroy();
+    }
+
+    public void fetchCurrentUsersCredentials(SipuadaPresenter.FetchUsersCredentialsCallback callback) {
+        Message message = serviceHandler.obtainMessage(FETCH_USERS_CREDENTIALS);
+        message.obj = callback;
+        serviceHandler.sendMessage(message);
     }
 
     public void createSipuada(SipuadaUserCredentials userCredentials) {
@@ -215,6 +226,12 @@ public class SipuadaService extends Service {
 //            sipuada.registerPlugin(sipuadaPluginForAudio);
             sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
         }
+    }
+
+    private void doFetchCurrentUsersCredentials(SipuadaPresenter.FetchUsersCredentialsCallback callback) {
+        List<SipuadaUserCredentials> usersCredentials = new Select()
+                .from(SipuadaUserCredentials.class).execute();
+        callback.onSuccess(usersCredentials);
     }
 
     private void doCreateSipuada(SipuadaUserCredentials userCredentials) {

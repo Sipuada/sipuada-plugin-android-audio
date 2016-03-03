@@ -138,6 +138,10 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
         String statusMessage = "Waiting for your command...";
         inviteOutput.setText(statusMessage);
         inviteOutput.setSelected(true);
+        final String remoteUser = inviteUser.getText();
+        if (remoteUser == null || remoteUser.trim().isEmpty() || !remoteUser.contains("@")) {
+            return;
+        }
         inviteButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -145,7 +149,6 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 String statusMessage = "Please wait...";
                 inviteOutput.setText(statusMessage);
                 inviteButton.setEnabled(false);
-                final String remoteUser = inviteUser.getText();
                 presenter.inviteUser(username, primaryHost, remoteUser,
                         new SipuadaApi.CallInvitationCallback() {
 

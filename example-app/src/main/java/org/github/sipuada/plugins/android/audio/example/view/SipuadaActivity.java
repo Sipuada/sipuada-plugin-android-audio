@@ -13,7 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.activeandroid.query.Select;
 import com.hannesdorfmann.mosby.mvp.MvpActivity;
 import com.joanzapata.iconify.IconDrawable;
 import com.pedrogomez.renderers.ListAdapteeCollection;
@@ -53,6 +52,9 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
         setSupportActionBar(appToolbar);
         appToolbar.setTitle(getTitle());
         appToolbar.setTitleTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
+        IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-add")
+                .actionBarSize().colorRes(android.R.color.black);
+        floatingActionButton.setImageDrawable(iconDrawable);
         adapter = new RVRendererAdapter<>(getLayoutInflater(),
                 new UserOperationEntriesRenderedBuilder(getPresenter()),
                 new ListAdapteeCollection<>(Arrays.asList(new SipuadaUserCredentials[]{})));
@@ -77,19 +79,6 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
     @Override
     public void sipuadaServiceConnected() {
         mBoundToSipuadaService = true;
-        adapter.clear();
-        List<SipuadaUserCredentials> usersCredentials = new Select()
-                .from(SipuadaUserCredentials.class).execute();
-        adapter.addAll(new ListAdapteeCollection<>(usersCredentials));
-        if (usersCredentials.isEmpty()) {
-            emptyView.setVisibility(View.VISIBLE);
-        } else {
-            emptyView.setVisibility(View.GONE);
-        }
-        adapter.notifyDataSetChanged();
-        IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-add")
-                .actionBarSize().colorRes(android.R.color.black);
-        floatingActionButton.setImageDrawable(iconDrawable);
         floatingActionButton.setEnabled(true);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
 
@@ -115,11 +104,6 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
             String primaryHost = data.getStringExtra("primaryHost");
             String password = data.getStringExtra("password");
             getPresenter().createSipuada(username, primaryHost, password);
-            adapter.clear();
-            List<SipuadaUserCredentials> usersCredentials = new Select()
-                    .from(SipuadaUserCredentials.class).execute();
-            adapter.addAll(new ListAdapteeCollection<>(usersCredentials));
-            adapter.notifyDataSetChanged();
         }
     }
 
@@ -140,6 +124,18 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
     @Override
     public SipuadaPresenter createPresenter() {
         return new SipuadaPresenter();
+    }
+
+    @Override
+    public void refreshViewData(List<SipuadaUserCredentials> usersCredentials) {
+        adapter.clear();
+        adapter.addAll(new ListAdapteeCollection<>(usersCredentials));
+        if (usersCredentials.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+        adapter.notifyDataSetChanged();
     }
 
 }
