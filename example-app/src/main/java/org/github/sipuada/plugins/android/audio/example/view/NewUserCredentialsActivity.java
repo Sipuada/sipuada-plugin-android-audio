@@ -2,19 +2,18 @@ package org.github.sipuada.plugins.android.audio.example.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText;
+import com.hannesdorfmann.mosby.MosbyActivity;
 
 import org.github.sipuada.plugins.android.audio.example.R;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 
-public class NewUserCredentialsDialog extends AppCompatActivity {
+public class NewUserCredentialsActivity extends MosbyActivity {
 
     @Bind(R.id.sipuplug_andrdio_example_UsernameMarqueeto) LabelledMarqueeEditText usernameEditText;
     @Bind(R.id.sipuplug_andrdio_example_PrimaryHostMarqueeto) LabelledMarqueeEditText primaryHostEditText;
@@ -25,7 +24,6 @@ public class NewUserCredentialsDialog extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_new_user_credentials);
-        ButterKnife.bind(this);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         submitButton.setOnClickListener(new View.OnClickListener() {

@@ -252,7 +252,7 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
                     public void run() {
                         if (isViewAttached()) {
                             //noinspection ConstantConditions
-                            getView().refreshViewData(usersCredentials);
+                            getView().refreshUsersCredentialsList(usersCredentials);
                         }
                     }
 

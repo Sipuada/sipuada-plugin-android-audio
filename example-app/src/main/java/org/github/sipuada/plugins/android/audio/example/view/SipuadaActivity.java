@@ -84,7 +84,7 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
 
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), NewUserCredentialsDialog.class);
+                Intent intent = new Intent(getApplicationContext(), NewUserCredentialsActivity.class);
                 startActivityForResult(intent, REQUEST_NEW_USER_CREDENTIALS);
             }
 
@@ -127,7 +127,7 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
     }
 
     @Override
-    public void refreshViewData(List<SipuadaUserCredentials> usersCredentials) {
+    public void refreshUsersCredentialsList(List<SipuadaUserCredentials> usersCredentials) {
         adapter.clear();
         adapter.addAll(new ListAdapteeCollection<>(usersCredentials));
         if (usersCredentials.isEmpty()) {

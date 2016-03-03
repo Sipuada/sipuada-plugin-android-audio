@@ -24,9 +24,14 @@
         </activity>
 
         <activity
-            android:name=".view.NewUserCredentialsDialog"
+            android:name=".view.NewUserCredentialsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:excludeFromRecents="true"/>
+
+        <activity
+            android:name=".view.IncomingCallInvitationActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:launchMode="singleTop"/>
 
         <service
             android:name=".presenter.SipuadaService"

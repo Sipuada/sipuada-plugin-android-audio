@@ -18,6 +18,7 @@ import com.google.common.eventbus.EventBus;
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.view.IncomingCallInvitationActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
@@ -347,7 +348,8 @@ public class SipuadaService extends Service {
             Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
                     " callId:{%s}]", callId));
             if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
-                Intent intent = new Intent(getApplicationContext(), SipuadaActivity.class);
+                Intent intent = new Intent(getApplicationContext(),
+                        IncomingCallInvitationActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }

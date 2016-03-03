@@ -18,6 +18,6 @@ public interface SipuadaViewApi extends MvpView {
 
     void doUnbindFromSipuadaService(ServiceConnection serviceConnection);
 
-    void refreshViewData(List<SipuadaUserCredentials> usersCredentials);
+    void refreshUsersCredentialsList(List<SipuadaUserCredentials> usersCredentials);
 
 }
