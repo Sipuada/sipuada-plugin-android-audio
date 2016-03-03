@@ -73,6 +73,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
         String statusMessage = "Waiting for your command...";
         registerOutput.setText(statusMessage);
         registerOutput.setSelected(true);
+        registerButton.setEnabled(true);
         registerButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -121,7 +122,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                                 public void run() {
                                     registerOutput.setText(String.format("Failed: %s", reason));
                                     registerOutput.setSelected(true);
-                                    registerButton.setEnabled(false);
+                                    registerButton.setEnabled(true);
                                 }
 
                             });
@@ -138,14 +139,15 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
         String statusMessage = "Waiting for your command...";
         inviteOutput.setText(statusMessage);
         inviteOutput.setSelected(true);
-        final String remoteUser = inviteUser.getText();
-        if (remoteUser == null || remoteUser.trim().isEmpty() || !remoteUser.contains("@")) {
-            return;
-        }
+        inviteButton.setEnabled(true);
         inviteButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
+                final String remoteUser = inviteUser.getText();
+                if (remoteUser == null || remoteUser.trim().isEmpty() || !remoteUser.contains("@")) {
+                    return;
+                }
                 String statusMessage = "Please wait...";
                 inviteOutput.setText(statusMessage);
                 inviteButton.setEnabled(false);
