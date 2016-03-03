@@ -46,6 +46,8 @@ public interface SipuadaPresenterApi extends MvpPresenter<SipuadaViewApi> {
     void inviteUser(String username, String primaryHost, String remoteUser,
                     CallInvitationCallback callback);
 
+    void cancelInviteToUser(String username, String primaryHost, String callId);
+
     class CallInvitationCanceled {
 
         private final String reason;

@@ -69,6 +69,18 @@
             android:gravity="start|center_vertical"
             tools:ignore="HardcodedText"/>
 
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/sipuplug_andrdio_example_CancelButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Cancel"
+            android:textAllCaps="true"
+            android:gravity="start|center_vertical"
+            android:visibility="gone"
+            tools:ignore="HardcodedText"/>
+
         <com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText
             android:id="@+id/sipuplug_andrdio_example_InviteUser"
             android:layout_width="0dp"

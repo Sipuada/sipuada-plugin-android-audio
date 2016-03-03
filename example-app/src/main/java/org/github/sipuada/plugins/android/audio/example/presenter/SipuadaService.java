@@ -46,6 +46,7 @@ public class SipuadaService extends Service {
     private static final int ADD_NEW_SIPUADA = 2;
     private static final int REGISTER_ADDRESSES = 3;
     private static final int INVITE_USER = 4;
+    private static final int CANCEL_USER_INVITE = 5;
 
     private final class SipuadaServiceHandler extends Handler {
 
@@ -71,6 +72,9 @@ public class SipuadaService extends Service {
                     break;
                 case INVITE_USER:
                     doInviteUser((InviteUserOperation) message.obj);
+                    break;
+                case CANCEL_USER_INVITE:
+                    doCancelInviteToUser((CancelUserInviteOperation) message.obj);
                     break;
                 default:
                     break;
@@ -216,6 +220,38 @@ public class SipuadaService extends Service {
         serviceHandler.sendMessage(message);
     }
 
+    protected class CancelUserInviteOperation {
+
+        private final String username;
+        private final String primaryHost;
+        private final String callId;
+
+        public CancelUserInviteOperation(String username, String primaryHost, String callId) {
+            this.username = username;
+            this.primaryHost = primaryHost;
+            this.callId = callId;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPrimaryHost() {
+            return primaryHost;
+        }
+
+        public String getCallId() {
+            return callId;
+        }
+
+    }
+
+    public void cancelInviteToUser(String username, String primaryHost, String callId) {
+        Message message = serviceHandler.obtainMessage(CANCEL_USER_INVITE);
+        message.obj = new CancelUserInviteOperation(username, primaryHost, callId);
+        serviceHandler.sendMessage(message);
+    }
+
     private void initialize() {
         List<SipuadaUserCredentials> usersCredentials = new Select()
                 .from(SipuadaUserCredentials.class).execute();
@@ -293,6 +329,11 @@ public class SipuadaService extends Service {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.inviteToCall(operation.getRemoteUsername(), operation.getRemoteHost(),
                 operation.getCallback());
+    }
+
+    public void doCancelInviteToUser(CancelUserInviteOperation operation) {
+        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
+        sipuada.cancelCallInvitation(operation.getCallId());
     }
 
     private Sipuada getSipuada(String username, String primaryHost) {

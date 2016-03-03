@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
-        implements SipuadaPresenterApi {
+public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implements SipuadaPresenterApi {
 
     private SipuadaService mSipuadaService;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -177,6 +176,10 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
         });
     }
 
+    @Override
+    public void cancelInviteToUser(String username, String primaryHost, String callId) {
+        mSipuadaService.cancelInviteToUser(username, primaryHost, callId);
+    }
 
     @Override
     @Subscribe
