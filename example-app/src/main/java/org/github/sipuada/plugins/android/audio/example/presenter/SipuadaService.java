@@ -331,18 +331,21 @@ public class SipuadaService extends Service {
         public void onCallEstablished(String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallEstablished;" +
                     " callId:{%s}]", callId));
+            eventBus.post(new SipuadaPresenterApi.EstablishedCallStarted(callId));
         }
 
         @Override
         public void onCallFinished(String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFinished;" +
                     " callId:{%s}]", callId));
+            eventBus.post(new SipuadaPresenterApi.EstablishedCallFinished(callId));
         }
 
         @Override
         public void onCallFailure(String reason, String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFailure;" +
                     " reason:{%s}, callId:{%s}]", reason, callId));
+            eventBus.post(new SipuadaPresenterApi.EstablishedCallFailed(reason, callId));
         }
 
     };

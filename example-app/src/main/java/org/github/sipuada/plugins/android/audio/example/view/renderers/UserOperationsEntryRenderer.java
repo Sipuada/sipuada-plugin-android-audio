@@ -1,8 +1,5 @@
 package org.github.sipuada.plugins.android.audio.example.view.renderers;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +9,9 @@ import android.widget.TextView;
 import com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText;
 import com.pedrogomez.renderers.Renderer;
 
-import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
 import java.util.List;
 
@@ -33,7 +28,6 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
     @Bind(R.id.sipuplug_andrdio_example_InviteOutput) TextView inviteOutput;
 
     private final SipuadaPresenterApi presenter;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public UserOperationsEntryRenderer(SipuadaPresenterApi presenter) {
         this.presenter = presenter;
@@ -82,50 +76,31 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 registerOutput.setText(statusMessage);
                 registerButton.setEnabled(false);
                 presenter.registerAddresses(username, primaryHost,
-                    new SipuadaApi.RegistrationCallback() {
+                    new SipuadaPresenterApi.RegistrationCallback() {
 
                         @Override
-                        public void onRegistrationSuccess(final List<String> registeredContacts) {
-                            Log.d(SipuadaApplication.TAG,
-                                    String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
-                                            registeredContacts));
-                            mainHandler.post(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    StringBuilder output = new StringBuilder();
-                                    if (registeredContacts.isEmpty()) {
-                                        output.append("No registered contacts");
-                                    } else {
-                                        output.append(registeredContacts.get(0));
-                                    }
-                                    for (int i = 1; i < registeredContacts.size(); i++) {
-                                        output.append(", ");
-                                        output.append(registeredContacts.get(i));
-                                    }
-                                    output.append(".");
-                                    registerOutput.setText(output.toString());
-                                    registerOutput.setSelected(true);
-                                    registerButton.setEnabled(true);
-                                }
-
-                            });
+                        public void onSuccess(final List<String> registeredContacts) {
+                            StringBuilder output = new StringBuilder();
+                            if (registeredContacts.isEmpty()) {
+                                output.append("No registered contacts");
+                            } else {
+                                output.append(registeredContacts.get(0));
+                            }
+                            for (int i = 1; i < registeredContacts.size(); i++) {
+                                output.append(", ");
+                                output.append(registeredContacts.get(i));
+                            }
+                            output.append(".");
+                            registerOutput.setText(output.toString());
+                            registerOutput.setSelected(true);
+                            registerButton.setEnabled(true);
                         }
 
                         @Override
-                        public void onRegistrationFailed(final String reason) {
-                            Log.d(SipuadaApplication.TAG,
-                                    String.format("[onRegistrationFailed; reason:{%s}]", reason));
-                            mainHandler.post(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    registerOutput.setText(String.format("Failed: %s", reason));
-                                    registerOutput.setSelected(true);
-                                    registerButton.setEnabled(true);
-                                }
-
-                            });
+                        public void onFailed(final String reason) {
+                            registerOutput.setText(String.format("Failed: %s", reason));
+                            registerOutput.setSelected(true);
+                            registerButton.setEnabled(true);
                         }
 
                     }
@@ -152,60 +127,57 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 inviteOutput.setText(statusMessage);
                 inviteButton.setEnabled(false);
                 presenter.inviteUser(username, primaryHost, remoteUser,
-                        new SipuadaApi.CallInvitationCallback() {
+                    new SipuadaPresenterApi.CallInvitationCallback() {
 
-                            @Override
-                            public void onWaitingForCallInvitationAnswer(String callId) {
-                                Log.d(SipuadaApplication.TAG, String
-                                        .format("[onWaitingForCallInvitationAnswer; callId:{%s}]", callId));
-                                mainHandler.post(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        inviteOutput.setText(String
-                                                .format("Waiting for answer from: %s", remoteUser));
-                                        inviteOutput.setSelected(true);
-                                        inviteButton.setEnabled(true);
-                                    }
-
-                                });
-                            }
-
-                            @Override
-                            public void onCallInvitationRinging(String callId) {
-                                Log.d(SipuadaApplication.TAG,
-                                        String.format("[onCallInvitationRinging; callId:{%s}]", callId));
-                                mainHandler.post(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        inviteOutput.setText(String
-                                                .format("%s's softphone is ringing!", remoteUser));
-                                        inviteOutput.setSelected(true);
-                                        inviteButton.setEnabled(true);
-                                    }
-
-                                });
-                            }
-
-                            @Override
-                            public void onCallInvitationDeclined(String callId) {
-                                Log.d(SipuadaApplication.TAG,
-                                        String.format("[onCallInvitationDeclined; callId:{%s}]", callId));
-                                mainHandler.post(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        inviteOutput.setText(String
-                                                .format("%s' declined your invite.", remoteUser));
-                                        inviteOutput.setSelected(true);
-                                        inviteButton.setEnabled(true);
-                                    }
-
-                                });
-                            }
+                        @Override
+                        public void onWaiting(String callId) {
+                            inviteOutput.setText(String
+                                    .format("Waiting for answer from: %s", remoteUser));
+                            inviteOutput.setSelected(true);
+                            inviteButton.setEnabled(true);
                         }
 
+                        @Override
+                        public void onRinging(String callId) {
+                            inviteOutput.setText(String
+                                    .format("%s's softphone is ringing!", remoteUser));
+                            inviteOutput.setSelected(true);
+                            inviteButton.setEnabled(true);
+                        }
+
+                        @Override
+                        public void onDeclined() {
+                            inviteOutput.setText(String
+                                    .format("%s' declined your invite.", remoteUser));
+                            inviteOutput.setSelected(true);
+                            inviteButton.setEnabled(true);
+                        }
+
+                        @Override
+                        public void onAccepted(String callId) {
+                            inviteOutput.setText(String
+                                    .format("%s' accepted your invite.", remoteUser));
+                            inviteOutput.setSelected(true);
+                            inviteButton.setEnabled(true);
+                        }
+
+                        @Override
+                        public void onFailed(final String reason) {
+                            inviteOutput.setText(String
+                                    .format("Failed: %s", reason));
+                            inviteOutput.setSelected(true);
+                            inviteButton.setEnabled(true);
+                        }
+
+                        @Override
+                        public void onCanceled(final String reason) {
+                            inviteOutput.setText(String
+                                    .format("Canceled: %s", reason));
+                            inviteOutput.setSelected(true);
+                            inviteButton.setEnabled(true);
+                        }
+
+                    }
                 );
             }
 

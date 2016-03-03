@@ -3,8 +3,9 @@ package org.github.sipuada.plugins.android.audio.example.presenter;
 import com.google.common.eventbus.Subscribe;
 import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
-import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
+
+import java.util.List;
 
 public interface SipuadaPresenterApi extends MvpPresenter<SipuadaViewApi> {
 
@@ -16,11 +17,34 @@ public interface SipuadaPresenterApi extends MvpPresenter<SipuadaViewApi> {
 
     void createSipuada(String username, String primaryHost, String password);
 
-    void registerAddresses(String username, String primaryHost,
-                           SipuadaApi.RegistrationCallback callback);
+    interface RegistrationCallback {
+
+        void onSuccess(List<String> registeredContacts);
+
+        void onFailed(String reason);
+
+    }
+
+    void registerAddresses(String username, String primaryHost, RegistrationCallback callback);
+
+    interface CallInvitationCallback {
+
+        void onWaiting(String callId);
+
+        void onRinging(String callId);
+
+        void onDeclined();
+
+        void onAccepted(String callId);
+
+        void onFailed(String reason);
+
+        void onCanceled(String reason);
+
+    }
 
     void inviteUser(String username, String primaryHost, String remoteUser,
-                    SipuadaApi.CallInvitationCallback callback);
+                    CallInvitationCallback callback);
 
     class CallInvitationCanceled {
 
@@ -41,7 +65,6 @@ public interface SipuadaPresenterApi extends MvpPresenter<SipuadaViewApi> {
         }
 
     }
-
     @Subscribe
     void onCallInvitationCanceled(CallInvitationCanceled event);
 
@@ -64,8 +87,61 @@ public interface SipuadaPresenterApi extends MvpPresenter<SipuadaViewApi> {
         }
 
     }
-
     @Subscribe
     void onCallInvitationFailed(CallInvitationFailed event);
+
+    class EstablishedCallStarted {
+
+        private final String callId;
+
+        public EstablishedCallStarted(String callId) {
+            this.callId = callId;
+        }
+
+        public String getCallId() {
+            return callId;
+        }
+
+    }
+    @Subscribe
+    void onCallEstablished(EstablishedCallStarted event);
+
+    class EstablishedCallFinished {
+
+        private final String callId;
+
+        public EstablishedCallFinished(String callId) {
+            this.callId = callId;
+        }
+
+        public String getCallId() {
+            return callId;
+        }
+
+    }
+    @Subscribe
+    void onCallFinished(EstablishedCallFinished event);
+
+    class EstablishedCallFailed {
+
+        private final String reason;
+        private final String callId;
+
+        public EstablishedCallFailed(String reason, String callId) {
+            this.reason = reason;
+            this.callId = callId;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public String getCallId() {
+            return callId;
+        }
+
+    }
+    @Subscribe
+    void onCallFailure(EstablishedCallFailed event);
 
 }

@@ -5,14 +5,20 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 
+import com.google.common.eventbus.Subscribe;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
         implements SipuadaPresenterApi {
@@ -79,24 +85,156 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
     }
 
     @Override
-    public void registerAddresses(String username, String primaryHost,
-                                  SipuadaApi.RegistrationCallback callback) {
-        mSipuadaService.registerAddresses(username, primaryHost, callback);
+    public void registerAddresses(String username, String primaryHost, final RegistrationCallback callback) {
+        mSipuadaService.registerAddresses(username, primaryHost, new SipuadaApi.RegistrationCallback() {
+
+            @Override
+            public void onRegistrationSuccess(final List<String> registeredContacts) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
+                                registeredContacts));
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onSuccess(registeredContacts);
+                    }
+
+                });
+            }
+
+            @Override
+            public void onRegistrationFailed(final String reason) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onRegistrationFailed; reason:{%s}]", reason));
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onFailed(reason);
+                    }
+
+                });
+            }
+
+        });
     }
+
+    private final Map<String, CallInvitationCallback> callInvitationResults =
+            Collections.synchronizedMap(new HashMap<String, CallInvitationCallback>());
 
     @Override
     public void inviteUser(String username, String primaryHost, String remoteUser,
-                           SipuadaApi.CallInvitationCallback callback) {
-        mSipuadaService.inviteUser(username, primaryHost, remoteUser, callback);
+                           final CallInvitationCallback callback) {
+        mSipuadaService.inviteUser(username, primaryHost, remoteUser,
+                new SipuadaApi.CallInvitationCallback() {
+
+            @Override
+            public void onWaitingForCallInvitationAnswer(final String callId) {
+                Log.d(SipuadaApplication.TAG, String
+                        .format("[onWaitingForCallInvitationAnswer; callId:{%s}]", callId));
+                callInvitationResults.put(callId, callback);
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onWaiting(callId);
+                    }
+
+                });
+            }
+
+            @Override
+            public void onCallInvitationRinging(final String callId) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onCallInvitationRinging; callId:{%s}]", callId));
+                callInvitationResults.put(callId, callback);
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onRinging(callId);
+                    }
+
+                });
+            }
+
+            @Override
+            public void onCallInvitationDeclined(final String callId) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onCallInvitationDeclined; callId:{%s}]", callId));
+                callInvitationResults.put(callId, callback);
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onDeclined();
+                    }
+
+                });
+            }
+
+        });
+    }
+
+
+    @Override
+    @Subscribe
+    public void onCallInvitationCanceled(final CallInvitationCanceled event) {
+        final CallInvitationCallback callback = callInvitationResults.get(event.getCallId());
+        if (callback != null) {
+            mainHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    callback.onCanceled(event.getReason());
+                }
+
+            });
+        }
     }
 
     @Override
-    public void onCallInvitationCanceled(CallInvitationCanceled event) {
+    @Subscribe
+    public void onCallInvitationFailed(final CallInvitationFailed event) {
+        final CallInvitationCallback callback = callInvitationResults.get(event.getCallId());
+        if (callback != null) {
+            mainHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    callback.onFailed(event.getReason());
+                }
+
+            });
+        }
+    }
+
+    @Override
+    @Subscribe
+    public void onCallEstablished(final EstablishedCallStarted event) {
+        final CallInvitationCallback callback = callInvitationResults.get(event.getCallId());
+        if (callback != null) {
+            mainHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    callback.onAccepted(event.getCallId());
+                }
+
+            });
+        }
+    }
+
+    @Override
+    @Subscribe
+    public void onCallFinished(EstablishedCallFinished event) {
 
     }
 
     @Override
-    public void onCallInvitationFailed(CallInvitationFailed event) {
+    @Subscribe
+    public void onCallFailure(EstablishedCallFailed event) {
 
     }
 
