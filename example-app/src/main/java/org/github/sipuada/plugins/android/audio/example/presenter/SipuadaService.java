@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.activeandroid.query.Select;
+import com.google.common.eventbus.EventBus;
 
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
@@ -37,7 +38,8 @@ public class SipuadaService extends Service {
     private SipuadaServiceHandler serviceHandler;
     private final IBinder binder = new SipuadaBinder();
 
-    private Map<String, Sipuada> sipuadaInstances = new HashMap<>();
+    private final Map<String, Sipuada> sipuadaInstances = new HashMap<>();
+    private final EventBus eventBus = new EventBus();
 
     private static final int INITIALIZE_SIPUADAS = 0;
     private static final int FETCH_USERS_CREDENTIALS = 1;
@@ -112,6 +114,10 @@ public class SipuadaService extends Service {
             sipuada.destroySipuada();
         }
         super.onDestroy();
+    }
+
+    protected void registerSipuadaPresenter(SipuadaPresenterApi presenter) {
+        eventBus.register(presenter);
     }
 
     public void fetchCurrentUsersCredentials(SipuadaPresenter.FetchUsersCredentialsCallback callback) {
@@ -297,7 +303,8 @@ public class SipuadaService extends Service {
 
         @Override
         public boolean onCallInvitationArrived(String callId) {
-            Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived; callId:{%s}]", callId));
+            Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
+                    " callId:{%s}]", callId));
             if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
                 Intent intent = new Intent(getApplicationContext(), SipuadaActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -308,27 +315,34 @@ public class SipuadaService extends Service {
 
         @Override
         public void onCallInvitationCanceled(String reason, String callId) {
-            Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationCanceled; reason:{%s}, callId:{%s}]", reason, callId));
+            Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationCanceled;" +
+                    " reason:{%s}, callId:{%s}]", reason, callId));
+            eventBus.post(new SipuadaPresenterApi.CallInvitationCanceled(reason, callId));
         }
 
         @Override
         public void onCallInvitationFailed(String reason, String callId) {
-            Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationFailed; reason:{%s}, callId:{%s}]", reason, callId));
+            Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationFailed;" +
+                    " reason:{%s}, callId:{%s}]", reason, callId));
+            eventBus.post(new SipuadaPresenterApi.CallInvitationFailed(reason, callId));
         }
 
         @Override
         public void onCallEstablished(String callId) {
-            Log.d(SipuadaApplication.TAG, String.format("[onCallEstablished; callId:{%s}]", callId));
+            Log.d(SipuadaApplication.TAG, String.format("[onCallEstablished;" +
+                    " callId:{%s}]", callId));
         }
 
         @Override
         public void onCallFinished(String callId) {
-            Log.d(SipuadaApplication.TAG, String.format("[onCallFinished; callId:{%s}]", callId));
+            Log.d(SipuadaApplication.TAG, String.format("[onCallFinished;" +
+                    " callId:{%s}]", callId));
         }
 
         @Override
         public void onCallFailure(String reason, String callId) {
-            Log.d(SipuadaApplication.TAG, String.format("[onCallFailure; reason:{%s}, callId:{%s}]", reason, callId));
+            Log.d(SipuadaApplication.TAG, String.format("[onCallFailure;" +
+                    " reason:{%s}, callId:{%s}]", reason, callId));
         }
 
     };

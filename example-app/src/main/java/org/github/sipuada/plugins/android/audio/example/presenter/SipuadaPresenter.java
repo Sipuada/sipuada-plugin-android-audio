@@ -32,6 +32,7 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
         public void onServiceConnected(ComponentName className, IBinder service) {
             SipuadaService.SipuadaBinder binder = (SipuadaService.SipuadaBinder) service;
             mSipuadaService = binder.getService();
+            mSipuadaService.registerSipuadaPresenter(SipuadaPresenter.this);
             if (isViewAttached()) {
                 //noinspection ConstantConditions
                 getView().sipuadaServiceConnected();
@@ -87,6 +88,16 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi>
     public void inviteUser(String username, String primaryHost, String remoteUser,
                            SipuadaApi.CallInvitationCallback callback) {
         mSipuadaService.inviteUser(username, primaryHost, remoteUser, callback);
+    }
+
+    @Override
+    public void onCallInvitationCanceled(CallInvitationCanceled event) {
+
+    }
+
+    @Override
+    public void onCallInvitationFailed(CallInvitationFailed event) {
+
     }
 
     private void fetchCurrentUsersCredentialsThenRefresh() {
