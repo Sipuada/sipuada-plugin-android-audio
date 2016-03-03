@@ -189,8 +189,8 @@ public class SipuadaService extends Service {
 
     }
 
-    public void inviteAddresses(String username, String primaryHost, String remoteUser,
-                                SipuadaApi.CallInvitationCallback callback) {
+    public void inviteUser(String username, String primaryHost, String remoteUser,
+                           SipuadaApi.CallInvitationCallback callback) {
         Message message = serviceHandler.obtainMessage(INVITE_USER);
         String remoteUsername = remoteUser.split("@")[0];
         String remoteHost = remoteUser.split("@")[1];

@@ -1,11 +1,9 @@
 package org.github.sipuada.plugins.android.audio.example.view;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -45,46 +43,7 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
     @Bind(R.id.sipuplug_andrdio_example_EmptyTextView) TextView emptyView;
 
     private RVRendererAdapter<SipuadaUserCredentials> adapter;
-    private SipuadaService mSipuadaService;
     private boolean mBoundToSipuadaService = false;
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            SipuadaService.SipuadaBinder binder = (SipuadaService.SipuadaBinder) service;
-            mSipuadaService = binder.getService();
-            mBoundToSipuadaService = true;
-            adapter.clear();
-            List<SipuadaUserCredentials> usersCredentials = new Select()
-                    .from(SipuadaUserCredentials.class).execute();
-            adapter.addAll(new ListAdapteeCollection<>(usersCredentials));
-            if (usersCredentials.isEmpty()) {
-                emptyView.setVisibility(View.VISIBLE);
-            } else {
-                emptyView.setVisibility(View.GONE);
-            }
-            adapter.notifyDataSetChanged();
-            IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-add")
-                    .actionBarSize().colorRes(android.R.color.black);
-            floatingActionButton.setImageDrawable(iconDrawable);
-            floatingActionButton.setEnabled(true);
-            floatingActionButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(getApplicationContext(), NewUserCredentialsDialog.class);
-                    startActivityForResult(intent, REQUEST_NEW_USER_CREDENTIALS);
-                }
-
-            });
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            mBoundToSipuadaService = false;
-        }
-
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +54,7 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
         appToolbar.setTitle(getTitle());
         appToolbar.setTitleTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
         adapter = new RVRendererAdapter<>(getLayoutInflater(),
-                new UserOperationEntriesRenderedBuilder(this),
+                new UserOperationEntriesRenderedBuilder(getPresenter()),
                 new ListAdapteeCollection<>(Arrays.asList(new SipuadaUserCredentials[]{})));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -106,8 +65,46 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
         super.onStart();
         floatingActionButton.setEnabled(false);
         floatingActionButton.setOnClickListener(null);
+        getPresenter().bindToSipuadaService();
+    }
+
+    @Override
+    public boolean doBindToSipuadaService(ServiceConnection serviceConnection) {
         Intent intent = new Intent(this, SipuadaService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        return bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void sipuadaServiceConnected() {
+        mBoundToSipuadaService = true;
+        adapter.clear();
+        List<SipuadaUserCredentials> usersCredentials = new Select()
+                .from(SipuadaUserCredentials.class).execute();
+        adapter.addAll(new ListAdapteeCollection<>(usersCredentials));
+        if (usersCredentials.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+        adapter.notifyDataSetChanged();
+        IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-add")
+                .actionBarSize().colorRes(android.R.color.black);
+        floatingActionButton.setImageDrawable(iconDrawable);
+        floatingActionButton.setEnabled(true);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), NewUserCredentialsDialog.class);
+                startActivityForResult(intent, REQUEST_NEW_USER_CREDENTIALS);
+            }
+
+        });
+    }
+
+    @Override
+    public void sipuadaServiceDisconnected() {
+        mBoundToSipuadaService = false;
     }
 
     @Override
@@ -117,7 +114,7 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
             String username = data.getStringExtra("username");
             String primaryHost = data.getStringExtra("primaryHost");
             String password = data.getStringExtra("password");
-            mSipuadaService.createSipuada(new SipuadaUserCredentials(username, primaryHost, password));
+            getPresenter().createSipuada(username, primaryHost, password);
             adapter.clear();
             List<SipuadaUserCredentials> usersCredentials = new Select()
                     .from(SipuadaUserCredentials.class).execute();
@@ -126,17 +123,17 @@ public class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresente
         }
     }
 
-    public SipuadaService getSipuadaService() {
-        return mSipuadaService;
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
         if (mBoundToSipuadaService) {
-            unbindService(mConnection);
-            mBoundToSipuadaService = false;
+            getPresenter().unbindFromSipuadaService();
         }
+    }
+
+    public void doUnbindFromSipuadaService(ServiceConnection serviceConnection) {
+        unbindService(serviceConnection);
+        mBoundToSipuadaService = false;
     }
 
     @NonNull

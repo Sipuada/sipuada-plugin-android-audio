@@ -1,5 +1,7 @@
 package org.github.sipuada.plugins.android.audio.example.view.renderers;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +14,8 @@ import com.pedrogomez.renderers.Renderer;
 
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.R;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity;
+import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
 import java.util.List;
@@ -31,10 +32,11 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
     @Bind(R.id.sipuplug_andrdio_example_InviteUser) LabelledMarqueeEditText inviteUser;
     @Bind(R.id.sipuplug_andrdio_example_InviteOutput) TextView inviteOutput;
 
-    private final SipuadaActivity activity;
+    private final SipuadaPresenterApi presenter;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    public UserOperationsEntryRenderer(SipuadaActivity activity) {
-        this.activity = activity;
+    public UserOperationsEntryRenderer(SipuadaPresenterApi presenter) {
+        this.presenter = presenter;
     }
 
     @Override
@@ -56,20 +58,18 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
         final String username = userCredentials.getUsername();
         final String primaryHost = userCredentials.getPrimaryHost();
         usernameAtPrimaryHost.setText(String.format("%s@%s", username, primaryHost));
-        final SipuadaService sipuadaService = activity.getSipuadaService();
-        if (sipuadaService == null) {
+        if (!presenter.sipuadaServiceIsConnected()) {
             registerButton.setEnabled(false);
             String statusMessage = "Binding to SipuadaService...";
             registerOutput.setText(statusMessage);
             registerButton.setOnClickListener(null);
             return;
         }
-        renderRegister(sipuadaService, username, primaryHost);
-        renderInvite(sipuadaService, username, primaryHost);
+        renderRegister(username, primaryHost);
+        renderInvite(username, primaryHost);
     }
 
-    private void renderRegister(final SipuadaService sipuadaService, final String username,
-                                final String primaryHost) {
+    private void renderRegister(final String username, final String primaryHost) {
         String statusMessage = "Waiting for your command...";
         registerOutput.setText(statusMessage);
         registerOutput.setSelected(true);
@@ -80,7 +80,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 String statusMessage = "Please wait...";
                 registerOutput.setText(statusMessage);
                 registerButton.setEnabled(false);
-                sipuadaService.registerAddresses(username, primaryHost,
+                presenter.registerAddresses(username, primaryHost,
                     new SipuadaApi.RegistrationCallback() {
 
                         @Override
@@ -88,7 +88,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                             Log.d(SipuadaApplication.TAG,
                                     String.format("[onRegistrationSuccess; registeredContacts:{%s}]",
                                             registeredContacts));
-                            activity.runOnUiThread(new Runnable() {
+                            mainHandler.post(new Runnable() {
 
                                 @Override
                                 public void run() {
@@ -115,7 +115,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                         public void onRegistrationFailed(final String reason) {
                             Log.d(SipuadaApplication.TAG,
                                     String.format("[onRegistrationFailed; reason:{%s}]", reason));
-                            activity.runOnUiThread(new Runnable() {
+                            mainHandler.post(new Runnable() {
 
                                 @Override
                                 public void run() {
@@ -134,8 +134,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
         });
     }
 
-    private void renderInvite(final SipuadaService sipuadaService, final String username,
-                                final String primaryHost) {
+    private void renderInvite(final String username, final String primaryHost) {
         String statusMessage = "Waiting for your command...";
         inviteOutput.setText(statusMessage);
         inviteOutput.setSelected(true);
@@ -147,60 +146,60 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 inviteOutput.setText(statusMessage);
                 inviteButton.setEnabled(false);
                 final String remoteUser = inviteUser.getText();
-                sipuadaService.inviteAddresses(username, primaryHost, remoteUser,
-                    new SipuadaApi.CallInvitationCallback() {
+                presenter.inviteUser(username, primaryHost, remoteUser,
+                        new SipuadaApi.CallInvitationCallback() {
 
-                        @Override
-                        public void onWaitingForCallInvitationAnswer(String callId) {
-                            Log.d(SipuadaApplication.TAG, String
-                                    .format("[onWaitingForCallInvitationAnswer; callId:{%s}]", callId));
-                            activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void onWaitingForCallInvitationAnswer(String callId) {
+                                Log.d(SipuadaApplication.TAG, String
+                                        .format("[onWaitingForCallInvitationAnswer; callId:{%s}]", callId));
+                                mainHandler.post(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    inviteOutput.setText(String
-                                            .format("Waiting for answer from: %s", remoteUser));
-                                    inviteOutput.setSelected(true);
-                                    inviteButton.setEnabled(true);
-                                }
+                                    @Override
+                                    public void run() {
+                                        inviteOutput.setText(String
+                                                .format("Waiting for answer from: %s", remoteUser));
+                                        inviteOutput.setSelected(true);
+                                        inviteButton.setEnabled(true);
+                                    }
 
-                            });
+                                });
+                            }
+
+                            @Override
+                            public void onCallInvitationRinging(String callId) {
+                                Log.d(SipuadaApplication.TAG,
+                                        String.format("[onCallInvitationRinging; callId:{%s}]", callId));
+                                mainHandler.post(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        inviteOutput.setText(String
+                                                .format("%s's softphone is ringing!", remoteUser));
+                                        inviteOutput.setSelected(true);
+                                        inviteButton.setEnabled(true);
+                                    }
+
+                                });
+                            }
+
+                            @Override
+                            public void onCallInvitationDeclined(String callId) {
+                                Log.d(SipuadaApplication.TAG,
+                                        String.format("[onCallInvitationDeclined; callId:{%s}]", callId));
+                                mainHandler.post(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        inviteOutput.setText(String
+                                                .format("%s' declined your invite.", remoteUser));
+                                        inviteOutput.setSelected(true);
+                                        inviteButton.setEnabled(true);
+                                    }
+
+                                });
+                            }
                         }
-
-                        @Override
-                        public void onCallInvitationRinging(String callId) {
-                            Log.d(SipuadaApplication.TAG,
-                                    String.format("[onCallInvitationRinging; callId:{%s}]", callId));
-                            activity.runOnUiThread(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    inviteOutput.setText(String
-                                            .format("%s's softphone is ringing!", remoteUser));
-                                    inviteOutput.setSelected(true);
-                                    inviteButton.setEnabled(true);
-                                }
-
-                            });
-                        }
-
-                        @Override
-                        public void onCallInvitationDeclined(String callId) {
-                            Log.d(SipuadaApplication.TAG,
-                                    String.format("[onCallInvitationDeclined; callId:{%s}]", callId));
-                            activity.runOnUiThread(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    inviteOutput.setText(String
-                                            .format("%s' declined your invite.", remoteUser));
-                                    inviteOutput.setSelected(true);
-                                    inviteButton.setEnabled(true);
-                                }
-
-                            });
-                        }
-                    }
 
                 );
             }
