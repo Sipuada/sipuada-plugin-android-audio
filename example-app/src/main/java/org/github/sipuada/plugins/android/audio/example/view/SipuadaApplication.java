@@ -13,6 +13,12 @@ public class SipuadaApplication extends com.activeandroid.app.Application {
     public static final String KEY_PREFIX = "com.github.sipuada.plugins.android.audio.example";
     public static final String KEY_CALL_ID = String.format("%s.%s",
             SipuadaApplication.KEY_PREFIX, "callId");
+    public static final String KEY_CALL_ACTION = String.format("%s.%s",
+            SipuadaApplication.KEY_PREFIX, "callAction");
+    public static final String KEY_CALL_STATE = String.format("%s.%s",
+            SipuadaApplication.KEY_PREFIX, "callState");
+    public static final String KEY_CALL_DATA = String.format("%s.%s",
+            SipuadaApplication.KEY_PREFIX, "callData");
     public static final String KEY_USERNAME = String.format("%s.%s",
             SipuadaApplication.KEY_PREFIX, "username");
     public static final String KEY_PRIMARY_HOST = String.format("%s.%s",

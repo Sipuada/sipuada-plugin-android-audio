@@ -7,7 +7,7 @@ import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
 import java.util.List;
 
-public interface MainPresenterApi extends SipuadaPresenterApi<SipuadaViewApi> {
+public interface MainPresenterApi<V extends SipuadaViewApi> extends SipuadaPresenterApi<V> {
 
     interface FetchUsersCredentialsCallback {
 

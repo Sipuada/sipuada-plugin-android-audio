@@ -5,14 +5,36 @@ import android.util.Log;
 import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.SipuadaApi;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
+import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
+import org.github.sipuada.plugins.android.audio.example.view.CallViewApi;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CallPresenter extends SipuadaPresenter<SipuadaViewApi> implements CallPresenterApi {
+public class CallPresenter extends SipuadaPresenter<CallViewApi>
+        implements CallPresenterApi<CallViewApi> {
+
+    @Override
+    public void performAction(CallActivity.CallAction callAction, SipuadaCallData sipuadaCallData) {
+        switch (callAction) {
+            case DO_NOTHING:
+                break;
+            case RECEIVE_CALL:
+//                receiveCall(callData);
+                break;
+            case FINISH_CALL:
+//                finishCall(callData);
+                break;
+            case MAKE_CALL:
+//                makeCall(callData);
+            default:
+                break;
+
+        }
+    }
 
     @Override
     protected void doUponServiceConnected() {}
@@ -184,6 +206,61 @@ public class CallPresenter extends SipuadaPresenter<SipuadaViewApi> implements C
     @Subscribe
     public void onCallFailure(EstablishedCallFailed event) {
 
+    }
+
+    public void makeCall(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showMakingCall(callData);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void callAccepted(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showMakingCallAccepted(callData);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void callDeclined(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showMakingCallDeclined(callData);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void receiveCall(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showReceivingCall(callData);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void acceptCall(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showReceivingCallAccept(callData);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void declineCall(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showReceivingCallDecline(callData);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void establishCall(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showCallInProgress(callData);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void finishCall(SipuadaCallData callData) {
+        if (isViewAttached()) {
+            getView().showCallFinished(callData);
+        }
     }
 
 }

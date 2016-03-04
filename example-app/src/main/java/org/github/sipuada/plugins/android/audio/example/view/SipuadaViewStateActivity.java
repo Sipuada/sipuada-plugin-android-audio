@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.support.annotation.NonNull;
 
-import com.hannesdorfmann.mosby.mvp.MvpActivity;
+import com.hannesdorfmann.mosby.mvp.viewstate.MvpViewStateActivity;
 
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
 
-public abstract class SipuadaActivity<P extends SipuadaPresenterApi<SipuadaViewApi>>
-        extends MvpActivity<SipuadaViewApi, P> implements SipuadaViewApi {
+public abstract class SipuadaViewStateActivity<P extends SipuadaPresenterApi<SipuadaViewApi>>
+        extends MvpViewStateActivity<SipuadaViewApi, P> implements SipuadaViewApi {
 
     private boolean mBoundToSipuadaService = false;
 

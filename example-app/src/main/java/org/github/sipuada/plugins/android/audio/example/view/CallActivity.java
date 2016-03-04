@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
+import com.hannesdorfmann.mosby.mvp.viewstate.RestoreableViewState;
 import com.pedrogomez.renderers.ListAdapteeCollection;
 import com.pedrogomez.renderers.RVRendererAdapter;
 
@@ -23,12 +24,16 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class CallActivity extends SipuadaActivity<CallPresenterApi> {
+public class CallActivity extends SipuadaViewStateActivity<CallPresenterApi> implements CallViewApi {
 
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView incomingCallsSummary;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
 
     private RVRendererAdapter<SipuadaCallData> adapter;
+
+    public enum CallAction {
+        DO_NOTHING, MAKE_CALL, RECEIVE_CALL, FINISH_CALL
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,51 @@ public class CallActivity extends SipuadaActivity<CallPresenterApi> {
     @Override
     public void onNewIntent(Intent intent) {
         handleIncomingCallInvitation(intent);
+    }
+
+    @Override
+    public RestoreableViewState createViewState() {
+        return new CallViewState();
+    }
+
+    @Override
+    public void onNewViewStateInstance() {
+        Intent intent = getIntent();
+        String callId = intent.getStringExtra(SipuadaApplication.KEY_CALL_ID);
+        String username = intent.getStringExtra(SipuadaApplication.KEY_USERNAME);
+        String primaryHost = intent.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
+        String remoteUsername = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_USERNAME);
+        String remoteHost = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_HOST);
+        CallAction callAction = (CallAction) intent
+                .getSerializableExtra(SipuadaApplication.KEY_CALL_ACTION);
+        presenter.performAction(callAction, new SipuadaCallData(callId, username, primaryHost,
+                remoteUsername, remoteHost));
+    }
+
+    @Override
+    protected void onSipuadaServiceConnected() {
+        incomingCallsSummary.setEnabled(true);
+        recyclerView.setEnabled(true);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onSipuadaServiceDisconnected() {
+        incomingCallsSummary.setEnabled(false);
+        recyclerView.setEnabled(false);
+        adapter.notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public CallPresenter createPresenter() {
+        return new CallPresenter();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0
+                || super.onKeyDown(keyCode, event);
     }
 
     private void handleIncomingCallInvitation(Intent intent) {
@@ -129,29 +179,43 @@ public class CallActivity extends SipuadaActivity<CallPresenterApi> {
     }
 
     @Override
-    protected void onSipuadaServiceConnected() {
-        incomingCallsSummary.setEnabled(true);
-        recyclerView.setEnabled(true);
-        adapter.notifyDataSetChanged();
+    public void showMakingCall(SipuadaCallData sipuadaCallData) {
+
     }
 
     @Override
-    protected void onSipuadaServiceDisconnected() {
-        incomingCallsSummary.setEnabled(false);
-        recyclerView.setEnabled(false);
-        adapter.notifyDataSetChanged();
-    }
+    public void showMakingCallAccepted(SipuadaCallData sipuadaCallData) {
 
-    @NonNull
-    @Override
-    public CallPresenter createPresenter() {
-        return new CallPresenter();
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0
-                || super.onKeyDown(keyCode, event);
+    public void showMakingCallDeclined(SipuadaCallData sipuadaCallData) {
+
+    }
+
+    @Override
+    public void showReceivingCall(SipuadaCallData sipuadaCallData) {
+
+    }
+
+    @Override
+    public void showReceivingCallAccept(SipuadaCallData sipuadaCallData) {
+
+    }
+
+    @Override
+    public void showReceivingCallDecline(SipuadaCallData sipuadaCallData) {
+
+    }
+
+    @Override
+    public void showCallInProgress(SipuadaCallData sipuadaCallData) {
+
+    }
+
+    @Override
+    public void showCallFinished(SipuadaCallData sipuadaCallData) {
+
     }
 
 }

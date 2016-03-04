@@ -6,15 +6,16 @@ import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.view.MainViewApi;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements MainPresenterApi {
+public class MainPresenter extends SipuadaPresenter<MainViewApi>
+        implements MainPresenterApi<MainViewApi> {
 
     @Override
     protected void doUponServiceConnected() {

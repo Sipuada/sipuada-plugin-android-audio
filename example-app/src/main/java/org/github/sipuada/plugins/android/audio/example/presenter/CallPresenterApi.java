@@ -2,9 +2,13 @@ package org.github.sipuada.plugins.android.audio.example.presenter;
 
 import com.google.common.eventbus.Subscribe;
 
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
+import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
-public interface CallPresenterApi extends SipuadaPresenterApi<SipuadaViewApi> {
+public interface CallPresenterApi<V extends SipuadaViewApi> extends SipuadaPresenterApi<V> {
+
+    void performAction(CallActivity.CallAction callAction, SipuadaCallData sipuadaCallData);
 
     interface OutgoingCallInvitationCallback {
 
