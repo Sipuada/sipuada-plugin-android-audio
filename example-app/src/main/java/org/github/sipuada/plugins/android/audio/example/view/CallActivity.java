@@ -2,6 +2,7 @@ package org.github.sipuada.plugins.android.audio.example.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -11,7 +12,8 @@ import com.pedrogomez.renderers.ListAdapteeCollection;
 import com.pedrogomez.renderers.RVRendererAdapter;
 
 import org.github.sipuada.plugins.android.audio.example.R;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
+import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenter;
+import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.view.renderers.CallInvitationEntriesRendererBuilder;
 
 import java.util.Arrays;
@@ -20,7 +22,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class IncomingCallInvitationActivity extends SipuadaActivity {
+public class CallActivity extends SipuadaActivity<CallPresenterApi> {
 
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView incomingCallsSummary;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
@@ -122,7 +124,7 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
         String remoteHost = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_HOST);
         final IncomingCallInvitation incomingCallInvitation =
                 new IncomingCallInvitation(callId, username, primaryHost, remoteUsername, remoteHost);
-        getPresenter().willAnswerInviteFromUser(callId, new SipuadaPresenterApi
+        getPresenter().willAnswerInviteFromUser(callId, new CallPresenterApi
                 .IncomingCallInvitationCallback() {
 
             @Override
@@ -205,6 +207,12 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
         incomingCallsSummary.setEnabled(false);
         recyclerView.setEnabled(false);
         adapter.notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public CallPresenter createPresenter() {
+        return new CallPresenter();
     }
 
     @Override

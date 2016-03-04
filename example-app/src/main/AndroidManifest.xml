@@ -29,7 +29,7 @@
             android:excludeFromRecents="true"/>
 
         <activity
-            android:name=".view.IncomingCallInvitationActivity"
+            android:name=".view.CallActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:launchMode="singleTop"/>
 

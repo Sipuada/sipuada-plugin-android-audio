@@ -2,6 +2,7 @@ package org.github.sipuada.plugins.android.audio.example.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,8 @@ import com.pedrogomez.renderers.RVRendererAdapter;
 
 import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.presenter.MainPresenter;
+import org.github.sipuada.plugins.android.audio.example.presenter.MainPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.view.renderers.UserOperationsEntriesRendererBuilder;
 
 import java.util.Arrays;
@@ -24,7 +27,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends SipuadaActivity {
+public class MainActivity extends SipuadaActivity<MainPresenterApi> {
 
     private static final int REQUEST_NEW_USER_CREDENTIALS = 1;
 
@@ -79,6 +82,12 @@ public class MainActivity extends SipuadaActivity {
     protected void onSipuadaServiceDisconnected() {
         floatingActionButton.setEnabled(false);
         floatingActionButton.setOnClickListener(null);
+    }
+
+    @NonNull
+    @Override
+    public MainPresenter createPresenter() {
+        return new MainPresenter();
     }
 
     @Override

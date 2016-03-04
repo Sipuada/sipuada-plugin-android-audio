@@ -9,14 +9,14 @@ import android.widget.TextView;
 import com.pedrogomez.renderers.Renderer;
 
 import org.github.sipuada.plugins.android.audio.example.R;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
-import org.github.sipuada.plugins.android.audio.example.view.IncomingCallInvitationActivity;
+import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenterApi;
+import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class CallInvitationEntryRenderer
-        extends Renderer<IncomingCallInvitationActivity.IncomingCallInvitation> {
+        extends Renderer<CallActivity.IncomingCallInvitation> {
 
     @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUsernameAtHost;
     @Bind(R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress) TextView localUsernameAtHost;
@@ -25,11 +25,11 @@ public class CallInvitationEntryRenderer
     @Bind(R.id.sipuplug_andrdio_example_CloseButton) TextView closeButton;
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallStatus) TextView incomingCallStatus;
 
-    private final SipuadaPresenterApi presenter;
-    private final IncomingCallInvitationActivity activity;
+    private final CallPresenterApi presenter;
+    private final CallActivity activity;
 
-    public CallInvitationEntryRenderer(SipuadaPresenterApi presenter,
-                                       IncomingCallInvitationActivity activity) {
+    public CallInvitationEntryRenderer(CallPresenterApi presenter,
+                                       CallActivity activity) {
         this.presenter = presenter;
         this.activity = activity;
     }
@@ -49,7 +49,7 @@ public class CallInvitationEntryRenderer
 
     @Override
     public void render() {
-        final IncomingCallInvitationActivity.IncomingCallInvitation incomingCallInvitation = getContent();
+        final CallActivity.IncomingCallInvitation incomingCallInvitation = getContent();
         String callId = incomingCallInvitation.getCallId();
         String username = incomingCallInvitation.getUsername();
         String primaryHost = incomingCallInvitation.getPrimaryHost();
@@ -87,7 +87,7 @@ public class CallInvitationEntryRenderer
     }
 
     private void renderAccept(final String callId, final String username, final String primaryHost,
-            final IncomingCallInvitationActivity.IncomingCallInvitation incomingCallInvitation) {
+            final CallActivity.IncomingCallInvitation incomingCallInvitation) {
         acceptButton.setEnabled(true);
         acceptButton.setVisibility(View.VISIBLE);
         acceptButton.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +105,7 @@ public class CallInvitationEntryRenderer
     }
 
     private void renderDecline(final String callId, final String username, final String primaryHost,
-            final IncomingCallInvitationActivity.IncomingCallInvitation incomingCallInvitation) {
+            final CallActivity.IncomingCallInvitation incomingCallInvitation) {
         declineButton.setEnabled(true);
         declineButton.setVisibility(View.VISIBLE);
         declineButton.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +120,7 @@ public class CallInvitationEntryRenderer
         });
     }
 
-    private void renderFinished(final IncomingCallInvitationActivity
+    private void renderFinished(final CallActivity
             .IncomingCallInvitation incomingCallInvitation) {
         StringBuilder statusMessage = new StringBuilder("Call invitation finished.");
         String reasonWhy = incomingCallInvitation.getReason();

@@ -8,14 +8,13 @@ import android.support.annotation.NonNull;
 import com.hannesdorfmann.mosby.mvp.MvpActivity;
 
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenter;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
 
 import java.util.List;
 
-public abstract class SipuadaActivity extends MvpActivity<SipuadaViewApi, SipuadaPresenterApi>
-        implements SipuadaViewApi {
+public abstract class SipuadaActivity<P extends SipuadaPresenterApi<SipuadaViewApi>>
+        extends MvpActivity<SipuadaViewApi, P> implements SipuadaViewApi {
 
     private boolean mBoundToSipuadaService = false;
 
@@ -62,9 +61,7 @@ public abstract class SipuadaActivity extends MvpActivity<SipuadaViewApi, Sipuad
 
     @NonNull
     @Override
-    public SipuadaPresenter createPresenter() {
-        return new SipuadaPresenter();
-    }
+    public abstract P createPresenter();
 
     @Override
     public void refreshUsersCredentialsList(List<SipuadaUserCredentials> usersCredentials){}

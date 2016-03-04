@@ -11,7 +11,7 @@ import com.pedrogomez.renderers.Renderer;
 
 import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
-import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
+import org.github.sipuada.plugins.android.audio.example.presenter.MainPresenterApi;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
     @Bind(R.id.sipuplug_andrdio_example_InviteOutput) TextView inviteOutput;
     @Bind(R.id.sipuplug_andrdio_example_CancelButton) Button cancelButton;
 
-    private final SipuadaPresenterApi presenter;
+    private final MainPresenterApi presenter;
 
-    public UserOperationsEntryRenderer(SipuadaPresenterApi presenter) {
+    public UserOperationsEntryRenderer(MainPresenterApi presenter) {
         this.presenter = presenter;
     }
 
@@ -77,7 +77,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 registerOutput.setText(statusMessage);
                 registerButton.setEnabled(false);
                 presenter.registerAddresses(username, primaryHost,
-                    new SipuadaPresenterApi.RegistrationCallback() {
+                    new MainPresenterApi.RegistrationCallback() {
 
                         @Override
                         public void onSuccess(final List<String> registeredContacts) {
@@ -132,7 +132,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 inviteUser.setEnabled(false);
                 inviteButton.setEnabled(false);
                 presenter.inviteUser(username, primaryHost, remoteUser,
-                    new SipuadaPresenterApi.OutgoingCallInvitationCallback() {
+                    new MainPresenterApi.OutgoingCallInvitationCallback() {
 
                         @Override
                         public void onWaiting(final String callId) {

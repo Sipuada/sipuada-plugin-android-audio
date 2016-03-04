@@ -19,7 +19,7 @@ import com.google.common.eventbus.EventBus;
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
-import org.github.sipuada.plugins.android.audio.example.view.IncomingCallInvitationActivity;
+import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 import org.github.sipuada.plugins.nop.NoOperationSipuadaPlugin;
 
@@ -68,7 +68,7 @@ public class SipuadaService extends Service {
                     initialize();
                     break;
                 case FETCH_USERS_CREDENTIALS:
-                    doFetchCurrentUsersCredentials((SipuadaPresenter
+                    doFetchCurrentUsersCredentials((MainPresenterApi
                             .FetchUsersCredentialsCallback) message.obj);
                     break;
                 case ADD_NEW_SIPUADA:
@@ -137,7 +137,7 @@ public class SipuadaService extends Service {
         eventBus.register(presenter);
     }
 
-    public void fetchCurrentUsersCredentials(SipuadaPresenter.FetchUsersCredentialsCallback callback) {
+    public void fetchCurrentUsersCredentials(MainPresenterApi.FetchUsersCredentialsCallback callback) {
         Message message = serviceHandler.obtainMessage(FETCH_USERS_CREDENTIALS);
         message.obj = callback;
         serviceHandler.sendMessage(message);
@@ -322,7 +322,7 @@ public class SipuadaService extends Service {
         }
     }
 
-    private void doFetchCurrentUsersCredentials(SipuadaPresenter.FetchUsersCredentialsCallback callback) {
+    private void doFetchCurrentUsersCredentials(MainPresenterApi.FetchUsersCredentialsCallback callback) {
         List<SipuadaUserCredentials> usersCredentials = new Select()
                 .from(SipuadaUserCredentials.class).execute();
         callback.onSuccess(usersCredentials);
@@ -381,7 +381,7 @@ public class SipuadaService extends Service {
                 public void run() {
                     callInvitationDispatchers.remove(callId);
                     Intent intent = new Intent(getApplicationContext(),
-                            IncomingCallInvitationActivity.class);
+                            CallActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(SipuadaApplication.KEY_CALL_ID, callId);
                     intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
@@ -476,7 +476,7 @@ public class SipuadaService extends Service {
             } else {
                 //TODO add a notification for this canceled incoming call invitation
             }
-            eventBus.post(new SipuadaPresenterApi.CallInvitationCanceled(reason, callId));
+            eventBus.post(new CallPresenterApi.CallInvitationCanceled(reason, callId));
         }
 
         @Override
@@ -489,14 +489,14 @@ public class SipuadaService extends Service {
             } else {
                 //TODO add a notification for this failed incoming call invitation
             }
-            eventBus.post(new SipuadaPresenterApi.CallInvitationFailed(reason, callId));
+            eventBus.post(new CallPresenterApi.CallInvitationFailed(reason, callId));
         }
 
         @Override
         public void onCallEstablished(String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallEstablished;" +
                     " callId:{%s}]", callId));
-            eventBus.post(new SipuadaPresenterApi.EstablishedCallStarted(callId));
+            eventBus.post(new CallPresenterApi.EstablishedCallStarted(callId));
         }
 
         @Override
@@ -504,7 +504,7 @@ public class SipuadaService extends Service {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFinished;" +
                     " callId:{%s}]", callId));
             SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
-            eventBus.post(new SipuadaPresenterApi.EstablishedCallFinished(callId));
+            eventBus.post(new CallPresenterApi.EstablishedCallFinished(callId));
         }
 
         @Override
@@ -512,7 +512,7 @@ public class SipuadaService extends Service {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFailure;" +
                     " reason:{%s}, callId:{%s}]", reason, callId));
             SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
-            eventBus.post(new SipuadaPresenterApi.EstablishedCallFailed(reason, callId));
+            eventBus.post(new CallPresenterApi.EstablishedCallFailed(reason, callId));
         }
 
         @Override
