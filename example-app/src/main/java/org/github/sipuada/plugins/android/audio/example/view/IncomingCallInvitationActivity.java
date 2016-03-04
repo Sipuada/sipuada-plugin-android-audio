@@ -14,6 +14,8 @@ import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresent
 import org.github.sipuada.plugins.android.audio.example.view.renderers.CallInvitationEntriesRendererBuilder;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.Bind;
 
@@ -135,7 +137,13 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
             }
 
         });
+        List<IncomingCallInvitation> incomingCallInvitations = new LinkedList<>();
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            incomingCallInvitations.add(adapter.getItem(i));
+        }
+        adapter.clear();
         adapter.add(incomingCallInvitation);
+        adapter.addAll(incomingCallInvitations);
         refreshIncomingCalls();
     }
 

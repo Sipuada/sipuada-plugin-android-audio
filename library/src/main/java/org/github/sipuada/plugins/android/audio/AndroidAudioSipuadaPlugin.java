@@ -62,7 +62,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 	}
 
 	@Override
-	public SessionDescription generateOffer(String callId, RequestMethod method) {
+	public SessionDescription generateOffer(String callId, RequestMethod method, String localAddress) {
 		roles.put(callId, CallRole.CALLER);
 		try {
 			/* This offer start with:
@@ -148,7 +148,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public SessionDescription generateAnswer(String callId, RequestMethod method, SessionDescription offer) {
+	public SessionDescription generateAnswer(String callId, RequestMethod method, SessionDescription offer, String localAddress) {
 		roles.put(callId, CallRole.CALLEE);
 		try {
 			/* This answer start with:
