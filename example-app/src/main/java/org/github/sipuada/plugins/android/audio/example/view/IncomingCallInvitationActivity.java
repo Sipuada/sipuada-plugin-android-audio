@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.pedrogomez.renderers.ListAdapteeCollection;
@@ -192,6 +193,12 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
         incomingCallsSummary.setEnabled(false);
         recyclerView.setEnabled(false);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0
+                || super.onKeyDown(keyCode, event);
     }
 
 }

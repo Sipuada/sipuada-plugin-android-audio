@@ -28,6 +28,7 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -277,6 +278,20 @@ public class SipuadaService extends Service {
     }
 
     private void initialize() {
+        SipuadaApi.RegistrationCallback registrationCallback = new SipuadaApi.RegistrationCallback() {
+
+            @Override
+            public void onRegistrationSuccess(List<String> registeredContacts) {
+                Log.d(SipuadaApplication.TAG, "Registration refresh of: " + Arrays
+                        .toString(registeredContacts.toArray(new String[registeredContacts.size()])));
+            }
+
+            @Override
+            public void onRegistrationFailed(String reason) {
+                Log.d(SipuadaApplication.TAG, "Registration refresh failed: " + reason);
+            }
+
+        };
         List<SipuadaUserCredentials> usersCredentials = new Select()
                 .from(SipuadaUserCredentials.class).execute();
         for (SipuadaUserCredentials userCredentials : usersCredentials) {
@@ -303,6 +318,7 @@ public class SipuadaService extends Service {
 //            sipuada.registerPlugin(sipuadaPluginForAudio);
             sipuada.registerPlugin(noopSipuadaPlugin);
             sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
+            sipuada.registerAddresses(registrationCallback);
         }
     }
 
@@ -315,6 +331,20 @@ public class SipuadaService extends Service {
     private final Map<String, Timer> callInvitationDispatchers = new HashMap<>();
 
     private void doCreateSipuada(SipuadaUserCredentials userCredentials) {
+        SipuadaApi.RegistrationCallback registrationCallback = new SipuadaApi.RegistrationCallback() {
+
+            @Override
+            public void onRegistrationSuccess(List<String> registeredContacts) {
+                Log.d(SipuadaApplication.TAG, "Registration refresh of: " + Arrays
+                        .toString(registeredContacts.toArray(new String[registeredContacts.size()])));
+            }
+
+            @Override
+            public void onRegistrationFailed(String reason) {
+                Log.d(SipuadaApplication.TAG, "Registration refresh failed: " + reason);
+            }
+
+        };
         String[] localAddresses = getLocalAddresses();
         final String username = userCredentials.getUsername();
         final String primaryHost = userCredentials.getPrimaryHost();
@@ -337,6 +367,7 @@ public class SipuadaService extends Service {
 //        sipuada.registerPlugin(sipuadaPluginForAudio);
         sipuada.registerPlugin(noopSipuadaPlugin);
         sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
+        sipuada.registerAddresses(registrationCallback);
     }
 
     private boolean handleIncomingCallInvitation(final String callId, final String username,

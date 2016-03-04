@@ -10,7 +10,31 @@
     android:gravity="center">
 
     <TextView
-        android:id="@+id/sipuplug_andrdio_example_EntryUsernameAtAddress"
+        android:id="@+id/sipuplug_andrdio_example_EntryRemoteUsernameAtAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:ellipsize="marquee"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:text="is calling"
+        android:textSize="14sp"
+        android:textStyle="bold|italic"
+        android:textColor="@color/colorAccent"
+        android:ellipsize="marquee"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:id="@+id/sipuplug_andrdio_example_EntryLocalUsernameAtAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

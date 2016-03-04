@@ -18,7 +18,8 @@ import butterknife.ButterKnife;
 public class CallInvitationEntryRenderer
         extends Renderer<IncomingCallInvitationActivity.IncomingCallInvitation> {
 
-    @Bind(R.id.sipuplug_andrdio_example_EntryUsernameAtAddress) TextView usernameAtPrimaryHost;
+    @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUsernameAtHost;
+    @Bind(R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress) TextView localUsernameAtHost;
     @Bind(R.id.sipuplug_andrdio_example_AcceptButton) Button acceptButton;
     @Bind(R.id.sipuplug_andrdio_example_DeclineButton) TextView declineButton;
     @Bind(R.id.sipuplug_andrdio_example_CloseButton) TextView closeButton;
@@ -54,8 +55,10 @@ public class CallInvitationEntryRenderer
         String primaryHost = incomingCallInvitation.getPrimaryHost();
         String remoteUsername = incomingCallInvitation.getRemoteUsername();
         String remoteHost = incomingCallInvitation.getRemoteHost();
-        usernameAtPrimaryHost.setText(String.format("%s@%s", remoteUsername, remoteHost));
-        usernameAtPrimaryHost.setSelected(true);
+        remoteUsernameAtHost.setText(String.format("%s@%s", remoteUsername, remoteHost));
+        remoteUsernameAtHost.setSelected(true);
+        localUsernameAtHost.setText(String.format("%s@%s", username, primaryHost));
+        localUsernameAtHost.setSelected(true);
         acceptButton.getBackground().setAlpha(115);
         declineButton.getBackground().setAlpha(115);
         closeButton.setEnabled(false);
