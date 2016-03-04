@@ -27,7 +27,7 @@ public interface SipuadaPresenterApi extends MvpPresenter<SipuadaViewApi> {
 
     void registerAddresses(String username, String primaryHost, RegistrationCallback callback);
 
-    interface CallInvitationCallback {
+    interface OutgoingCallInvitationCallback {
 
         void onWaiting(String callId);
 
@@ -44,9 +44,23 @@ public interface SipuadaPresenterApi extends MvpPresenter<SipuadaViewApi> {
     }
 
     void inviteUser(String username, String primaryHost, String remoteUser,
-                    CallInvitationCallback callback);
+                    OutgoingCallInvitationCallback callback);
 
     void cancelInviteToUser(String username, String primaryHost, String callId);
+
+    interface IncomingCallInvitationCallback {
+
+        void onFailed(String reason);
+
+        void onCanceled(String reason);
+
+    }
+
+    void willAnswerInviteFromUser(String callId, IncomingCallInvitationCallback callback);
+
+    void acceptInviteFromUser(String username, String primaryHost, String callId);
+
+    void declineInviteFromUser(String username, String primaryHost, String callId);
 
     class CallInvitationCanceled {
 

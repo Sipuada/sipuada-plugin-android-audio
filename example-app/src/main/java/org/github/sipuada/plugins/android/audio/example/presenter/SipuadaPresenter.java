@@ -119,12 +119,12 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
         });
     }
 
-    private final Map<String, CallInvitationCallback> callInvitationResults =
-            Collections.synchronizedMap(new HashMap<String, CallInvitationCallback>());
+    private final Map<String, OutgoingCallInvitationCallback> pendingOutgoingCallInvitations =
+            Collections.synchronizedMap(new HashMap<String, OutgoingCallInvitationCallback>());
 
     @Override
     public void inviteUser(String username, String primaryHost, String remoteUser,
-                           final CallInvitationCallback callback) {
+                           final OutgoingCallInvitationCallback callback) {
         mSipuadaService.inviteUser(username, primaryHost, remoteUser,
                 new SipuadaApi.CallInvitationCallback() {
 
@@ -132,7 +132,7 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
             public void onWaitingForCallInvitationAnswer(final String callId) {
                 Log.d(SipuadaApplication.TAG, String
                         .format("[onWaitingForCallInvitationAnswer; callId:{%s}]", callId));
-                callInvitationResults.put(callId, callback);
+                pendingOutgoingCallInvitations.put(callId, callback);
                 mainHandler.post(new Runnable() {
 
                     @Override
@@ -147,7 +147,7 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
             public void onCallInvitationRinging(final String callId) {
                 Log.d(SipuadaApplication.TAG,
                         String.format("[onCallInvitationRinging; callId:{%s}]", callId));
-                callInvitationResults.put(callId, callback);
+                pendingOutgoingCallInvitations.put(callId, callback);
                 mainHandler.post(new Runnable() {
 
                     @Override
@@ -162,7 +162,6 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
             public void onCallInvitationDeclined(final String callId) {
                 Log.d(SipuadaApplication.TAG,
                         String.format("[onCallInvitationDeclined; callId:{%s}]", callId));
-                callInvitationResults.put(callId, callback);
                 mainHandler.post(new Runnable() {
 
                     @Override
@@ -181,16 +180,47 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
         mSipuadaService.cancelInviteToUser(username, primaryHost, callId);
     }
 
+    private final Map<String, IncomingCallInvitationCallback> pendingIncomingCallInvitations =
+            Collections.synchronizedMap(new HashMap<String, IncomingCallInvitationCallback>());
+
+    @Override
+    public void willAnswerInviteFromUser(String callId, IncomingCallInvitationCallback callback) {
+        pendingIncomingCallInvitations.put(callId, callback);
+    }
+
+    @Override
+    public void acceptInviteFromUser(String username, String primaryHost, String callId) {
+        mSipuadaService.acceptInviteFromUser(username, primaryHost, callId);
+    }
+
+    @Override
+    public void declineInviteFromUser(String username, String primaryHost, String callId) {
+        mSipuadaService.declineInviteFromUser(username, primaryHost, callId);
+    }
+
     @Override
     @Subscribe
     public void onCallInvitationCanceled(final CallInvitationCanceled event) {
-        final CallInvitationCallback callback = callInvitationResults.get(event.getCallId());
-        if (callback != null) {
+        final OutgoingCallInvitationCallback outgoingCallback = pendingOutgoingCallInvitations
+                .remove(event.getCallId());
+        if (outgoingCallback != null) {
             mainHandler.post(new Runnable() {
 
                 @Override
                 public void run() {
-                    callback.onCanceled(event.getReason());
+                    outgoingCallback.onCanceled(event.getReason());
+                }
+
+            });
+        }
+        final IncomingCallInvitationCallback incomingCallback = pendingIncomingCallInvitations
+                .remove(event.getCallId());
+        if (incomingCallback != null) {
+            mainHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    incomingCallback.onCanceled(event.getReason());
                 }
 
             });
@@ -200,13 +230,26 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
     @Override
     @Subscribe
     public void onCallInvitationFailed(final CallInvitationFailed event) {
-        final CallInvitationCallback callback = callInvitationResults.get(event.getCallId());
-        if (callback != null) {
+        final OutgoingCallInvitationCallback outgoingCallback = pendingOutgoingCallInvitations
+                .remove(event.getCallId());
+        if (outgoingCallback != null) {
             mainHandler.post(new Runnable() {
 
                 @Override
                 public void run() {
-                    callback.onFailed(event.getReason());
+                    outgoingCallback.onFailed(event.getReason());
+                }
+
+            });
+        }
+        final IncomingCallInvitationCallback incomingCallback = pendingIncomingCallInvitations
+                .remove(event.getCallId());
+        if (incomingCallback != null) {
+            mainHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    incomingCallback.onFailed(event.getReason());
                 }
 
             });
@@ -216,7 +259,8 @@ public class SipuadaPresenter extends MvpBasePresenter<SipuadaViewApi> implement
     @Override
     @Subscribe
     public void onCallEstablished(final EstablishedCallStarted event) {
-        final CallInvitationCallback callback = callInvitationResults.get(event.getCallId());
+        final OutgoingCallInvitationCallback callback = pendingOutgoingCallInvitations
+                .remove(event.getCallId());
         if (callback != null) {
             mainHandler.post(new Runnable() {
 

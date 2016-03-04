@@ -19,7 +19,6 @@ import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.IncomingCallInvitationActivity;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
 import java.net.Inet4Address;
@@ -48,6 +47,8 @@ public class SipuadaService extends Service {
     private static final int REGISTER_ADDRESSES = 3;
     private static final int INVITE_USER = 4;
     private static final int CANCEL_USER_INVITE = 5;
+    private static final int ACCEPT_USER_INVITE = 6;
+    private static final int DECLINE_USER_INVITE = 7;
 
     private final class SipuadaServiceHandler extends Handler {
 
@@ -75,7 +76,13 @@ public class SipuadaService extends Service {
                     doInviteUser((InviteUserOperation) message.obj);
                     break;
                 case CANCEL_USER_INVITE:
-                    doCancelInviteToUser((CancelUserInviteOperation) message.obj);
+                    doCancelInviteToUser((UserInviteOperation) message.obj);
+                    break;
+                case ACCEPT_USER_INVITE:
+                    doAcceptInviteFromUser((UserInviteOperation) message.obj);
+                    break;
+                case DECLINE_USER_INVITE:
+                    doDeclineInviteFromUser((UserInviteOperation) message.obj);
                     break;
                 default:
                     break;
@@ -221,13 +228,13 @@ public class SipuadaService extends Service {
         serviceHandler.sendMessage(message);
     }
 
-    protected class CancelUserInviteOperation {
+    protected class UserInviteOperation {
 
         private final String username;
         private final String primaryHost;
         private final String callId;
 
-        public CancelUserInviteOperation(String username, String primaryHost, String callId) {
+        public UserInviteOperation(String username, String primaryHost, String callId) {
             this.username = username;
             this.primaryHost = primaryHost;
             this.callId = callId;
@@ -249,7 +256,19 @@ public class SipuadaService extends Service {
 
     public void cancelInviteToUser(String username, String primaryHost, String callId) {
         Message message = serviceHandler.obtainMessage(CANCEL_USER_INVITE);
-        message.obj = new CancelUserInviteOperation(username, primaryHost, callId);
+        message.obj = new UserInviteOperation(username, primaryHost, callId);
+        serviceHandler.sendMessage(message);
+    }
+
+    public void acceptInviteFromUser(String username, String primaryHost, String callId) {
+        Message message = serviceHandler.obtainMessage(ACCEPT_USER_INVITE);
+        message.obj = new UserInviteOperation(username, primaryHost, callId);
+        serviceHandler.sendMessage(message);
+    }
+
+    public void declineInviteFromUser(String username, String primaryHost, String callId) {
+        Message message = serviceHandler.obtainMessage(DECLINE_USER_INVITE);
+        message.obj = new UserInviteOperation(username, primaryHost, callId);
         serviceHandler.sendMessage(message);
     }
 
@@ -260,12 +279,29 @@ public class SipuadaService extends Service {
 //            AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
 //                    new AndroidAudioSipuadaPlugin(userCredentials.username,
 //                            localAddresses[0], getApplicationContext());
-            String username = userCredentials.getUsername();
-            String primaryHost = userCredentials.getPrimaryHost();
+            final String username = userCredentials.getUsername();
+            final String primaryHost = userCredentials.getPrimaryHost();
             String password = userCredentials.getPassword();
             String[] localAddresses = getLocalAddresses();
-            Sipuada sipuada = new Sipuada(sipuadaListener,
-                    username, primaryHost, password, localAddresses);
+            Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
+
+                @Override
+                public boolean onCallInvitationArrived(String callId) {
+                    Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
+                            " callId:{%s}]", callId));
+                    if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
+                        Intent intent = new Intent(getApplicationContext(),
+                                IncomingCallInvitationActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra(SipuadaApplication.KEY_CALL_ID, callId);
+                        intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
+                        intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
+                        startActivity(intent);
+                    }
+                    return SipuadaApplication.CURRENTLY_BUSY_FROM_DB;
+                }
+
+            }, username, primaryHost, password, localAddresses);
 //            sipuada.registerPlugin(sipuadaPluginForAudio);
             sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
         }
@@ -279,13 +315,30 @@ public class SipuadaService extends Service {
 
     private void doCreateSipuada(SipuadaUserCredentials userCredentials) {
         String[] localAddresses = getLocalAddresses();
-        String username = userCredentials.getUsername();
-        String primaryHost = userCredentials.getPrimaryHost();
+        final String username = userCredentials.getUsername();
+        final String primaryHost = userCredentials.getPrimaryHost();
         String password = userCredentials.getPassword();
 //        AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
 //                new AndroidAudioSipuadaPlugin(username, localAddresses[0], getApplicationContext());
-        Sipuada sipuada = new Sipuada(sipuadaListener,
-                username, primaryHost, password, localAddresses);
+        Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
+
+            @Override
+            public boolean onCallInvitationArrived(String callId) {
+                Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
+                        " callId:{%s}]", callId));
+                if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
+                    Intent intent = new Intent(getApplicationContext(),
+                            IncomingCallInvitationActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(SipuadaApplication.KEY_CALL_ID, callId);
+                    intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
+                    intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
+                    startActivity(intent);
+                }
+                return SipuadaApplication.CURRENTLY_BUSY_FROM_DB;
+            }
+
+        }, username, primaryHost, password, localAddresses);
 //        sipuada.registerPlugin(sipuadaPluginForAudio);
         sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
     }
@@ -332,29 +385,29 @@ public class SipuadaService extends Service {
                 operation.getCallback());
     }
 
-    public void doCancelInviteToUser(CancelUserInviteOperation operation) {
+    public void doCancelInviteToUser(UserInviteOperation operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.cancelCallInvitation(operation.getCallId());
+    }
+
+    public void doAcceptInviteFromUser(UserInviteOperation operation) {
+        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
+        sipuada.acceptCallInvitation(operation.getCallId());
+    }
+
+    public void doDeclineInviteFromUser(UserInviteOperation operation) {
+        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
+        sipuada.declineCallInvitation(operation.getCallId());
     }
 
     private Sipuada getSipuada(String username, String primaryHost) {
         return sipuadaInstances.get(getSipuadaKey(username, primaryHost));
     }
 
-    SipuadaApi.SipuadaListener sipuadaListener = new SipuadaApi.SipuadaListener() {
+    abstract class SipuadaServiceListener implements SipuadaApi.SipuadaListener {
 
         @Override
-        public boolean onCallInvitationArrived(String callId) {
-            Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
-                    " callId:{%s}]", callId));
-            if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
-                Intent intent = new Intent(getApplicationContext(),
-                        IncomingCallInvitationActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-            return SipuadaApplication.CURRENTLY_BUSY_FROM_DB;
-        }
+        public abstract boolean onCallInvitationArrived(String callId);
 
         @Override
         public void onCallInvitationCanceled(String reason, String callId) {
@@ -391,6 +444,6 @@ public class SipuadaService extends Service {
             eventBus.post(new SipuadaPresenterApi.EstablishedCallFailed(reason, callId));
         }
 
-    };
+    }
 
 }

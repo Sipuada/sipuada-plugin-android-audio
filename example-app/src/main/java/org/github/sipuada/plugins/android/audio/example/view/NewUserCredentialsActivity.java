@@ -23,7 +23,7 @@ public class NewUserCredentialsActivity extends MosbyActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_new_user_credentials);
+        setContentView(R.layout.activity_new_user_credentials);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         submitButton.setOnClickListener(new View.OnClickListener() {

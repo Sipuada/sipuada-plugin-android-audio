@@ -132,7 +132,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
                 inviteUser.setEnabled(false);
                 inviteButton.setEnabled(false);
                 presenter.inviteUser(username, primaryHost, remoteUser,
-                    new SipuadaPresenterApi.CallInvitationCallback() {
+                    new SipuadaPresenterApi.OutgoingCallInvitationCallback() {
 
                         @Override
                         public void onWaiting(final String callId) {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/sipuplug_andrdio_example_IncomingCallsSummary"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.3"
+        android:gravity="center|bottom"
+        android:layout_marginBottom="30dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        tools:ignore="HardcodedText"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/white"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/sipuplug_andrdio_example_RecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.6"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:paddingTop="?attr/actionBarSize"/>
+
+</LinearLayout>

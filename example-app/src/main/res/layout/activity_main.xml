@@ -14,7 +14,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
         android:gravity="center"
-        tools:context="org.github.sipuada.plugins.android.audio.example.view.SipuadaActivity">
+        tools:context=".view.MainActivity">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/sipuplug_andrdio_example_RecyclerView"
