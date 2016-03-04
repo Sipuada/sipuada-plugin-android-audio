@@ -155,7 +155,7 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
 
     private void refreshIncomingCalls() {
         int pendingIncomingCallsNumber = 0, finishedIncomingCallsNumber = 0;
-        for (int i=0; i<adapter.getItemCount(); i++) {
+        for (int i = 0; i < adapter.getItemCount(); i++) {
             if (adapter.getItem(i).isFinished()) {
                 finishedIncomingCallsNumber++;
             }
@@ -179,6 +179,18 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
         }
         incomingCallsSummary.setText(summary);
         adapter.notifyDataSetChanged();
+    }
+
+    public void declineRemainingCallInvitations(IncomingCallInvitation incomingCallInvitation) {
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            IncomingCallInvitation otherCallInvitation = adapter.getItem(i);
+            if (otherCallInvitation.getCallId().equals(incomingCallInvitation.getCallId())) {
+                continue;
+            }
+            getPresenter().declineInviteFromUser(incomingCallInvitation.getUsername(),
+                    incomingCallInvitation.getPrimaryHost(), incomingCallInvitation.getCallId());
+            finish();
+        }
     }
 
     @Override

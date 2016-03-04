@@ -82,11 +82,12 @@ public class CallInvitationEntryRenderer
         String statusMessage = "Waiting for your decision...";
         incomingCallStatus.setText(statusMessage);
         incomingCallStatus.setSelected(true);
-        renderAccept(callId, username, primaryHost);
+        renderAccept(callId, username, primaryHost, incomingCallInvitation);
         renderDecline(callId, username, primaryHost, incomingCallInvitation);
     }
 
-    private void renderAccept(final String callId, final String username, final String primaryHost) {
+    private void renderAccept(final String callId, final String username, final String primaryHost,
+            final IncomingCallInvitationActivity.IncomingCallInvitation incomingCallInvitation) {
         acceptButton.setEnabled(true);
         acceptButton.setVisibility(View.VISIBLE);
         acceptButton.setOnClickListener(new View.OnClickListener() {
@@ -97,6 +98,7 @@ public class CallInvitationEntryRenderer
                 incomingCallStatus.setText(statusMessage);
                 incomingCallStatus.setSelected(true);
                 presenter.acceptInviteFromUser(username, primaryHost, callId);
+                activity.declineRemainingCallInvitations(incomingCallInvitation);
             }
 
         });

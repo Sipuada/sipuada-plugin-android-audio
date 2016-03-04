@@ -448,6 +448,7 @@ public class SipuadaService extends Service {
     public void doAcceptInviteFromUser(UserInviteOperation operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.acceptCallInvitation(operation.getCallId());
+        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = true;
     }
 
     public void doDeclineInviteFromUser(UserInviteOperation operation) {
@@ -502,6 +503,7 @@ public class SipuadaService extends Service {
         public void onCallFinished(String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFinished;" +
                     " callId:{%s}]", callId));
+            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
             eventBus.post(new SipuadaPresenterApi.EstablishedCallFinished(callId));
         }
 
@@ -509,6 +511,7 @@ public class SipuadaService extends Service {
         public void onCallFailure(String reason, String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFailure;" +
                     " reason:{%s}, callId:{%s}]", reason, callId));
+            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
             eventBus.post(new SipuadaPresenterApi.EstablishedCallFailed(reason, callId));
         }
 
