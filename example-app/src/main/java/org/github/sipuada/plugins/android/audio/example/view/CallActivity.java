@@ -12,6 +12,7 @@ import com.pedrogomez.renderers.ListAdapteeCollection;
 import com.pedrogomez.renderers.RVRendererAdapter;
 
 import org.github.sipuada.plugins.android.audio.example.R;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenter;
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.view.renderers.CallInvitationEntriesRendererBuilder;
@@ -27,75 +28,7 @@ public class CallActivity extends SipuadaActivity<CallPresenterApi> {
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView incomingCallsSummary;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
 
-    private RVRendererAdapter<IncomingCallInvitation> adapter;
-
-    public class IncomingCallInvitation {
-
-        private final String callId;
-        private final String username;
-        private final String primaryHost;
-        private final String remoteUsername;
-        private final String remoteHost;
-        private boolean finished = false;
-        private String reason = null;
-
-        public IncomingCallInvitation(String callId, String username, String primaryHost,
-                                      String remoteUsername, String remoteHost) {
-            this.callId = callId;
-            this.username = username;
-            this.primaryHost = primaryHost;
-            this.remoteUsername = remoteUsername;
-            this.remoteHost = remoteHost;
-        }
-
-        public String getCallId() {
-            return callId;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPrimaryHost() {
-            return primaryHost;
-        }
-
-        public String getRemoteUsername() {
-            return remoteUsername;
-        }
-
-        public String getRemoteHost() {
-            return remoteHost;
-        }
-
-        public boolean isFinished() {
-            return finished;
-        }
-
-        public void setFinished(String reason) {
-            this.finished = true;
-            this.reason = reason;
-        }
-
-        public String getReason() {
-            return reason;
-        }
-
-        @Override
-        public int hashCode() {
-            return callId.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (other instanceof IncomingCallInvitation) {
-                IncomingCallInvitation that = (IncomingCallInvitation) other;
-                return this.getCallId().equals(that.getCallId());
-            }
-            return false;
-        }
-
-    }
+    private RVRendererAdapter<SipuadaCallData> adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,7 +37,7 @@ public class CallActivity extends SipuadaActivity<CallPresenterApi> {
         incomingCallsSummary.setEnabled(false);
         adapter = new RVRendererAdapter<>(getLayoutInflater(),
                 new CallInvitationEntriesRendererBuilder(getPresenter(), this),
-                new ListAdapteeCollection<>(Arrays.asList(new IncomingCallInvitation[]{})));
+                new ListAdapteeCollection<>(Arrays.asList(new SipuadaCallData[]{})));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         recyclerView.setEnabled(false);
@@ -122,75 +55,75 @@ public class CallActivity extends SipuadaActivity<CallPresenterApi> {
         String primaryHost = intent.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
         String remoteUsername = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_USERNAME);
         String remoteHost = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_HOST);
-        final IncomingCallInvitation incomingCallInvitation =
-                new IncomingCallInvitation(callId, username, primaryHost, remoteUsername, remoteHost);
+        final SipuadaCallData sipuadaCallData =
+                new SipuadaCallData(callId, username, primaryHost, remoteUsername, remoteHost);
         getPresenter().willAnswerInviteFromUser(callId, new CallPresenterApi
                 .IncomingCallInvitationCallback() {
 
             @Override
             public void onFailed(String reason) {
-                incomingCallInvitation.setFinished(reason);
+//                sipuadaCallData.setFinished(reason);
                 refreshIncomingCalls();
             }
 
             @Override
             public void onCanceled(String reason) {
-                incomingCallInvitation.setFinished(reason);
+//                sipuadaCallData.setFinished(reason);
                 refreshIncomingCalls();
             }
 
         });
-        List<IncomingCallInvitation> incomingCallInvitations = new LinkedList<>();
+        List<SipuadaCallData> sipuadaCallDatas = new LinkedList<>();
         for (int i = 0; i < adapter.getItemCount(); i++) {
-            incomingCallInvitations.add(adapter.getItem(i));
+            sipuadaCallDatas.add(adapter.getItem(i));
         }
         adapter.clear();
-        adapter.add(incomingCallInvitation);
-        adapter.addAll(incomingCallInvitations);
+        adapter.add(sipuadaCallData);
+        adapter.addAll(sipuadaCallDatas);
         refreshIncomingCalls();
     }
 
-    public void closeFinishedCallInvitation(IncomingCallInvitation incomingCallInvitation) {
-        adapter.remove(incomingCallInvitation);
+    public void closeFinishedCallInvitation(SipuadaCallData sipuadaCallData) {
+        adapter.remove(sipuadaCallData);
         refreshIncomingCalls();
     }
 
     private void refreshIncomingCalls() {
-        int pendingIncomingCallsNumber = 0, finishedIncomingCallsNumber = 0;
+        int pendingIncomingCallsNumber = 0/*, finishedIncomingCallsNumber = 0*/;
         for (int i = 0; i < adapter.getItemCount(); i++) {
-            if (adapter.getItem(i).isFinished()) {
-                finishedIncomingCallsNumber++;
-            }
-            else {
+//            if (adapter.getItem(i).isFinished()) {
+//                finishedIncomingCallsNumber++;
+//            }
+//            else {
                 pendingIncomingCallsNumber++;
-            }
+//            }
         }
         String summary = "Incoming calls...";
         if (pendingIncomingCallsNumber == 1) {
             summary = String.format("%d incoming call invite...", pendingIncomingCallsNumber);
         } else if (pendingIncomingCallsNumber > 1) {
             summary = String.format("%d incoming call invites...", pendingIncomingCallsNumber);
-        } else if (finishedIncomingCallsNumber > 1) {
-            summary = String.format("%d incoming call invites finished.",
-                    finishedIncomingCallsNumber);
-        } else if (finishedIncomingCallsNumber == 1) {
-            summary = String.format("%d incoming call invite finished.",
-                    finishedIncomingCallsNumber);
-        } else if (pendingIncomingCallsNumber == 0 && finishedIncomingCallsNumber == 0) {
+//        } else if (finishedIncomingCallsNumber > 1) {
+//            summary = String.format("%d incoming call invites finished.",
+//                    finishedIncomingCallsNumber);
+//        } else if (finishedIncomingCallsNumber == 1) {
+//            summary = String.format("%d incoming call invite finished.",
+//                    finishedIncomingCallsNumber);
+        } else if (pendingIncomingCallsNumber == 0/* && finishedIncomingCallsNumber == 0*/) {
             finish();
         }
         incomingCallsSummary.setText(summary);
         adapter.notifyDataSetChanged();
     }
 
-    public void declineRemainingCallInvitations(IncomingCallInvitation incomingCallInvitation) {
+    public void declineRemainingCallInvitations(SipuadaCallData sipuadaCallData) {
         for (int i = 0; i < adapter.getItemCount(); i++) {
-            IncomingCallInvitation otherCallInvitation = adapter.getItem(i);
-            if (otherCallInvitation.getCallId().equals(incomingCallInvitation.getCallId())) {
+            SipuadaCallData otherCallInvitation = adapter.getItem(i);
+            if (otherCallInvitation.getCallId().equals(sipuadaCallData.getCallId())) {
                 continue;
             }
-            getPresenter().declineInviteFromUser(incomingCallInvitation.getUsername(),
-                    incomingCallInvitation.getPrimaryHost(), incomingCallInvitation.getCallId());
+            getPresenter().declineInviteFromUser(sipuadaCallData.getUsername(),
+                    sipuadaCallData.getPrimaryHost(), sipuadaCallData.getCallId());
             finish();
         }
     }
