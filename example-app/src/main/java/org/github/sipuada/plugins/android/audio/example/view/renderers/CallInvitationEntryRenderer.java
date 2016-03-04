@@ -52,7 +52,9 @@ public class CallInvitationEntryRenderer
         String callId = incomingCallInvitation.getCallId();
         String username = incomingCallInvitation.getUsername();
         String primaryHost = incomingCallInvitation.getPrimaryHost();
-        usernameAtPrimaryHost.setText(callId);
+        String remoteUsername = incomingCallInvitation.getRemoteUsername();
+        String remoteHost = incomingCallInvitation.getRemoteHost();
+        usernameAtPrimaryHost.setText(String.format("%s@%s", remoteUsername, remoteHost));
         usernameAtPrimaryHost.setSelected(true);
         acceptButton.getBackground().setAlpha(115);
         declineButton.getBackground().setAlpha(115);
@@ -71,36 +73,14 @@ public class CallInvitationEntryRenderer
             return;
         }
         else if (incomingCallInvitation.isFinished()) {
-            StringBuilder statusMessage = new StringBuilder("Call invitation finished.");
-            String reasonWhy = incomingCallInvitation.getReason();
-            if (reasonWhy != null) {
-                statusMessage.append(String.format(" Reason: %s", reasonWhy));
-            }
-            incomingCallStatus.setText(statusMessage);
-            incomingCallStatus.setSelected(true);
-            acceptButton.setEnabled(false);
-            acceptButton.setVisibility(View.GONE);
-            acceptButton.setOnClickListener(null);
-            declineButton.setEnabled(false);
-            declineButton.setVisibility(View.GONE);
-            declineButton.setOnClickListener(null);
-            closeButton.setEnabled(true);
-            closeButton.setVisibility(View.VISIBLE);
-            closeButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    activity.closeFinishedCallInvitation(incomingCallInvitation);
-                }
-
-            });
+            renderFinished(incomingCallInvitation);
             return;
         }
         String statusMessage = "Waiting for your decision...";
         incomingCallStatus.setText(statusMessage);
         incomingCallStatus.setSelected(true);
         renderAccept(callId, username, primaryHost);
-        renderDecline(callId, username, primaryHost);
+        renderDecline(callId, username, primaryHost, incomingCallInvitation);
     }
 
     private void renderAccept(final String callId, final String username, final String primaryHost) {
@@ -119,18 +99,44 @@ public class CallInvitationEntryRenderer
         });
     }
 
-    private void renderDecline(final String callId, final String username, final String primaryHost) {
+    private void renderDecline(final String callId, final String username, final String primaryHost,
+            final IncomingCallInvitationActivity.IncomingCallInvitation incomingCallInvitation) {
         declineButton.setEnabled(true);
         declineButton.setVisibility(View.VISIBLE);
         declineButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                String statusMessage = "Please wait...";
-                incomingCallStatus.setText(statusMessage);
-                incomingCallStatus.setSelected(true);
                 presenter.declineInviteFromUser(username, primaryHost, callId);
-//                activity.closeFinishedCallInvitation(incomingCallInvitation);
+                incomingCallInvitation.setFinished("Declined by you.");
+                renderFinished(incomingCallInvitation);
+            }
+
+        });
+    }
+
+    private void renderFinished(final IncomingCallInvitationActivity
+            .IncomingCallInvitation incomingCallInvitation) {
+        StringBuilder statusMessage = new StringBuilder("Call invitation finished.");
+        String reasonWhy = incomingCallInvitation.getReason();
+        if (reasonWhy != null) {
+            statusMessage.append(String.format(" Reason: %s", reasonWhy));
+        }
+        incomingCallStatus.setText(statusMessage);
+        incomingCallStatus.setSelected(true);
+        acceptButton.setEnabled(false);
+        acceptButton.setVisibility(View.GONE);
+        acceptButton.setOnClickListener(null);
+        declineButton.setEnabled(false);
+        declineButton.setVisibility(View.GONE);
+        declineButton.setOnClickListener(null);
+        closeButton.setEnabled(true);
+        closeButton.setVisibility(View.VISIBLE);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                activity.closeFinishedCallInvitation(incomingCallInvitation);
             }
 
         });

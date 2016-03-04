@@ -29,13 +29,18 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
         private final String callId;
         private final String username;
         private final String primaryHost;
+        private final String remoteUsername;
+        private final String remoteHost;
         private boolean finished = false;
         private String reason = null;
 
-        public IncomingCallInvitation(String callId, String username, String primaryHost) {
+        public IncomingCallInvitation(String callId, String username, String primaryHost,
+                                      String remoteUsername, String remoteHost) {
             this.callId = callId;
             this.username = username;
             this.primaryHost = primaryHost;
+            this.remoteUsername = remoteUsername;
+            this.remoteHost = remoteHost;
         }
 
         public String getCallId() {
@@ -48,6 +53,14 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
 
         public String getPrimaryHost() {
             return primaryHost;
+        }
+
+        public String getRemoteUsername() {
+            return remoteUsername;
+        }
+
+        public String getRemoteHost() {
+            return remoteHost;
         }
 
         public boolean isFinished() {
@@ -102,8 +115,10 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
         String callId = intent.getStringExtra(SipuadaApplication.KEY_CALL_ID);
         String username = intent.getStringExtra(SipuadaApplication.KEY_USERNAME);
         String primaryHost = intent.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
+        String remoteUsername = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_USERNAME);
+        String remoteHost = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_HOST);
         final IncomingCallInvitation incomingCallInvitation =
-                new IncomingCallInvitation(callId, username, primaryHost);
+                new IncomingCallInvitation(callId, username, primaryHost, remoteUsername, remoteHost);
         getPresenter().willAnswerInviteFromUser(callId, new SipuadaPresenterApi
                 .IncomingCallInvitationCallback() {
 
@@ -144,8 +159,11 @@ public class IncomingCallInvitationActivity extends SipuadaActivity {
             summary = String.format("%d incoming call invite...", pendingIncomingCallsNumber);
         } else if (pendingIncomingCallsNumber > 1) {
             summary = String.format("%d incoming call invites...", pendingIncomingCallsNumber);
-        } else if (finishedIncomingCallsNumber > 0) {
+        } else if (finishedIncomingCallsNumber > 1) {
             summary = String.format("%d incoming call invites finished.",
+                    finishedIncomingCallsNumber);
+        } else if (finishedIncomingCallsNumber == 1) {
+            summary = String.format("%d incoming call invite finished.",
                     finishedIncomingCallsNumber);
         } else if (pendingIncomingCallsNumber == 0 && finishedIncomingCallsNumber == 0) {
             finish();

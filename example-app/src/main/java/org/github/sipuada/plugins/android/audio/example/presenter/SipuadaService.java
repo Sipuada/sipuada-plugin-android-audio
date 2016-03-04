@@ -2,6 +2,7 @@ package org.github.sipuada.plugins.android.audio.example.presenter;
 
 import android.app.Service;
 import android.content.Intent;
+import android.javax.sip.header.ContentTypeHeader;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -286,7 +287,8 @@ public class SipuadaService extends Service {
             Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
 
                 @Override
-                public boolean onCallInvitationArrived(String callId) {
+                public boolean onCallInvitationArrived(String callId, String remoteUsername,
+                                                       String remoteHost) {
                     Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
                             " callId:{%s}]", callId));
                     if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
@@ -296,6 +298,8 @@ public class SipuadaService extends Service {
                         intent.putExtra(SipuadaApplication.KEY_CALL_ID, callId);
                         intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
                         intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
+                        intent.putExtra(SipuadaApplication.KEY_REMOTE_USERNAME, remoteUsername);
+                        intent.putExtra(SipuadaApplication.KEY_REMOTE_HOST, remoteHost);
                         startActivity(intent);
                     }
                     return SipuadaApplication.CURRENTLY_BUSY_FROM_DB;
@@ -323,7 +327,8 @@ public class SipuadaService extends Service {
         Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
 
             @Override
-            public boolean onCallInvitationArrived(String callId) {
+            public boolean onCallInvitationArrived(String callId, String remoteUsername,
+                                                   String remoteHost) {
                 Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
                         " callId:{%s}]", callId));
                 if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
@@ -333,6 +338,8 @@ public class SipuadaService extends Service {
                     intent.putExtra(SipuadaApplication.KEY_CALL_ID, callId);
                     intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
                     intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
+                    intent.putExtra(SipuadaApplication.KEY_REMOTE_USERNAME, remoteUsername);
+                    intent.putExtra(SipuadaApplication.KEY_REMOTE_HOST, remoteHost);
                     startActivity(intent);
                 }
                 return SipuadaApplication.CURRENTLY_BUSY_FROM_DB;
@@ -407,7 +414,8 @@ public class SipuadaService extends Service {
     abstract class SipuadaServiceListener implements SipuadaApi.SipuadaListener {
 
         @Override
-        public abstract boolean onCallInvitationArrived(String callId);
+        public abstract boolean onCallInvitationArrived(String callId, String remoteUsername,
+                                                        String remoteHost);
 
         @Override
         public void onCallInvitationCanceled(String reason, String callId) {
@@ -443,6 +451,12 @@ public class SipuadaService extends Service {
                     " reason:{%s}, callId:{%s}]", reason, callId));
             eventBus.post(new SipuadaPresenterApi.EstablishedCallFailed(reason, callId));
         }
+
+        @Override
+        public void onInfoReceived(String callId, ContentTypeHeader contentType, String content) {}
+
+        @Override
+        public void onMessageReceived(String callId, ContentTypeHeader contentType, String content) {}
 
     }
 
