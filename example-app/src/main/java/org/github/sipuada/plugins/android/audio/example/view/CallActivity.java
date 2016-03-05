@@ -24,7 +24,8 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class CallActivity extends SipuadaViewStateActivity<CallPresenterApi> implements CallViewApi {
+public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPresenterApi>
+        implements CallViewApi {
 
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView incomingCallsSummary;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;

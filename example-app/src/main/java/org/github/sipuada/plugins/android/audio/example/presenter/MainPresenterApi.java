@@ -3,11 +3,11 @@ package org.github.sipuada.plugins.android.audio.example.presenter;
 import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
+import org.github.sipuada.plugins.android.audio.example.view.MainViewApi;
 
 import java.util.List;
 
-public interface MainPresenterApi<V extends SipuadaViewApi> extends SipuadaPresenterApi<V> {
+public interface MainPresenterApi extends SipuadaPresenterApi<MainViewApi> {
 
     interface FetchUsersCredentialsCallback {
 

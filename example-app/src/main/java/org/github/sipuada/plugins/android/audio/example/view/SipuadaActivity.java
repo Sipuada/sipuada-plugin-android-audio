@@ -10,8 +10,8 @@ import com.hannesdorfmann.mosby.mvp.MvpActivity;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.presenter.SipuadaService;
 
-public abstract class SipuadaActivity<P extends SipuadaPresenterApi<SipuadaViewApi>>
-        extends MvpActivity<SipuadaViewApi, P> implements SipuadaViewApi {
+public abstract class SipuadaActivity<V extends SipuadaViewApi, P extends SipuadaPresenterApi<V>>
+        extends MvpActivity<V, P> implements SipuadaViewApi {
 
     private boolean mBoundToSipuadaService = false;
 
