@@ -10,6 +10,22 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void performAction(CallActivity.CallAction callAction, SipuadaCallData sipuadaCallData);
 
+    void makeCall(SipuadaCallData sipuadaCallData);
+
+    void callAccepted(SipuadaCallData sipuadaCallData);
+
+    void callDeclined(SipuadaCallData sipuadaCallData);
+
+    void receiveCall(SipuadaCallData sipuadaCallData);
+
+    void acceptCall(SipuadaCallData sipuadaCallData);
+
+    void declineCall(SipuadaCallData sipuadaCallData);
+
+    void establishCall(SipuadaCallData sipuadaCallData);
+
+    void finishCall(SipuadaCallData sipuadaCallData);
+
     interface OutgoingCallInvitationCallback {
 
         void onWaiting(String callId);

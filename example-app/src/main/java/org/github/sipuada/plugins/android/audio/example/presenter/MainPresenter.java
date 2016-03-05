@@ -14,8 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainPresenter extends SipuadaPresenter<MainViewApi>
-        implements MainPresenterApi<MainViewApi> {
+public class MainPresenter extends SipuadaPresenter<MainViewApi> implements MainPresenterApi {
 
     @Override
     protected void doUponServiceConnected() {

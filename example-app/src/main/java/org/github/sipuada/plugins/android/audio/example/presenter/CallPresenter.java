@@ -14,8 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CallPresenter extends SipuadaPresenter<CallViewApi>
-        implements CallPresenterApi<CallViewApi> {
+public class CallPresenter extends SipuadaPresenter<CallViewApi> implements CallPresenterApi {
 
     @Override
     public void performAction(CallActivity.CallAction callAction, SipuadaCallData sipuadaCallData) {
@@ -23,13 +22,13 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi>
             case DO_NOTHING:
                 break;
             case RECEIVE_CALL:
-//                receiveCall(callData);
+//                receiveCall(sipuadaCallData);
                 break;
             case FINISH_CALL:
-//                finishCall(callData);
+//                finishCall(sipuadaCallData);
                 break;
             case MAKE_CALL:
-//                makeCall(callData);
+//                makeCall(sipuadaCallData);
             default:
                 break;
 
@@ -208,58 +207,67 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi>
 
     }
 
-    public void makeCall(SipuadaCallData callData) {
+    @Override
+    public void makeCall(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showMakingCall(callData);
+            //noinspection ConstantConditions
+            getView().showMakingCall(sipuadaCallData);
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void callAccepted(SipuadaCallData callData) {
+    @Override
+    public void callAccepted(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showMakingCallAccepted(callData);
+            //noinspection ConstantConditions
+            getView().showMakingCallAccepted(sipuadaCallData);
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void callDeclined(SipuadaCallData callData) {
+    @Override
+    public void callDeclined(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showMakingCallDeclined(callData);
+            //noinspection ConstantConditions
+            getView().showMakingCallDeclined(sipuadaCallData);
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void receiveCall(SipuadaCallData callData) {
+    @Override
+    public void receiveCall(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showReceivingCall(callData);
+            //noinspection ConstantConditions
+            getView().showReceivingCall(sipuadaCallData);
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void acceptCall(SipuadaCallData callData) {
+    @Override
+    public void acceptCall(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showReceivingCallAccept(callData);
+            //noinspection ConstantConditions
+            getView().showReceivingCallAccept(sipuadaCallData);
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void declineCall(SipuadaCallData callData) {
+    @Override
+    public void declineCall(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showReceivingCallDecline(callData);
+            //noinspection ConstantConditions
+            getView().showReceivingCallDecline(sipuadaCallData);
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void establishCall(SipuadaCallData callData) {
+    @Override
+    public void establishCall(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showCallInProgress(callData);
+            //noinspection ConstantConditions
+            getView().showCallInProgress(sipuadaCallData);
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void finishCall(SipuadaCallData callData) {
+    @Override
+    public void finishCall(SipuadaCallData sipuadaCallData) {
         if (isViewAttached()) {
-            getView().showCallFinished(callData);
+            //noinspection ConstantConditions
+            getView().showCallFinished(sipuadaCallData);
         }
     }
 
