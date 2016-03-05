@@ -24,7 +24,7 @@
         </activity>
 
         <activity
-            android:name=".view.NewUserCredentialsActivity"
+            android:name=".view.CredentialsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:excludeFromRecents="true"/>
 

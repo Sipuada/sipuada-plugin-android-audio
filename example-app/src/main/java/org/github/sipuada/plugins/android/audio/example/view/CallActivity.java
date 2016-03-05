@@ -39,7 +39,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_incoming_call_invitation);
+        setContentView(R.layout.activity_call);
         incomingCallsSummary.setEnabled(false);
         adapter = new RVRendererAdapter<>(getLayoutInflater(),
                 new CallInvitationEntriesRendererBuilder(getPresenter(), this),

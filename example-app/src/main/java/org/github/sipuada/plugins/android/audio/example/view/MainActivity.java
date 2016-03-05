@@ -71,7 +71,7 @@ public class MainActivity extends SipuadaActivity<MainViewApi, MainPresenterApi>
 
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), NewUserCredentialsActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CredentialsActivity.class);
                 startActivityForResult(intent, REQUEST_NEW_USER_CREDENTIALS);
             }
 

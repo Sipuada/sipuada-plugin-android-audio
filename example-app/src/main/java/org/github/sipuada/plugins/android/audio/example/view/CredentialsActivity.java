@@ -13,7 +13,7 @@ import org.github.sipuada.plugins.android.audio.example.R;
 
 import butterknife.Bind;
 
-public class NewUserCredentialsActivity extends MosbyActivity {
+public class CredentialsActivity extends MosbyActivity {
 
     @Bind(R.id.sipuplug_andrdio_example_UsernameMarqueeto) LabelledMarqueeEditText usernameEditText;
     @Bind(R.id.sipuplug_andrdio_example_PrimaryHostMarqueeto) LabelledMarqueeEditText primaryHostEditText;
@@ -23,7 +23,7 @@ public class NewUserCredentialsActivity extends MosbyActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_user_credentials);
+        setContentView(R.layout.activity_credentials);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         submitButton.setOnClickListener(new View.OnClickListener() {
