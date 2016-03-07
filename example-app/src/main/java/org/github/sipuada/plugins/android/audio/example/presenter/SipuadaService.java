@@ -379,7 +379,6 @@ public class SipuadaService extends Service {
         final String oldUsername = oldUserCredentials.getUsername();
         final String oldPrimaryHost = oldUserCredentials.getPrimaryHost();
         removeSipuada(oldUsername, oldPrimaryHost);
-        oldUserCredentials.delete();
         SipuadaUserCredentials newUserCredentials = operation.getNewUserCredentials();
         final String newUsername = newUserCredentials.getUsername();
         final String newPrimaryHost = newUserCredentials.getPrimaryHost();
@@ -503,6 +502,9 @@ public class SipuadaService extends Service {
         if (sipuada != null) {
             sipuada.destroySipuada();
         }
+        SipuadaUserCredentials self = new Select().from(SipuadaUserCredentials.class)
+                .where("Username = ? AND PrimaryHost = ?", username, primaryHost).executeSingle();
+        self.delete();
     }
 
     abstract class SipuadaServiceListener implements SipuadaApi.SipuadaListener {

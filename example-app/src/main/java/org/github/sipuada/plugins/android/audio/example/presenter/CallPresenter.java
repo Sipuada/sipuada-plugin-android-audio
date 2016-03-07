@@ -112,6 +112,8 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
             }
 
         });
+        sipuadaService.cancelInviteToUser(sipuadaCallData.getUsername(),
+                sipuadaCallData.getPrimaryHost(), sipuadaCallData.getCallId());
     }
 
     @Override

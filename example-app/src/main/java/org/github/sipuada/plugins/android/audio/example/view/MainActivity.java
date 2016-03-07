@@ -93,16 +93,19 @@ public class MainActivity extends SipuadaActivity<MainViewApi, MainPresenterApi>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String username = data.getStringExtra(SipuadaApplication.KEY_USERNAME);
-        String primaryHost = data.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
-        String password = data.getStringExtra(SipuadaApplication.KEY_PASSWORD);
-        SipuadaUserCredentials oldUserCredentials = data.getParcelableExtra(SipuadaApplication
-                .KEY_USER_CREDENTIALS);
         if (requestCode == REQUEST_NEW_USER_CREDENTIALS
                 && resultCode == RESULT_OK) {
+            String username = data.getStringExtra(SipuadaApplication.KEY_USERNAME);
+            String primaryHost = data.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
+            String password = data.getStringExtra(SipuadaApplication.KEY_PASSWORD);
             getPresenter().createSipuada(username, primaryHost, password);
         } else if (requestCode == REQUEST_UPDATE_USER_CREDENTIALS
             && resultCode == RESULT_OK) {
+            String username = data.getStringExtra(SipuadaApplication.KEY_USERNAME);
+            String primaryHost = data.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
+            String password = data.getStringExtra(SipuadaApplication.KEY_PASSWORD);
+            SipuadaUserCredentials oldUserCredentials = data.getParcelableExtra(SipuadaApplication
+                    .KEY_USER_CREDENTIALS);
             getPresenter().updateSipuada(oldUserCredentials, username, primaryHost, password);
         }
     }

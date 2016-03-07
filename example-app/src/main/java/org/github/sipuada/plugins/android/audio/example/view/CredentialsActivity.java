@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText;
 import com.hannesdorfmann.mosby.MosbyActivity;
@@ -16,6 +17,7 @@ import butterknife.Bind;
 
 public class CredentialsActivity extends MosbyActivity {
 
+    @Bind(R.id.sipuplug_andrdio_example_ActionTitle) TextView actionTitle;
     @Bind(R.id.sipuplug_andrdio_example_UsernameMarqueeto) LabelledMarqueeEditText usernameEditText;
     @Bind(R.id.sipuplug_andrdio_example_PrimaryHostMarqueeto) LabelledMarqueeEditText primaryHostEditText;
     @Bind(R.id.sipuplug_andrdio_example_PasswordMarqueeto) LabelledMarqueeEditText passwordEditText;
@@ -28,16 +30,21 @@ public class CredentialsActivity extends MosbyActivity {
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         Intent intent = getIntent();
+        String actionTitleMessage = "Enter new user Credentials";
+        actionTitle.setText(actionTitleMessage);
         SipuadaUserCredentials oldUserCredentials = null;
         if (intent != null) {
             oldUserCredentials = intent
                     .getParcelableExtra(SipuadaApplication.KEY_USER_CREDENTIALS);
             if (oldUserCredentials != null) {
+                actionTitleMessage = "Update this user' Credentials";
+                actionTitle.setText(actionTitleMessage);
                 usernameEditText.setText(oldUserCredentials.getUsername());
                 primaryHostEditText.setText(oldUserCredentials.getPrimaryHost());
                 passwordEditText.setText(oldUserCredentials.getPassword());
             }
         }
+        actionTitle.setVisibility(View.VISIBLE);
         final SipuadaUserCredentials realOldUserCredentials = oldUserCredentials;
         submitButton.setOnClickListener(new View.OnClickListener() {
 
