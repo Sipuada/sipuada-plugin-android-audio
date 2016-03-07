@@ -21,7 +21,6 @@ import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
-import org.github.sipuada.plugins.nop.NoOperationSipuadaPlugin;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -298,7 +297,7 @@ public class SipuadaService extends Service {
 //            AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
 //                    new AndroidAudioSipuadaPlugin(userCredentials.username,
 //                            localAddresses[0], getApplicationContext());
-            NoOperationSipuadaPlugin noopSipuadaPlugin = new NoOperationSipuadaPlugin();
+//            NoOperationSipuadaPlugin noopSipuadaPlugin = new NoOperationSipuadaPlugin();
             final String username = userCredentials.getUsername();
             final String primaryHost = userCredentials.getPrimaryHost();
             String password = userCredentials.getPassword();
@@ -316,7 +315,7 @@ public class SipuadaService extends Service {
 
             }, username, primaryHost, password, localAddresses);
 //            sipuada.registerPlugin(sipuadaPluginForAudio);
-            sipuada.registerPlugin(noopSipuadaPlugin);
+//            sipuada.registerPlugin(noopSipuadaPlugin);
             sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
             sipuada.registerAddresses(registrationCallback);
         }
@@ -351,7 +350,7 @@ public class SipuadaService extends Service {
         String password = userCredentials.getPassword();
 //        AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
 //                new AndroidAudioSipuadaPlugin(username, localAddresses[0], getApplicationContext());
-        NoOperationSipuadaPlugin noopSipuadaPlugin = new NoOperationSipuadaPlugin();
+//        NoOperationSipuadaPlugin noopSipuadaPlugin = new NoOperationSipuadaPlugin();
         Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
 
             @Override
@@ -365,7 +364,7 @@ public class SipuadaService extends Service {
 
         }, username, primaryHost, password, localAddresses);
 //        sipuada.registerPlugin(sipuadaPluginForAudio);
-        sipuada.registerPlugin(noopSipuadaPlugin);
+//        sipuada.registerPlugin(noopSipuadaPlugin);
         sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
         sipuada.registerAddresses(registrationCallback);
     }
@@ -383,6 +382,8 @@ public class SipuadaService extends Service {
                     Intent intent = new Intent(getApplicationContext(),
                             CallActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(SipuadaApplication.KEY_CALL_ACTION,
+                            CallPresenter.CallAction.RECEIVE_CALL);
                     intent.putExtra(SipuadaApplication.KEY_CALL_ID, callId);
                     intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
                     intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);

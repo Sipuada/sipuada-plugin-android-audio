@@ -12,11 +12,12 @@ import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
+import org.github.sipuada.plugins.android.audio.example.view.CallViewState;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class CallInvitationEntryRenderer extends Renderer<SipuadaCallData> {
+public class CallEntryRenderer extends Renderer<CallViewState.SipuadaCall> {
 
     @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUsernameAtHost;
     @Bind(R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress) TextView localUsernameAtHost;
@@ -28,8 +29,8 @@ public class CallInvitationEntryRenderer extends Renderer<SipuadaCallData> {
     private final CallPresenterApi presenter;
     private final CallActivity activity;
 
-    public CallInvitationEntryRenderer(CallPresenterApi presenter,
-                                       CallActivity activity) {
+    public CallEntryRenderer(CallPresenterApi presenter,
+                             CallActivity activity) {
         this.presenter = presenter;
         this.activity = activity;
     }
@@ -49,7 +50,8 @@ public class CallInvitationEntryRenderer extends Renderer<SipuadaCallData> {
 
     @Override
     public void render() {
-        final SipuadaCallData sipuadaCallData = getContent();
+        CallViewState.SipuadaCall callInformation = getContent();
+        final SipuadaCallData sipuadaCallData = callInformation.getCallData();
         String callId = sipuadaCallData.getCallId();
         String username = sipuadaCallData.getUsername();
         String primaryHost = sipuadaCallData.getPrimaryHost();
@@ -97,8 +99,7 @@ public class CallInvitationEntryRenderer extends Renderer<SipuadaCallData> {
                 String statusMessage = "Please wait...";
                 incomingCallStatus.setText(statusMessage);
                 incomingCallStatus.setSelected(true);
-                presenter.acceptInviteFromUser(username, primaryHost, callId);
-                activity.declineRemainingCallInvitations(sipuadaCallData);
+                presenter.acceptCall(sipuadaCallData);
             }
 
         });
@@ -112,8 +113,7 @@ public class CallInvitationEntryRenderer extends Renderer<SipuadaCallData> {
 
             @Override
             public void onClick(View view) {
-                presenter.declineInviteFromUser(username, primaryHost, callId);
-//                sipuadaCallData.setFinished("Declined by you.");
+                presenter.declineCall(sipuadaCallData);
                 renderFinished(sipuadaCallData);
             }
 
@@ -122,10 +122,6 @@ public class CallInvitationEntryRenderer extends Renderer<SipuadaCallData> {
 
     private void renderFinished(final SipuadaCallData sipuadaCallData) {
         StringBuilder statusMessage = new StringBuilder("Call invitation finished.");
-//        String reasonWhy = sipuadaCallData.getReason();
-//        if (reasonWhy != null) {
-//            statusMessage.append(String.format(" Reason: %s", reasonWhy));
-//        }
         incomingCallStatus.setText(statusMessage);
         incomingCallStatus.setSelected(true);
         acceptButton.setEnabled(false);
@@ -140,7 +136,7 @@ public class CallInvitationEntryRenderer extends Renderer<SipuadaCallData> {
 
             @Override
             public void onClick(View view) {
-                activity.closeFinishedCallInvitation(sipuadaCallData);
+                activity.closeCall(sipuadaCallData);
             }
 
         });

@@ -6,11 +6,19 @@ public interface CallViewApi extends SipuadaViewApi {
 
     void showMakingCall(SipuadaCallData sipuadaCallData);
 
+    void showCancelingCall(SipuadaCallData sipuadaCallData);
+
+    void showFailingCall(SipuadaCallData sipuadaCallData);
+
     void showMakingCallAccepted(SipuadaCallData sipuadaCallData);
 
     void showMakingCallDeclined(SipuadaCallData sipuadaCallData);
 
     void showReceivingCall(SipuadaCallData sipuadaCallData);
+
+    void showReceivingCallCanceled(SipuadaCallData sipuadaCallData);
+
+    void showReceivingCallFailed(SipuadaCallData sipuadaCallData);
 
     void showReceivingCallAccept(SipuadaCallData sipuadaCallData);
 

@@ -3,20 +3,27 @@ package org.github.sipuada.plugins.android.audio.example.presenter;
 import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
-import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
 import org.github.sipuada.plugins.android.audio.example.view.CallViewApi;
 
 public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
-    void performAction(CallActivity.CallAction callAction, SipuadaCallData sipuadaCallData);
+    void performAction(CallPresenter.CallAction callAction, SipuadaCallData sipuadaCallData);
 
     void makeCall(SipuadaCallData sipuadaCallData);
+
+    void cancelCall(SipuadaCallData sipuadaCallData);
+
+    void failCall(SipuadaCallData sipuadaCallData);
 
     void callAccepted(SipuadaCallData sipuadaCallData);
 
     void callDeclined(SipuadaCallData sipuadaCallData);
 
     void receiveCall(SipuadaCallData sipuadaCallData);
+
+    void callCanceled(SipuadaCallData sipuadaCallData);
+
+    void callFailed(SipuadaCallData sipuadaCallData);
 
     void acceptCall(SipuadaCallData sipuadaCallData);
 
@@ -25,41 +32,6 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
     void establishCall(SipuadaCallData sipuadaCallData);
 
     void finishCall(SipuadaCallData sipuadaCallData);
-
-    interface OutgoingCallInvitationCallback {
-
-        void onWaiting(String callId);
-
-        void onRinging(String callId);
-
-        void onDeclined();
-
-        void onAccepted(String callId);
-
-        void onFailed(String reason);
-
-        void onCanceled(String reason);
-
-    }
-
-    void inviteUser(String username, String primaryHost, String remoteUser,
-                    OutgoingCallInvitationCallback callback);
-
-    void cancelInviteToUser(String username, String primaryHost, String callId);
-
-    interface IncomingCallInvitationCallback {
-
-        void onFailed(String reason);
-
-        void onCanceled(String reason);
-
-    }
-
-    void willAnswerInviteFromUser(String callId, IncomingCallInvitationCallback callback);
-
-    void acceptInviteFromUser(String username, String primaryHost, String callId);
-
-    void declineInviteFromUser(String username, String primaryHost, String callId);
 
     class CallInvitationCanceled {
 

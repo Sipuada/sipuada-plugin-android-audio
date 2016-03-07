@@ -16,43 +16,49 @@ import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenter;
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenterApi;
-import org.github.sipuada.plugins.android.audio.example.view.renderers.CallInvitationEntriesRendererBuilder;
+import org.github.sipuada.plugins.android.audio.example.view.renderers.CallsRendererBuilder;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 import butterknife.Bind;
 
 public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPresenterApi>
         implements CallViewApi {
 
-    @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView incomingCallsSummary;
+    @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView callsSummary;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
 
-    private RVRendererAdapter<SipuadaCallData> adapter;
-
-    public enum CallAction {
-        DO_NOTHING, MAKE_CALL, RECEIVE_CALL, FINISH_CALL
-    }
+    private RVRendererAdapter<CallViewState.SipuadaCall> adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call);
-        incomingCallsSummary.setEnabled(false);
+        callsSummary.setEnabled(false);
         adapter = new RVRendererAdapter<>(getLayoutInflater(),
-                new CallInvitationEntriesRendererBuilder(getPresenter(), this),
-                new ListAdapteeCollection<>(Arrays.asList(new SipuadaCallData[]{})));
+                new CallsRendererBuilder(getPresenter(), this),
+                new ListAdapteeCollection<>(Arrays.asList(new CallViewState.SipuadaCall[]{})));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         recyclerView.setEnabled(false);
-        handleIncomingCallInvitation(getIntent());
     }
 
     @Override
     public void onNewIntent(Intent intent) {
-        handleIncomingCallInvitation(intent);
+        handleCallActionIntent(intent);
+    }
+
+    @Override
+    public void onNewViewStateInstance() {
+        Intent intent = getIntent();
+        handleCallActionIntent(intent);
+    }
+
+    @Override
+    protected void onSipuadaServiceConnected() {
+        callsSummary.setEnabled(true);
+        recyclerView.setEnabled(true);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -61,29 +67,8 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     }
 
     @Override
-    public void onNewViewStateInstance() {
-        Intent intent = getIntent();
-        String callId = intent.getStringExtra(SipuadaApplication.KEY_CALL_ID);
-        String username = intent.getStringExtra(SipuadaApplication.KEY_USERNAME);
-        String primaryHost = intent.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
-        String remoteUsername = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_USERNAME);
-        String remoteHost = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_HOST);
-        CallAction callAction = (CallAction) intent
-                .getSerializableExtra(SipuadaApplication.KEY_CALL_ACTION);
-        presenter.performAction(callAction, new SipuadaCallData(callId, username, primaryHost,
-                remoteUsername, remoteHost));
-    }
-
-    @Override
-    protected void onSipuadaServiceConnected() {
-        incomingCallsSummary.setEnabled(true);
-        recyclerView.setEnabled(true);
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
     protected void onSipuadaServiceDisconnected() {
-        incomingCallsSummary.setEnabled(false);
+        callsSummary.setEnabled(false);
         recyclerView.setEnabled(false);
         adapter.notifyDataSetChanged();
     }
@@ -100,7 +85,9 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 || super.onKeyDown(keyCode, event);
     }
 
-    private void handleIncomingCallInvitation(Intent intent) {
+    private void handleCallActionIntent(Intent intent) {
+        CallPresenter.CallAction sipuadaCallAction = (CallPresenter.CallAction) intent
+                .getSerializableExtra(SipuadaApplication.KEY_CALL_ACTION);
         String callId = intent.getStringExtra(SipuadaApplication.KEY_CALL_ID);
         String username = intent.getStringExtra(SipuadaApplication.KEY_USERNAME);
         String primaryHost = intent.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
@@ -108,79 +95,22 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         String remoteHost = intent.getStringExtra(SipuadaApplication.KEY_REMOTE_HOST);
         final SipuadaCallData sipuadaCallData =
                 new SipuadaCallData(callId, username, primaryHost, remoteUsername, remoteHost);
-        getPresenter().willAnswerInviteFromUser(callId, new CallPresenterApi
-                .IncomingCallInvitationCallback() {
-
-            @Override
-            public void onFailed(String reason) {
-//                sipuadaCallData.setFinished(reason);
-                refreshIncomingCalls();
-            }
-
-            @Override
-            public void onCanceled(String reason) {
-//                sipuadaCallData.setFinished(reason);
-                refreshIncomingCalls();
-            }
-
-        });
-        List<SipuadaCallData> sipuadaCallDatas = new LinkedList<>();
-        for (int i = 0; i < adapter.getItemCount(); i++) {
-            sipuadaCallDatas.add(adapter.getItem(i));
-        }
-        adapter.clear();
-        adapter.add(sipuadaCallData);
-        adapter.addAll(sipuadaCallDatas);
-        refreshIncomingCalls();
-    }
-
-    public void closeFinishedCallInvitation(SipuadaCallData sipuadaCallData) {
-        adapter.remove(sipuadaCallData);
-        refreshIncomingCalls();
-    }
-
-    private void refreshIncomingCalls() {
-        int pendingIncomingCallsNumber = 0/*, finishedIncomingCallsNumber = 0*/;
-        for (int i = 0; i < adapter.getItemCount(); i++) {
-//            if (adapter.getItem(i).isFinished()) {
-//                finishedIncomingCallsNumber++;
-//            }
-//            else {
-                pendingIncomingCallsNumber++;
-//            }
-        }
-        String summary = "Incoming calls...";
-        if (pendingIncomingCallsNumber == 1) {
-            summary = String.format("%d incoming call invite...", pendingIncomingCallsNumber);
-        } else if (pendingIncomingCallsNumber > 1) {
-            summary = String.format("%d incoming call invites...", pendingIncomingCallsNumber);
-//        } else if (finishedIncomingCallsNumber > 1) {
-//            summary = String.format("%d incoming call invites finished.",
-//                    finishedIncomingCallsNumber);
-//        } else if (finishedIncomingCallsNumber == 1) {
-//            summary = String.format("%d incoming call invite finished.",
-//                    finishedIncomingCallsNumber);
-        } else if (pendingIncomingCallsNumber == 0/* && finishedIncomingCallsNumber == 0*/) {
-            finish();
-        }
-        incomingCallsSummary.setText(summary);
-        adapter.notifyDataSetChanged();
-    }
-
-    public void declineRemainingCallInvitations(SipuadaCallData sipuadaCallData) {
-        for (int i = 0; i < adapter.getItemCount(); i++) {
-            SipuadaCallData otherCallInvitation = adapter.getItem(i);
-            if (otherCallInvitation.getCallId().equals(sipuadaCallData.getCallId())) {
-                continue;
-            }
-            getPresenter().declineInviteFromUser(sipuadaCallData.getUsername(),
-                    sipuadaCallData.getPrimaryHost(), sipuadaCallData.getCallId());
-            finish();
-        }
+        addSipuadaCall(sipuadaCallAction, sipuadaCallData);
+        presenter.performAction(sipuadaCallAction, sipuadaCallData);
     }
 
     @Override
     public void showMakingCall(SipuadaCallData sipuadaCallData) {
+
+    }
+
+    @Override
+    public void showCancelingCall(SipuadaCallData sipuadaCallData) {
+
+    }
+
+    @Override
+    public void showFailingCall(SipuadaCallData sipuadaCallData) {
 
     }
 
@@ -196,17 +126,27 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Override
     public void showReceivingCall(SipuadaCallData sipuadaCallData) {
+        addSipuadaCall(CallPresenter.CallAction.RECEIVE_CALL, sipuadaCallData);
+    }
 
+    @Override
+    public void showReceivingCallCanceled(SipuadaCallData sipuadaCallData) {
+        //set sipuada call view state's sipuadaCallState to CALL_RECEIVING_CANCELED
+    }
+
+    @Override
+    public void showReceivingCallFailed(SipuadaCallData sipuadaCallData) {
+        //set sipuada call view state's sipuadaCallState to CALL_RECEIVING_FAILED
     }
 
     @Override
     public void showReceivingCallAccept(SipuadaCallData sipuadaCallData) {
-
+        //set sipuada call view state's sipuadaCallState to CALL_RECEIVING_ACCEPT
     }
 
     @Override
     public void showReceivingCallDecline(SipuadaCallData sipuadaCallData) {
-
+        //set sipuada call view state's sipuadaCallState to CALL_RECEIVING_DECLINE
     }
 
     @Override
@@ -217,6 +157,63 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     @Override
     public void showCallFinished(SipuadaCallData sipuadaCallData) {
 
+    }
+
+    private void addSipuadaCall(CallPresenter.CallAction sipuadaCallAction,
+                                SipuadaCallData sipuadaCallData) {
+        CallViewState callsViewState = (CallViewState) getViewState();
+        CallViewState.SipuadaCallState sipuadaCallState;
+        switch (sipuadaCallAction) {
+            case MAKE_CALL:
+                sipuadaCallState = CallViewState.SipuadaCallState.CALL_MAKING;
+                break;
+            case RECEIVE_CALL:
+                sipuadaCallState = CallViewState.SipuadaCallState.CALL_RECEIVING;
+                break;
+            case FINISH_CALL:
+            default:
+                sipuadaCallState = CallViewState.SipuadaCallState.CALL_FINISHED;
+                break;
+        }
+        callsViewState.addOrModifySipuadaCall(sipuadaCallState, sipuadaCallData);
+        refreshCallDataList(callsViewState);
+    }
+
+    public void closeCall(SipuadaCallData sipuadaCallData) {
+        CallViewState callsViewState = (CallViewState) getViewState();
+        callsViewState.removeSipuadaCall(sipuadaCallData);
+        refreshCallDataList(callsViewState);
+    }
+
+    private void refreshCallDataList(CallViewState callsViewState) {
+        adapter.clear();
+        int pendingIncomingCallsNumber = 0, finishedIncomingCallsNumber = 0;
+        for (int i = 0; i < callsViewState.getSipuadaCallsCount(); i++) {
+            CallViewState.SipuadaCall sipuadaCall = callsViewState.getSipuadaCall(i);
+            if (sipuadaCall.getCallState() == CallViewState.SipuadaCallState.CALL_FINISHED) {
+                finishedIncomingCallsNumber++;
+            }
+            else {
+                pendingIncomingCallsNumber++;
+            }
+            adapter.add(sipuadaCall);
+        }
+        String summary = "Incoming calls...";
+        if (pendingIncomingCallsNumber == 1) {
+            summary = String.format("%d incoming call invite...", pendingIncomingCallsNumber);
+        } else if (pendingIncomingCallsNumber > 1) {
+            summary = String.format("%d incoming call invites...", pendingIncomingCallsNumber);
+        } else if (finishedIncomingCallsNumber > 1) {
+            summary = String.format("%d incoming call invites finished.",
+                    finishedIncomingCallsNumber);
+        } else if (finishedIncomingCallsNumber == 1) {
+            summary = String.format("%d incoming call invite finished.",
+                    finishedIncomingCallsNumber);
+        } else if (pendingIncomingCallsNumber == 0 && finishedIncomingCallsNumber == 0) {
+            finish();
+        }
+        callsSummary.setText(summary);
+        adapter.notifyDataSetChanged();
     }
 
 }
