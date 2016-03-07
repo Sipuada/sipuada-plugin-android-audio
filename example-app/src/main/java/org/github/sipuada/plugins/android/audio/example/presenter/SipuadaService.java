@@ -377,7 +377,7 @@ public class SipuadaService extends Service {
 
     private boolean handleIncomingCallInvitation(final String callId, final String username,
                 final String primaryHost, final String remoteUsername, final String remoteHost) {
-        if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
+//        if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
             Timer timer = new Timer();
             callInvitationDispatchers.put(callId, timer);
             timer.schedule(new TimerTask() {
@@ -399,10 +399,11 @@ public class SipuadaService extends Service {
                 }
 
             }, 2000);
-        } else {
-            //TODO add a notification for this incoming call invitation while you're busy
-        }
-        return SipuadaApplication.CURRENTLY_BUSY_FROM_DB;
+//        } else {
+//            //TODO add a notification for this incoming call invitation while you're busy
+//        }
+//        return SipuadaApplication.CURRENTLY_BUSY_FROM_DB;
+        return false;
     }
 
     private String[] getLocalAddresses() {
@@ -461,13 +462,13 @@ public class SipuadaService extends Service {
     public void doAcceptInviteFromUser(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.acceptCallInvitation(operation.getCallId());
-        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = true;
+//        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = true;
     }
 
     public void doFinishCall(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.finishCall(operation.getCallId());
-        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
+//        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
     }
 
     public void doDeclineInviteFromUser(SipuadaCallData operation) {
@@ -532,7 +533,7 @@ public class SipuadaService extends Service {
         public void onCallFinished(String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFinished;" +
                     " callId:{%s}]", callId));
-            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
+//            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
             eventBus.post(new CallPresenterApi.EstablishedCallFinished(callId));
         }
 
@@ -540,7 +541,7 @@ public class SipuadaService extends Service {
         public void onCallFailure(String reason, String callId) {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFailure;" +
                     " reason:{%s}, callId:{%s}]", reason, callId));
-            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
+//            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
             eventBus.post(new CallPresenterApi.EstablishedCallFailed(reason, callId));
         }
 

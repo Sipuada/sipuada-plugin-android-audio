@@ -14,8 +14,10 @@ public class CallReceivingAcceptRenderer extends CallReceivingRenderer {
         if (presenter.sipuadaServiceIsConnected()) {
             acceptButton.setEnabled(true);
             acceptButton.setOnClickListener(null);
+            acceptButton.setAlpha(0.65f);
             declineButton.setEnabled(false);
             declineButton.setOnClickListener(null);
+            declineButton.setAlpha(0.35f);
             String statusMessage = "Accepting call...";
             callStatus.setText(statusMessage);
             callStatus.setSelected(true);

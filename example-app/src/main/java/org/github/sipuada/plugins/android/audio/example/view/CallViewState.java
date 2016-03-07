@@ -70,10 +70,6 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
             return callState;
         }
 
-        public void setCallState(SipuadaCallState state) {
-            callState = state;
-        }
-
         public SipuadaCallData getCallData() {
             return callData;
         }
@@ -95,118 +91,118 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 
     @Override
     public void apply(CallViewApi sipuadaCallView, boolean retained) {
-        boolean notifyInsteadOfShow = false;
+//        boolean notifyInsteadOfShow = false;
         for (SipuadaCall sipuadaCall : callsInformation) {
             SipuadaCallData sipuadaCallData = sipuadaCall.getCallData();
             switch (sipuadaCall.getCallState()) {
                 case CALL_IN_PROGRESS:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyCallInProgress(sipuadaCallData);
-                    } else {
-                        notifyInsteadOfShow = true;
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyCallInProgress(sipuadaCallData);
+//                    } else {
+//                        notifyInsteadOfShow = true;
                         sipuadaCallView.showCallInProgress(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_RECEIVING_ACCEPT:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyReceivingCallAccept(sipuadaCallData);
-                    } else {
-                        notifyInsteadOfShow = true;
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyReceivingCallAccept(sipuadaCallData);
+//                    } else {
+//                        notifyInsteadOfShow = true;
                         sipuadaCallView.showReceivingCallAccept(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING_ACCEPTED:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyMakingCallAccepted(sipuadaCallData);
-                    } else {
-                        notifyInsteadOfShow = true;
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyMakingCallAccepted(sipuadaCallData);
+//                    } else {
+//                        notifyInsteadOfShow = true;
                         sipuadaCallView.showMakingCallAccepted(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_RECEIVING_DECLINE:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyReceivingCallDecline(sipuadaCallData);
-                    } else {
-                        notifyInsteadOfShow = true;
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyReceivingCallDecline(sipuadaCallData);
+//                    } else {
+//                        notifyInsteadOfShow = true;
                         sipuadaCallView.showReceivingCallDecline(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING_RINGING:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyMakingCallRinging(sipuadaCallData);
-                    } else {
-                        notifyInsteadOfShow = true;
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyMakingCallRinging(sipuadaCallData);
+//                    } else {
+//                        notifyInsteadOfShow = true;
                         sipuadaCallView.showMakingCallRinging(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING_DECLINED:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyMakingCallDeclined(sipuadaCallData);
-                    } else {
-                        notifyInsteadOfShow = true;
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyMakingCallDeclined(sipuadaCallData);
+//                    } else {
+//                        notifyInsteadOfShow = true;
                         sipuadaCallView.showMakingCallDeclined(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_RECEIVING_CANCELED:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyReceivingCallCanceled(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyReceivingCallCanceled(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showReceivingCallCanceled(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_RECEIVING_FAILED:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyReceivingCallFailed(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyReceivingCallFailed(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showReceivingCallFailed(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING_CANCEL:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyCancelingCall(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyCancelingCall(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showCancelingCall(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING_CANCELED:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyMakingCallCanceled(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyMakingCallCanceled(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showMakingCallCanceled(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING_FAILED:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyMakingCallFailed(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyMakingCallFailed(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showMakingCallFailed(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_RECEIVING:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyReceivingCall(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyReceivingCall(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showReceivingCall(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING_CANCELABLE:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyMakingCallCancelable(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyMakingCallCancelable(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showMakingCallCancelable(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_MAKING:
-                    if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyMakingCall(sipuadaCallData);
-                    } else {
+//                    if (notifyInsteadOfShow) {
+//                        //sipuadaCallView.notifyMakingCall(sipuadaCallData);
+//                    } else {
                         sipuadaCallView.showMakingCall(sipuadaCallData);
-                    }
+//                    }
                     break;
                 case CALL_FINISHED:
-                    if (!notifyInsteadOfShow) {
+//                    if (!notifyInsteadOfShow) {
                         sipuadaCallView.showCallFinished(sipuadaCallData);
-                    }
+//                    }
                     break;
             }
         }

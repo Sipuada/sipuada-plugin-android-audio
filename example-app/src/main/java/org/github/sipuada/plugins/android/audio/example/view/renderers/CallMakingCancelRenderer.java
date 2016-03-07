@@ -12,6 +12,9 @@ public class CallMakingCancelRenderer extends CallMakingRenderer {
     public void render() {
         super.render();
         if (presenter.sipuadaServiceIsConnected()) {
+            cancelButton.setEnabled(false);
+            cancelButton.setOnClickListener(null);
+            cancelButton.setAlpha(0.65f);
             String statusMessage = "Cancelling...";
             callStatus.setText(statusMessage);
             callStatus.setSelected(true);

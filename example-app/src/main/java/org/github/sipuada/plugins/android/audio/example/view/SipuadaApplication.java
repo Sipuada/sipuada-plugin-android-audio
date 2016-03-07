@@ -30,8 +30,6 @@ public class SipuadaApplication extends com.activeandroid.app.Application {
     public static final String KEY_USER_CREDENTIALS = String.format("%s.%s",
             SipuadaApplication.KEY_PREFIX, "userCredentials");
 
-    public static boolean CURRENTLY_BUSY_FROM_DB = false;
-
     @Override
     public void onCreate() {
         super.onCreate();
