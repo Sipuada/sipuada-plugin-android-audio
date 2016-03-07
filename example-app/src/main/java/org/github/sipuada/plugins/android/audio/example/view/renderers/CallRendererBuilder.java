@@ -19,6 +19,22 @@ public class CallRendererBuilder
     @Override
     protected Class getPrototypeClass(CallViewState.SipuadaCall content) {
         switch (content.getCallState()) {
+            case CALL_MAKING:
+                return CallMakingRenderer.class;
+            case CALL_MAKING_CANCELABLE:
+                return CallMakingCancelableRenderer.class;
+            case CALL_MAKING_RINGING:
+                return CallMakingRingingRenderer.class;
+            case CALL_MAKING_CANCEL:
+                return CallMakingCancelRenderer.class;
+            case CALL_MAKING_CANCELED:
+                return CallMakingCanceledRenderer.class;
+            case CALL_MAKING_FAILED:
+                return CallMakingFailedRenderer.class;
+            case CALL_MAKING_DECLINED:
+                return CallMakingDeclinedRenderer.class;
+            case CALL_MAKING_ACCEPTED:
+                return CallMakingAcceptedRenderer.class;
             default:
             case CALL_RECEIVING:
                 return CallReceivingRenderer.class;
@@ -40,6 +56,14 @@ public class CallRendererBuilder
     private List<Renderer<CallViewState.SipuadaCall>>
     getPrototypes(CallPresenterApi presenter) {
         List<Renderer<CallViewState.SipuadaCall>> prototypes = new LinkedList<>();
+        prototypes.add(new CallMakingRenderer(presenter));
+        prototypes.add(new CallMakingCancelableRenderer(presenter));
+        prototypes.add(new CallMakingRingingRenderer(presenter));
+        prototypes.add(new CallMakingCancelRenderer(presenter));
+        prototypes.add(new CallMakingCanceledRenderer(presenter));
+        prototypes.add(new CallMakingFailedRenderer(presenter));
+        prototypes.add(new CallMakingDeclinedRenderer(presenter));
+        prototypes.add(new CallMakingAcceptedRenderer(presenter));
         prototypes.add(new CallReceivingRenderer(presenter));
         prototypes.add(new CallReceivingCanceledRenderer(presenter));
         prototypes.add(new CallReceivingFailedRenderer(presenter));

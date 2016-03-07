@@ -26,13 +26,13 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
 
     @Override
     public void createSipuada(String username, String primaryHost, String password) {
-        mSipuadaService.createSipuada(new SipuadaUserCredentials(username, primaryHost, password));
+        sipuadaService.createSipuada(new SipuadaUserCredentials(username, primaryHost, password));
         fetchCurrentUsersCredentialsThenRefresh();
     }
 
     @Override
     public void registerAddresses(String username, String primaryHost, final RegistrationCallback callback) {
-        mSipuadaService.registerAddresses(username, primaryHost, new SipuadaApi.RegistrationCallback() {
+        sipuadaService.registerAddresses(username, primaryHost, new SipuadaApi.RegistrationCallback() {
 
             @Override
             public void onRegistrationSuccess(final List<String> registeredContacts) {
@@ -67,7 +67,7 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
     }
 
     private void fetchCurrentUsersCredentialsThenRefresh() {
-        mSipuadaService.fetchCurrentUsersCredentials(new FetchUsersCredentialsCallback() {
+        sipuadaService.fetchCurrentUsersCredentials(new FetchUsersCredentialsCallback() {
 
             @Override
             public void onSuccess(final List<SipuadaUserCredentials> usersCredentials) {
@@ -95,7 +95,7 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
     @Override
     public void inviteUser(String username, String primaryHost, String remoteUser,
                            final MainPresenterApi.OutgoingCallInvitationCallback callback) {
-        mSipuadaService.inviteUser(username, primaryHost, remoteUser,
+        sipuadaService.inviteUser(username, primaryHost, remoteUser,
                 new SipuadaApi.CallInvitationCallback() {
 
                     @Override
@@ -147,7 +147,7 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
 
     @Override
     public void cancelInviteToUser(String username, String primaryHost, String callId) {
-        mSipuadaService.cancelInviteToUser(username, primaryHost, callId);
+        sipuadaService.cancelInviteToUser(username, primaryHost, callId);
     }
 
     @Override

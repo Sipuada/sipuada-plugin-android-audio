@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 public class SipuadaCallData implements Parcelable {
 
-    private final String callId;
+    private String callId;
     private final String username;
     private final String primaryHost;
     private final String remoteUsername;
@@ -56,6 +56,10 @@ public class SipuadaCallData implements Parcelable {
 
     public String getCallId() {
         return callId;
+    }
+
+    public void setCallId(String callId) {
+        this.callId = callId;
     }
 
     public String getUsername() {

@@ -16,13 +16,12 @@ import java.util.Iterator;
 
 public class CallViewState implements RestoreableViewState<CallViewApi> {
 
-    private ArrayList<SipuadaCall> callsInformation = (ArrayList<SipuadaCall>) Collections
-            .synchronizedList(new ArrayList<SipuadaCall>());
+    private ArrayList<SipuadaCall> callsInformation = new ArrayList<>();
 
     public enum SipuadaCallState {
 
-        CALL_MAKING, CALL_MAKING_CANCEL, CALL_MAKING_FAIL,
-        CALL_MAKING_ACCEPTED, CALL_MAKING_DECLINED,
+        CALL_MAKING, CALL_MAKING_CANCELABLE, CALL_MAKING_RINGING, CALL_MAKING_CANCEL,
+        CALL_MAKING_CANCELED, CALL_MAKING_FAILED, CALL_MAKING_ACCEPTED, CALL_MAKING_DECLINED,
         CALL_RECEIVING, CALL_RECEIVING_CANCELED, CALL_RECEIVING_FAILED,
         CALL_RECEIVING_ACCEPT, CALL_RECEIVING_DECLINE,
         CALL_IN_PROGRESS, CALL_FINISHED
@@ -132,6 +131,14 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
                         sipuadaCallView.showReceivingCallDecline(sipuadaCallData);
                     }
                     break;
+                case CALL_MAKING_RINGING:
+                    if (notifyInsteadOfShow) {
+                        //sipuadaCallView.notifyMakingCallRinging(sipuadaCallData);
+                    } else {
+                        notifyInsteadOfShow = true;
+                        sipuadaCallView.showMakingCallRinging(sipuadaCallData);
+                    }
+                    break;
                 case CALL_MAKING_DECLINED:
                     if (notifyInsteadOfShow) {
                         //sipuadaCallView.notifyMakingCallDeclined(sipuadaCallData);
@@ -161,11 +168,18 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
                         sipuadaCallView.showCancelingCall(sipuadaCallData);
                     }
                     break;
-                case CALL_MAKING_FAIL:
+                case CALL_MAKING_CANCELED:
                     if (notifyInsteadOfShow) {
-                        //sipuadaCallView.notifyFailingCall(sipuadaCallData);
+                        //sipuadaCallView.notifyMakingCallCanceled(sipuadaCallData);
                     } else {
-                        sipuadaCallView.showFailingCall(sipuadaCallData);
+                        sipuadaCallView.showMakingCallCanceled(sipuadaCallData);
+                    }
+                    break;
+                case CALL_MAKING_FAILED:
+                    if (notifyInsteadOfShow) {
+                        //sipuadaCallView.notifyMakingCallFailed(sipuadaCallData);
+                    } else {
+                        sipuadaCallView.showMakingCallFailed(sipuadaCallData);
                     }
                     break;
                 case CALL_RECEIVING:
@@ -173,6 +187,13 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
                         //sipuadaCallView.notifyReceivingCall(sipuadaCallData);
                     } else {
                         sipuadaCallView.showReceivingCall(sipuadaCallData);
+                    }
+                    break;
+                case CALL_MAKING_CANCELABLE:
+                    if (notifyInsteadOfShow) {
+                        //sipuadaCallView.notifyMakingCallCancelable(sipuadaCallData);
+                    } else {
+                        sipuadaCallView.showMakingCallCancelable(sipuadaCallData);
                     }
                     break;
                 case CALL_MAKING:
@@ -194,23 +215,27 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
     public void addOrModifySipuadaCall(SipuadaCallState sipuadaCallState,
                                        SipuadaCallData sipuadaCallData) {
         Iterator<SipuadaCall> iterator = callsInformation.iterator();
-        //noinspection SynchronizeOnNonFinalField
-        synchronized (callsInformation) {
-            while (iterator.hasNext()) {
-                SipuadaCall sipuadaCall = iterator.next();
-                if (sipuadaCall.getCallData().getCallId().equals(sipuadaCallData.getCallId())) {
-                    iterator.remove();
-                }
+        while (iterator.hasNext()) {
+            SipuadaCall sipuadaCall = iterator.next();
+            if (sipuadaCall.getCallData().getCallId().equals(sipuadaCallData.getCallId())) {
+                iterator.remove();
             }
-            callsInformation.add(new SipuadaCall(sipuadaCallState, sipuadaCallData));
         }
+        callsInformation.add(new SipuadaCall(sipuadaCallState, sipuadaCallData));
         final SipuadaCallState[] statesPriority = new SipuadaCallState[]{
                 SipuadaCallState.CALL_IN_PROGRESS,
                 SipuadaCallState.CALL_RECEIVING_ACCEPT,
                 SipuadaCallState.CALL_MAKING_ACCEPTED,
                 SipuadaCallState.CALL_RECEIVING_DECLINE,
+                SipuadaCallState.CALL_MAKING_RINGING,
                 SipuadaCallState.CALL_MAKING_DECLINED,
+                SipuadaCallState.CALL_RECEIVING_CANCELED,
+                SipuadaCallState.CALL_RECEIVING_FAILED,
+                SipuadaCallState.CALL_MAKING_CANCEL,
+                SipuadaCallState.CALL_MAKING_CANCELED,
+                SipuadaCallState.CALL_MAKING_FAILED,
                 SipuadaCallState.CALL_RECEIVING,
+                SipuadaCallState.CALL_MAKING_CANCELABLE,
                 SipuadaCallState.CALL_MAKING,
                 SipuadaCallState.CALL_FINISHED
         };

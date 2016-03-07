@@ -104,13 +104,28 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     }
 
     @Override
+    public void showMakingCallCancelable(SipuadaCallData sipuadaCallData) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELABLE, sipuadaCallData);
+    }
+
+    @Override
     public void showCancelingCall(SipuadaCallData sipuadaCallData) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCEL, sipuadaCallData);
     }
 
     @Override
-    public void showFailingCall(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_FAIL, sipuadaCallData);
+    public void showMakingCallCanceled(SipuadaCallData sipuadaCallData) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELED, sipuadaCallData);
+    }
+
+    @Override
+    public void showMakingCallFailed(SipuadaCallData sipuadaCallData) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_FAILED, sipuadaCallData);
+    }
+
+    @Override
+    public void showMakingCallRinging(SipuadaCallData sipuadaCallData) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_RINGING, sipuadaCallData);
     }
 
     @Override
@@ -195,29 +210,84 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     private void refreshCallDataList(CallViewState callsViewState) {
         adapter.clear();
-        int pendingIncomingCallsNumber = 0, finishedIncomingCallsNumber = 0;
+        int pendingOutgoingCallsNumber = 0, pendingIncomingCallsNumber = 0,
+                establishedCallsNumber = 0, finishedCallsNumber = 0;
         for (int i = 0; i < callsViewState.getSipuadaCallsCount(); i++) {
             CallViewState.SipuadaCall sipuadaCall = callsViewState.getSipuadaCall(i);
             if (sipuadaCall.getCallState() == CallViewState.SipuadaCallState.CALL_FINISHED) {
-                finishedIncomingCallsNumber++;
+                finishedCallsNumber++;
             }
             else {
+                switch (sipuadaCall.getCallState()) {
+                    case CALL_MAKING:
+                    case CALL_MAKING_RINGING:
+                    case CALL_MAKING_ACCEPTED:
+                    case CALL_MAKING_DECLINED:
+                        pendingOutgoingCallsNumber++;
+                        break;
+                    case CALL_RECEIVING:
+                    case CALL_RECEIVING_ACCEPT:
+                    case CALL_RECEIVING_DECLINE:
+                        pendingIncomingCallsNumber++;
+                        break;
+                    case CALL_IN_PROGRESS:
+                        establishedCallsNumber++;
+                        break;
+                    case CALL_MAKING_CANCEL:
+                    case CALL_MAKING_CANCELED:
+                    case CALL_MAKING_FAILED:
+                    case CALL_RECEIVING_CANCELED:
+                    case CALL_RECEIVING_FAILED:
+                    case CALL_FINISHED:
+                        finishedCallsNumber++;
+                        break;
+                }
                 pendingIncomingCallsNumber++;
             }
             adapter.add(sipuadaCall);
         }
-        String summary = "Incoming calls...";
-        if (pendingIncomingCallsNumber == 1) {
-            summary = String.format("%d incoming call invite...", pendingIncomingCallsNumber);
+        StringBuilder summary = new StringBuilder();
+        if (establishedCallsNumber == 1) {
+            summary.append(String.format("%d established call", establishedCallsNumber));
+        } else if (establishedCallsNumber > 1) {
+            summary.append(String.format("%d established calls", establishedCallsNumber));
+        }
+        if (pendingIncomingCallsNumber > 1) {
+            if (summary.length() != 0) {
+                summary.append(", ");
+            }
+            summary.append(String.format("%d incoming call invite", pendingIncomingCallsNumber));
         } else if (pendingIncomingCallsNumber > 1) {
-            summary = String.format("%d incoming call invites...", pendingIncomingCallsNumber);
-        } else if (finishedIncomingCallsNumber > 1) {
-            summary = String.format("%d incoming call invites finished.",
-                    finishedIncomingCallsNumber);
-        } else if (finishedIncomingCallsNumber == 1) {
-            summary = String.format("%d incoming call invite finished.",
-                    finishedIncomingCallsNumber);
-        } else if (pendingIncomingCallsNumber == 0 && finishedIncomingCallsNumber == 0) {
+            if (summary.length() != 0) {
+                summary.append(", ");
+            }
+            summary.append(String.format("%d incoming call invites", pendingIncomingCallsNumber));
+        }
+        if (pendingOutgoingCallsNumber == 1) {
+            if (summary.length() != 0) {
+                summary.append(", ");
+            }
+            summary.append(String.format("%d outgoing call invite", pendingOutgoingCallsNumber));
+        } else if (pendingOutgoingCallsNumber > 1) {
+            if (summary.length() != 0) {
+                summary.append(", ");
+            }
+            summary.append(String.format("%d outgoing call invites", pendingOutgoingCallsNumber));
+        }
+        if (finishedCallsNumber == 1) {
+            if (summary.length() != 0) {
+                summary.append(", ");
+            }
+            summary.append(String.format("%d call finished", finishedCallsNumber));
+        } else if (finishedCallsNumber > 1) {
+            if (summary.length() != 0) {
+                summary.append(", ");
+            }
+            summary.append(String.format("%d calls finished", finishedCallsNumber));
+        }
+        summary.append("...");
+        if (pendingIncomingCallsNumber == 0 && finishedCallsNumber == 0) {
+            summary.append("Finishing...");
             finish();
         }
         callsSummary.setText(summary);

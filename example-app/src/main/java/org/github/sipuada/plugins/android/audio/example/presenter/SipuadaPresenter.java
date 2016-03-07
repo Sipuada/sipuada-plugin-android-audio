@@ -8,24 +8,21 @@ import android.os.Looper;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
-import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
-
-import java.util.List;
 
 public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBasePresenter<V>
         implements SipuadaPresenterApi<V> {
 
-    protected SipuadaService mSipuadaService;
+    protected SipuadaService sipuadaService;
     protected final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection connection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             SipuadaService.SipuadaBinder binder = (SipuadaService.SipuadaBinder) service;
-            mSipuadaService = binder.getService();
-            mSipuadaService.registerSipuadaPresenter(SipuadaPresenter.this);
+            sipuadaService = binder.getService();
+            sipuadaService.registerSipuadaPresenter(SipuadaPresenter.this);
             if (isViewAttached()) {
                 doUponServiceConnected();
                 //noinspection ConstantConditions
@@ -35,7 +32,7 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
 
         @Override
         public void onServiceDisconnected(ComponentName className) {
-            mSipuadaService = null;
+            sipuadaService = null;
             if (isViewAttached()) {
                 doUponServiceDisconnected();
                 //noinspection ConstantConditions
@@ -47,14 +44,14 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
 
     @Override
     public boolean sipuadaServiceIsConnected() {
-        return mSipuadaService != null;
+        return sipuadaService != null;
     }
 
     @Override
     public void bindToSipuadaService() {
         if (isViewAttached()) {
             //noinspection ConstantConditions
-            getView().doBindToSipuadaService(mConnection);
+            getView().doBindToSipuadaService(connection);
         }
     }
 
@@ -62,7 +59,7 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
     public void unbindFromSipuadaService() {
         if (isViewAttached()) {
             //noinspection ConstantConditions
-            getView().doUnbindFromSipuadaService(mConnection);
+            getView().doUnbindFromSipuadaService(connection);
         }
     }
 

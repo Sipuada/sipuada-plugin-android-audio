@@ -18,6 +18,7 @@ import com.google.common.eventbus.EventBus;
 
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
@@ -53,6 +54,7 @@ public class SipuadaService extends Service {
     private static final int CANCEL_USER_INVITE = 5;
     private static final int ACCEPT_USER_INVITE = 6;
     private static final int DECLINE_USER_INVITE = 7;
+    private static final int FINISH_CALL = 8;
 
     private final class SipuadaServiceHandler extends Handler {
 
@@ -80,13 +82,16 @@ public class SipuadaService extends Service {
                     doInviteUser((InviteUserOperation) message.obj);
                     break;
                 case CANCEL_USER_INVITE:
-                    doCancelInviteToUser((UserInviteOperation) message.obj);
+                    doCancelInviteToUser((SipuadaCallData) message.obj);
                     break;
                 case ACCEPT_USER_INVITE:
-                    doAcceptInviteFromUser((UserInviteOperation) message.obj);
+                    doAcceptInviteFromUser((SipuadaCallData) message.obj);
                     break;
                 case DECLINE_USER_INVITE:
-                    doDeclineInviteFromUser((UserInviteOperation) message.obj);
+                    doDeclineInviteFromUser((SipuadaCallData) message.obj);
+                    break;
+                case FINISH_CALL:
+                    doFinishCall((SipuadaCallData) message.obj);
                     break;
                 default:
                     break;
@@ -232,47 +237,27 @@ public class SipuadaService extends Service {
         serviceHandler.sendMessage(message);
     }
 
-    protected class UserInviteOperation {
-
-        private final String username;
-        private final String primaryHost;
-        private final String callId;
-
-        public UserInviteOperation(String username, String primaryHost, String callId) {
-            this.username = username;
-            this.primaryHost = primaryHost;
-            this.callId = callId;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPrimaryHost() {
-            return primaryHost;
-        }
-
-        public String getCallId() {
-            return callId;
-        }
-
-    }
-
     public void cancelInviteToUser(String username, String primaryHost, String callId) {
         Message message = serviceHandler.obtainMessage(CANCEL_USER_INVITE);
-        message.obj = new UserInviteOperation(username, primaryHost, callId);
+        message.obj = new SipuadaCallData(callId, username, primaryHost, null, null);
         serviceHandler.sendMessage(message);
     }
 
     public void acceptInviteFromUser(String username, String primaryHost, String callId) {
         Message message = serviceHandler.obtainMessage(ACCEPT_USER_INVITE);
-        message.obj = new UserInviteOperation(username, primaryHost, callId);
+        message.obj = new SipuadaCallData(callId, username, primaryHost, null, null);
         serviceHandler.sendMessage(message);
     }
 
     public void declineInviteFromUser(String username, String primaryHost, String callId) {
         Message message = serviceHandler.obtainMessage(DECLINE_USER_INVITE);
-        message.obj = new UserInviteOperation(username, primaryHost, callId);
+        message.obj = new SipuadaCallData(callId, username, primaryHost, null, null);
+        serviceHandler.sendMessage(message);
+    }
+
+    public void finishCall(String username, String primaryHost, String callId) {
+        Message message = serviceHandler.obtainMessage(FINISH_CALL);
+        message.obj = new SipuadaCallData(callId, username, primaryHost, null, null);
         serviceHandler.sendMessage(message);
     }
 
@@ -441,18 +426,24 @@ public class SipuadaService extends Service {
                 operation.getCallback());
     }
 
-    public void doCancelInviteToUser(UserInviteOperation operation) {
+    public void doCancelInviteToUser(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.cancelCallInvitation(operation.getCallId());
     }
 
-    public void doAcceptInviteFromUser(UserInviteOperation operation) {
+    public void doAcceptInviteFromUser(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.acceptCallInvitation(operation.getCallId());
         SipuadaApplication.CURRENTLY_BUSY_FROM_DB = true;
     }
 
-    public void doDeclineInviteFromUser(UserInviteOperation operation) {
+    public void doFinishCall(SipuadaCallData operation) {
+        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
+        sipuada.finishCall(operation.getCallId());
+        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
+    }
+
+    public void doDeclineInviteFromUser(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
         sipuada.declineCallInvitation(operation.getCallId());
     }
