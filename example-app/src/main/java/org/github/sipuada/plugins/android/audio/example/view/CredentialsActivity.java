@@ -10,6 +10,7 @@ import com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText;
 import com.hannesdorfmann.mosby.MosbyActivity;
 
 import org.github.sipuada.plugins.android.audio.example.R;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 
 import butterknife.Bind;
 
@@ -26,6 +27,18 @@ public class CredentialsActivity extends MosbyActivity {
         setContentView(R.layout.activity_credentials);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
+        Intent intent = getIntent();
+        SipuadaUserCredentials oldUserCredentials = null;
+        if (intent != null) {
+            oldUserCredentials = intent
+                    .getParcelableExtra(SipuadaApplication.KEY_USER_CREDENTIALS);
+            if (oldUserCredentials != null) {
+                usernameEditText.setText(oldUserCredentials.getUsername());
+                primaryHostEditText.setText(oldUserCredentials.getPrimaryHost());
+                passwordEditText.setText(oldUserCredentials.getPassword());
+            }
+        }
+        final SipuadaUserCredentials realOldUserCredentials = oldUserCredentials;
         submitButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -40,9 +53,12 @@ public class CredentialsActivity extends MosbyActivity {
                     return;
                 }
                 Intent intent = new Intent();
-                intent.putExtra("username", username);
-                intent.putExtra("primaryHost", primaryHost);
-                intent.putExtra("password", password);
+                intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
+                intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
+                intent.putExtra(SipuadaApplication.KEY_PASSWORD, password);
+                if (realOldUserCredentials != null) {
+                    intent.putExtra(SipuadaApplication.KEY_USER_CREDENTIALS, realOldUserCredentials);
+                }
                 setResult(RESULT_OK, intent);
                 finish();
             }

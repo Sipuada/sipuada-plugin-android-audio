@@ -2,17 +2,12 @@ package org.github.sipuada.plugins.android.audio.example.presenter;
 
 import android.util.Log;
 
-import com.google.common.eventbus.Subscribe;
-
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.MainViewApi;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainPresenter extends SipuadaPresenter<MainViewApi> implements MainPresenterApi {
 
@@ -27,6 +22,14 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
     @Override
     public void createSipuada(String username, String primaryHost, String password) {
         sipuadaService.createSipuada(new SipuadaUserCredentials(username, primaryHost, password));
+        fetchCurrentUsersCredentialsThenRefresh();
+    }
+
+    @Override
+    public void updateSipuada(SipuadaUserCredentials oldUserCredentials, String username,
+                              String primaryHost, String password) {
+        sipuadaService.updateSipuada(oldUserCredentials, new SipuadaUserCredentials(username,
+                primaryHost, password));
         fetchCurrentUsersCredentialsThenRefresh();
     }
 
@@ -85,120 +88,6 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
             }
 
         });
-    }
-
-    //TODO TODO TODO TODO remove the stuff below as it will belong to the CallPresenterApi only
-
-    private final Map<String, MainPresenterApi.OutgoingCallInvitationCallback> pendingOutgoingCallInvitations =
-            Collections.synchronizedMap(new HashMap<String, MainPresenterApi.OutgoingCallInvitationCallback>());
-
-    @Override
-    public void inviteUser(String username, String primaryHost, String remoteUser,
-                           final MainPresenterApi.OutgoingCallInvitationCallback callback) {
-        sipuadaService.inviteUser(username, primaryHost, remoteUser,
-                new SipuadaApi.CallInvitationCallback() {
-
-                    @Override
-                    public void onWaitingForCallInvitationAnswer(final String callId) {
-                        Log.d(SipuadaApplication.TAG, String
-                                .format("[onWaitingForCallInvitationAnswer; callId:{%s}]", callId));
-                        pendingOutgoingCallInvitations.put(callId, callback);
-                        mainHandler.post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                callback.onWaiting(callId);
-                            }
-
-                        });
-                    }
-
-                    @Override
-                    public void onCallInvitationRinging(final String callId) {
-                        Log.d(SipuadaApplication.TAG,
-                                String.format("[onCallInvitationRinging; callId:{%s}]", callId));
-                        pendingOutgoingCallInvitations.put(callId, callback);
-                        mainHandler.post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                callback.onRinging(callId);
-                            }
-
-                        });
-                    }
-
-                    @Override
-                    public void onCallInvitationDeclined(final String callId) {
-                        Log.d(SipuadaApplication.TAG,
-                                String.format("[onCallInvitationDeclined; callId:{%s}]", callId));
-                        mainHandler.post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                callback.onDeclined();
-                            }
-
-                        });
-                    }
-
-                });
-    }
-
-    @Override
-    public void cancelInviteToUser(String username, String primaryHost, String callId) {
-        sipuadaService.cancelInviteToUser(username, primaryHost, callId);
-    }
-
-    @Override
-    @Subscribe
-    public void onCallInvitationCanceled(final MainPresenterApi.CallInvitationCanceled event) {
-        final MainPresenterApi.OutgoingCallInvitationCallback outgoingCallback = pendingOutgoingCallInvitations
-                .remove(event.getCallId());
-        if (outgoingCallback != null) {
-            mainHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    outgoingCallback.onCanceled(event.getReason());
-                }
-
-            });
-        }
-    }
-
-    @Override
-    @Subscribe
-    public void onCallInvitationFailed(final MainPresenterApi.CallInvitationFailed event) {
-        final MainPresenterApi.OutgoingCallInvitationCallback outgoingCallback = pendingOutgoingCallInvitations
-                .remove(event.getCallId());
-        if (outgoingCallback != null) {
-            mainHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    outgoingCallback.onFailed(event.getReason());
-                }
-
-            });
-        }
-    }
-
-    @Override
-    @Subscribe
-    public void onCallEstablished(final MainPresenterApi.EstablishedCallStarted event) {
-        final MainPresenterApi.OutgoingCallInvitationCallback callback = pendingOutgoingCallInvitations
-                .remove(event.getCallId());
-        if (callback != null) {
-            mainHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    callback.onAccepted(event.getCallId());
-                }
-
-            });
-        }
     }
 
 }

@@ -21,10 +21,14 @@ public class SipuadaApplication extends com.activeandroid.app.Application {
             SipuadaApplication.KEY_PREFIX, "username");
     public static final String KEY_PRIMARY_HOST = String.format("%s.%s",
             SipuadaApplication.KEY_PREFIX, "primaryHost");
+    public static final String KEY_PASSWORD = String.format("%s.%s",
+            SipuadaApplication.KEY_PREFIX, "password");
     public static final String KEY_REMOTE_USERNAME = String.format("%s.%s",
             SipuadaApplication.KEY_PREFIX, "remoteUsername");
     public static final String KEY_REMOTE_HOST = String.format("%s.%s",
             SipuadaApplication.KEY_PREFIX, "remoteHost");
+    public static final String KEY_USER_CREDENTIALS = String.format("%s.%s",
+            SipuadaApplication.KEY_PREFIX, "userCredentials");
 
     public static boolean CURRENTLY_BUSY_FROM_DB = false;
 

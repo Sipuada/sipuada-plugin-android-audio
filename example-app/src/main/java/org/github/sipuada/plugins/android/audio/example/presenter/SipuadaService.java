@@ -49,12 +49,13 @@ public class SipuadaService extends Service {
     private static final int INITIALIZE_SIPUADAS = 0;
     private static final int FETCH_USERS_CREDENTIALS = 1;
     private static final int ADD_NEW_SIPUADA = 2;
-    private static final int REGISTER_ADDRESSES = 3;
-    private static final int INVITE_USER = 4;
-    private static final int CANCEL_USER_INVITE = 5;
-    private static final int ACCEPT_USER_INVITE = 6;
-    private static final int DECLINE_USER_INVITE = 7;
-    private static final int FINISH_CALL = 8;
+    private static final int UPDATE_SIPUADA = 3;
+    private static final int REGISTER_ADDRESSES = 4;
+    private static final int INVITE_USER = 5;
+    private static final int CANCEL_USER_INVITE = 6;
+    private static final int ACCEPT_USER_INVITE = 7;
+    private static final int DECLINE_USER_INVITE = 8;
+    private static final int FINISH_CALL = 9;
 
     private final class SipuadaServiceHandler extends Handler {
 
@@ -74,6 +75,9 @@ public class SipuadaService extends Service {
                     break;
                 case ADD_NEW_SIPUADA:
                     doCreateSipuada((SipuadaUserCredentials) message.obj);
+                    break;
+                case UPDATE_SIPUADA:
+                    doUpdateSipuada((UpdateSipuadaOperation) message.obj);
                     break;
                 case REGISTER_ADDRESSES:
                     doRegisterAddresses((RegisterAddressesOperation) message.obj);
@@ -150,6 +154,33 @@ public class SipuadaService extends Service {
     public void createSipuada(SipuadaUserCredentials userCredentials) {
         Message message = serviceHandler.obtainMessage(ADD_NEW_SIPUADA);
         message.obj = userCredentials;
+        serviceHandler.sendMessage(message);
+    }
+
+    protected class UpdateSipuadaOperation {
+
+        private final SipuadaUserCredentials oldUserCredentials;
+        private final SipuadaUserCredentials newUserCredentials;
+
+        public UpdateSipuadaOperation(SipuadaUserCredentials oldUserCredentials,
+                                      SipuadaUserCredentials newUserCredentials) {
+            this.oldUserCredentials = oldUserCredentials;
+            this.newUserCredentials = newUserCredentials;
+        }
+
+        public SipuadaUserCredentials getOldUserCredentials() {
+            return oldUserCredentials;
+        }
+
+        public SipuadaUserCredentials getNewUserCredentials() {
+            return newUserCredentials;
+        }
+
+    }
+
+    public void updateSipuada(SipuadaUserCredentials oldUserCredentials, SipuadaUserCredentials newUserCredentials) {
+        Message message = serviceHandler.obtainMessage(UPDATE_SIPUADA);
+        message.obj = new UpdateSipuadaOperation(oldUserCredentials, newUserCredentials);
         serviceHandler.sendMessage(message);
     }
 
@@ -261,21 +292,23 @@ public class SipuadaService extends Service {
         serviceHandler.sendMessage(message);
     }
 
+    private final SipuadaApi.RegistrationCallback registrationCallback = new SipuadaApi
+            .RegistrationCallback() {
+
+        @Override
+        public void onRegistrationSuccess(List<String> registeredContacts) {
+            Log.d(SipuadaApplication.TAG, "Registration refresh of: " + Arrays
+                    .toString(registeredContacts.toArray(new String[registeredContacts.size()])));
+        }
+
+        @Override
+        public void onRegistrationFailed(String reason) {
+            Log.d(SipuadaApplication.TAG, "Registration refresh failed: " + reason);
+        }
+
+    };
+
     private void initialize() {
-        SipuadaApi.RegistrationCallback registrationCallback = new SipuadaApi.RegistrationCallback() {
-
-            @Override
-            public void onRegistrationSuccess(List<String> registeredContacts) {
-                Log.d(SipuadaApplication.TAG, "Registration refresh of: " + Arrays
-                        .toString(registeredContacts.toArray(new String[registeredContacts.size()])));
-            }
-
-            @Override
-            public void onRegistrationFailed(String reason) {
-                Log.d(SipuadaApplication.TAG, "Registration refresh failed: " + reason);
-            }
-
-        };
         List<SipuadaUserCredentials> usersCredentials = new Select()
                 .from(SipuadaUserCredentials.class).execute();
         for (SipuadaUserCredentials userCredentials : usersCredentials) {
@@ -315,24 +348,10 @@ public class SipuadaService extends Service {
     private final Map<String, Timer> callInvitationDispatchers = new HashMap<>();
 
     private void doCreateSipuada(SipuadaUserCredentials userCredentials) {
-        SipuadaApi.RegistrationCallback registrationCallback = new SipuadaApi.RegistrationCallback() {
-
-            @Override
-            public void onRegistrationSuccess(List<String> registeredContacts) {
-                Log.d(SipuadaApplication.TAG, "Registration refresh of: " + Arrays
-                        .toString(registeredContacts.toArray(new String[registeredContacts.size()])));
-            }
-
-            @Override
-            public void onRegistrationFailed(String reason) {
-                Log.d(SipuadaApplication.TAG, "Registration refresh failed: " + reason);
-            }
-
-        };
         String[] localAddresses = getLocalAddresses();
         final String username = userCredentials.getUsername();
         final String primaryHost = userCredentials.getPrimaryHost();
-        String password = userCredentials.getPassword();
+        final String password = userCredentials.getPassword();
 //        AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
 //                new AndroidAudioSipuadaPlugin(username, localAddresses[0], getApplicationContext());
 //        NoOperationSipuadaPlugin noopSipuadaPlugin = new NoOperationSipuadaPlugin();
@@ -351,6 +370,33 @@ public class SipuadaService extends Service {
 //        sipuada.registerPlugin(sipuadaPluginForAudio);
 //        sipuada.registerPlugin(noopSipuadaPlugin);
         sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
+        sipuada.registerAddresses(registrationCallback);
+    }
+
+    private void doUpdateSipuada(UpdateSipuadaOperation operation) {
+        String[] localAddresses = getLocalAddresses();
+        SipuadaUserCredentials oldUserCredentials = operation.getOldUserCredentials();
+        final String oldUsername = oldUserCredentials.getUsername();
+        final String oldPrimaryHost = oldUserCredentials.getPrimaryHost();
+        removeSipuada(oldUsername, oldPrimaryHost);
+        oldUserCredentials.delete();
+        SipuadaUserCredentials newUserCredentials = operation.getNewUserCredentials();
+        final String newUsername = newUserCredentials.getUsername();
+        final String newPrimaryHost = newUserCredentials.getPrimaryHost();
+        final String newPassword = newUserCredentials.getPassword();
+        Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
+
+            @Override
+            public boolean onCallInvitationArrived(String callId, String remoteUsername,
+                                                   String remoteHost) {
+                Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
+                        " callId:{%s}]", callId));
+                return handleIncomingCallInvitation(callId, newUsername, newPrimaryHost,
+                        remoteUsername, remoteHost);
+            }
+
+        }, newUsername, newPrimaryHost, newPassword, localAddresses);
+        sipuadaInstances.put(getSipuadaKey(newUsername, newPrimaryHost), sipuada);
         sipuada.registerAddresses(registrationCallback);
     }
 
@@ -450,6 +496,13 @@ public class SipuadaService extends Service {
 
     private Sipuada getSipuada(String username, String primaryHost) {
         return sipuadaInstances.get(getSipuadaKey(username, primaryHost));
+    }
+
+    private void removeSipuada(String username, String primaryHost) {
+        Sipuada sipuada = sipuadaInstances.remove(getSipuadaKey(username, primaryHost));
+        if (sipuada != null) {
+            sipuada.destroySipuada();
+        }
     }
 
     abstract class SipuadaServiceListener implements SipuadaApi.SipuadaListener {

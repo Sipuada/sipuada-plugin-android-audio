@@ -1,5 +1,6 @@
 package org.github.sipuada.plugins.android.audio.example.view.renderers;
 
+import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredent
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenter;
 import org.github.sipuada.plugins.android.audio.example.presenter.MainPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
+import org.github.sipuada.plugins.android.audio.example.view.CredentialsActivity;
 import org.github.sipuada.plugins.android.audio.example.view.MainActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
@@ -25,7 +27,7 @@ import butterknife.ButterKnife;
 
 public class MainRenderer extends Renderer<SipuadaUserCredentials> {
 
-    @Bind(R.id.sipuplug_andrdio_example_EntryUsernameAtAddress) TextView usernameAtPrimaryHost;
+    @Bind(R.id.sipuplug_andrdio_example_EntryUsernameAtAddress) TextView user;
     @Bind(R.id.sipuplug_andrdio_example_RegisterButton) Button registerButton;
     @Bind(R.id.sipuplug_andrdio_example_RegisterOutput) TextView registerOutput;
     @Bind(R.id.sipuplug_andrdio_example_InviteButton) Button inviteButton;
@@ -56,10 +58,21 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
 
     @Override
     public void render() {
-        SipuadaUserCredentials userCredentials = getContent();
+        final SipuadaUserCredentials userCredentials = getContent();
         final String username = userCredentials.getUsername();
         final String primaryHost = userCredentials.getPrimaryHost();
-        usernameAtPrimaryHost.setText(String.format("%s@%s", username, primaryHost));
+        user.setText(String.format("%s@%s", username, primaryHost));
+        user.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View view) {
+                Intent intent = new Intent(activity.getApplicationContext(), CredentialsActivity.class);
+                intent.putExtra(SipuadaApplication.KEY_USER_CREDENTIALS, userCredentials);
+                activity.startActivityForResult(intent, MainActivity.REQUEST_UPDATE_USER_CREDENTIALS);
+                return true;
+            }
+
+        });
         if (!presenter.sipuadaServiceIsConnected()) {
             registerButton.setEnabled(false);
             String statusMessage = "Please wait...";
@@ -135,8 +148,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                 }
                 String remoteUsername = remoteUser.split("@")[0];
                 String remoteHost = remoteUser.split("@")[1];
-                Intent intent = new Intent(activity.getApplicationContext(),
-                        CallActivity.class);
+                Intent intent = new Intent(activity.getApplicationContext(), CallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(SipuadaApplication.KEY_CALL_ACTION,
                         CallPresenter.CallAction.MAKE_CALL);
