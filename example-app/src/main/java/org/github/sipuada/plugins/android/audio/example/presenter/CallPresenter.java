@@ -30,7 +30,7 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
 
     @Override
     protected void doUponServiceConnected() {
-        if (scheduledCallAction == null) {
+        if (scheduledCallAction == null || scheduledCallActionData == null) {
             return;
         }
         switch (scheduledCallAction) {
