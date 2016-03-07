@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
@@ -214,35 +215,30 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 establishedCallsNumber = 0, finishedCallsNumber = 0;
         for (int i = 0; i < callsViewState.getSipuadaCallsCount(); i++) {
             CallViewState.SipuadaCall sipuadaCall = callsViewState.getSipuadaCall(i);
-            if (sipuadaCall.getCallState() == CallViewState.SipuadaCallState.CALL_FINISHED) {
-                finishedCallsNumber++;
-            }
-            else {
-                switch (sipuadaCall.getCallState()) {
-                    case CALL_MAKING:
-                    case CALL_MAKING_RINGING:
-                    case CALL_MAKING_ACCEPTED:
-                    case CALL_MAKING_DECLINED:
-                        pendingOutgoingCallsNumber++;
-                        break;
-                    case CALL_RECEIVING:
-                    case CALL_RECEIVING_ACCEPT:
-                    case CALL_RECEIVING_DECLINE:
-                        pendingIncomingCallsNumber++;
-                        break;
-                    case CALL_IN_PROGRESS:
-                        establishedCallsNumber++;
-                        break;
-                    case CALL_MAKING_CANCEL:
-                    case CALL_MAKING_CANCELED:
-                    case CALL_MAKING_FAILED:
-                    case CALL_RECEIVING_CANCELED:
-                    case CALL_RECEIVING_FAILED:
-                    case CALL_FINISHED:
-                        finishedCallsNumber++;
-                        break;
-                }
-                pendingIncomingCallsNumber++;
+            switch (sipuadaCall.getCallState()) {
+                case CALL_MAKING:
+                case CALL_MAKING_CANCELABLE:
+                case CALL_MAKING_RINGING:
+                case CALL_MAKING_ACCEPTED:
+                case CALL_MAKING_DECLINED:
+                    pendingOutgoingCallsNumber++;
+                    break;
+                case CALL_RECEIVING:
+                case CALL_RECEIVING_ACCEPT:
+                case CALL_RECEIVING_DECLINE:
+                    pendingIncomingCallsNumber++;
+                    break;
+                case CALL_IN_PROGRESS:
+                    establishedCallsNumber++;
+                    break;
+                case CALL_MAKING_CANCEL:
+                case CALL_MAKING_CANCELED:
+                case CALL_MAKING_FAILED:
+                case CALL_RECEIVING_CANCELED:
+                case CALL_RECEIVING_FAILED:
+                case CALL_FINISHED:
+                    finishedCallsNumber++;
+                    break;
             }
             adapter.add(sipuadaCall);
         }
@@ -252,7 +248,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         } else if (establishedCallsNumber > 1) {
             summary.append(String.format("%d established calls", establishedCallsNumber));
         }
-        if (pendingIncomingCallsNumber > 1) {
+        if (pendingIncomingCallsNumber == 1) {
             if (summary.length() != 0) {
                 summary.append(", ");
             }
@@ -285,10 +281,13 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
             }
             summary.append(String.format("%d calls finished", finishedCallsNumber));
         }
-        summary.append("...");
-        if (pendingIncomingCallsNumber == 0 && finishedCallsNumber == 0) {
+        if (establishedCallsNumber == 0 && pendingIncomingCallsNumber == 0
+                && pendingOutgoingCallsNumber == 0 && finishedCallsNumber == 0) {
             summary.append("Finishing...");
             finish();
+        }
+        else {
+            summary.append("...");
         }
         callsSummary.setText(summary);
         adapter.notifyDataSetChanged();

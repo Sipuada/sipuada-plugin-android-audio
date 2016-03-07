@@ -217,7 +217,15 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
         Iterator<SipuadaCall> iterator = callsInformation.iterator();
         while (iterator.hasNext()) {
             SipuadaCall sipuadaCall = iterator.next();
-            if (sipuadaCall.getCallData().getCallId().equals(sipuadaCallData.getCallId())) {
+            String sipuadaCallId = sipuadaCall.getCallData().getCallId();
+            if (sipuadaCallId == null) {
+                if (sipuadaCallData.getUsername().equals(sipuadaCall.getCallData().getUsername()) &&
+                    sipuadaCallData.getPrimaryHost().equals(sipuadaCall.getCallData().getPrimaryHost()) &&
+                    sipuadaCallData.getRemoteUsername().equals(sipuadaCall.getCallData().getRemoteUsername()) &&
+                    sipuadaCallData.getRemoteHost().equals(sipuadaCall.getCallData().getRemoteHost())) {
+                    iterator.remove();
+                }
+            } else if (sipuadaCallId.equals(sipuadaCallData.getCallId())) {
                 iterator.remove();
             }
         }

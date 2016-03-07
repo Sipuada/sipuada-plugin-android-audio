@@ -41,6 +41,22 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void closeCall(SipuadaCallData sipuadaCallData);
 
+    class CallInvitationSent {
+
+        private final SipuadaCallData callData;
+
+        public CallInvitationSent(SipuadaCallData callData) {
+            this.callData = callData;
+        }
+
+        public SipuadaCallData getCallData() {
+            return callData;
+        }
+
+    }
+    @Subscribe
+    void onCallInvitationSent(CallInvitationSent event);
+
     class CallInvitationCanceled {
 
         private final String reason;

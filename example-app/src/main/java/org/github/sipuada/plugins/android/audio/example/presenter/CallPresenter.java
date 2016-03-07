@@ -25,23 +25,34 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
         MAKE_CALL, RECEIVE_CALL
     }
 
+    private CallAction scheduledCallAction;
+    private SipuadaCallData scheduledCallActionData;
+
     @Override
-    protected void doUponServiceConnected() {}
+    protected void doUponServiceConnected() {
+        if (scheduledCallAction == null) {
+            return;
+        }
+        switch (scheduledCallAction) {
+            case MAKE_CALL:
+                makeCall(scheduledCallActionData);
+                break;
+            default:
+            case RECEIVE_CALL:
+                receiveCall(scheduledCallActionData);
+                break;
+        }
+        scheduledCallAction = null;
+        scheduledCallActionData = null;
+    }
 
     @Override
     protected void doUponServiceDisconnected() {}
 
     @Override
     public void performAction(CallAction callAction, SipuadaCallData sipuadaCallData) {
-        switch (callAction) {
-            case MAKE_CALL:
-                makeCall(sipuadaCallData);
-                break;
-            default:
-            case RECEIVE_CALL:
-                receiveCall(sipuadaCallData);
-                break;
-        }
+        scheduledCallAction = callAction;
+        scheduledCallActionData = sipuadaCallData;
     }
 
     @Override
@@ -57,26 +68,20 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
             }
 
         });
-        sipuadaService.inviteUser(sipuadaCallData.getUsername(), sipuadaCallData.getPrimaryHost(),
-                String.format("%s@%s", sipuadaCallData.getRemoteUsername(), sipuadaCallData.getRemoteHost()),
-            new SipuadaApi.CallInvitationCallback() {
+        sipuadaService.inviteUser(sipuadaCallData, new SipuadaApi.CallInvitationCallback() {
 
                 @Override
                 public void onWaitingForCallInvitationAnswer(String callId) {
-                    sipuadaCallData.setCallId(callId);
-                    outgoingCalls.put(callId, sipuadaCallData);
                     callCancelable(sipuadaCallData);
                 }
 
                 @Override
                 public void onCallInvitationRinging(String callId) {
-                    sipuadaCallData.setCallId(callId);
                     callRinging(sipuadaCallData);
                 }
 
                 @Override
                 public void onCallInvitationDeclined(String callId) {
-                    sipuadaCallData.setCallId(callId);
                     callDeclined(sipuadaCallData);
                 }
 
@@ -148,7 +153,6 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
 
     @Override
     public void callRinging(final SipuadaCallData sipuadaCallData) {
-        outgoingCalls.put(sipuadaCallData.getCallId(), sipuadaCallData);
         mainHandler.post(new Runnable() {
 
             @Override
@@ -325,6 +329,12 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
             }
 
         });
+    }
+
+    @Override
+    @Subscribe
+    public void onCallInvitationSent(final CallInvitationSent event) {
+        outgoingCalls.put(event.getCallData().getCallId(), event.getCallData());
     }
 
     @Override

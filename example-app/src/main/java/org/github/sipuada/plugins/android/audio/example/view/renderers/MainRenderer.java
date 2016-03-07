@@ -1,6 +1,5 @@
 package org.github.sipuada.plugins.android.audio.example.view.renderers;
 
-import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;

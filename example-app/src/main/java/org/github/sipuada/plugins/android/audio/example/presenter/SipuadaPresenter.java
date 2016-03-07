@@ -23,8 +23,8 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
             SipuadaService.SipuadaBinder binder = (SipuadaService.SipuadaBinder) service;
             sipuadaService = binder.getService();
             sipuadaService.registerSipuadaPresenter(SipuadaPresenter.this);
+            doUponServiceConnected();
             if (isViewAttached()) {
-                doUponServiceConnected();
                 //noinspection ConstantConditions
                 getView().sipuadaServiceConnected();
             }
@@ -33,8 +33,8 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
         @Override
         public void onServiceDisconnected(ComponentName className) {
             sipuadaService = null;
+            doUponServiceDisconnected();
             if (isViewAttached()) {
-                doUponServiceDisconnected();
                 //noinspection ConstantConditions
                 getView().sipuadaServiceDisconnected();
             }

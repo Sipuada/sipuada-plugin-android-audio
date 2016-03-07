@@ -63,7 +63,7 @@ public class CallFinishedRenderer extends Renderer<CallViewState.SipuadaCall> {
             closeButton.setOnClickListener(null);
             return;
         }
-        String statusMessage = "Call failed.";
+        String statusMessage = "Call finished.";
         callStatus.setText(statusMessage);
         callStatus.setSelected(true);
         renderClose(sipuadaCallData);

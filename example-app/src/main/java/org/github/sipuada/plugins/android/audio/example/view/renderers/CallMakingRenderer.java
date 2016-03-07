@@ -18,8 +18,8 @@ import butterknife.ButterKnife;
 
 public class CallMakingRenderer extends Renderer<CallViewState.SipuadaCall> {
 
-    @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUser;
     @Bind(R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress) TextView localUser;
+    @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUser;
     @Bind(R.id.sipuplug_andrdio_example_CancelButton) Button cancelButton;
     @Bind(R.id.sipuplug_andrdio_example_CallStatus) TextView callStatus;
 
@@ -50,10 +50,10 @@ public class CallMakingRenderer extends Renderer<CallViewState.SipuadaCall> {
         String primaryHost = sipuadaCallData.getPrimaryHost();
         String remoteUsername = sipuadaCallData.getRemoteUsername();
         String remoteHost = sipuadaCallData.getRemoteHost();
-        remoteUser.setText(String.format("%s@%s", remoteUsername, remoteHost));
-        remoteUser.setSelected(true);
         localUser.setText(String.format("%s@%s", username, primaryHost));
         localUser.setSelected(true);
+        remoteUser.setText(String.format("%s@%s", remoteUsername, remoteHost));
+        remoteUser.setSelected(true);
         cancelButton.setEnabled(false);
         cancelButton.setOnClickListener(null);
         if (!presenter.sipuadaServiceIsConnected()) {

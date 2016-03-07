@@ -37,7 +37,7 @@ public class CredentialsActivity extends MosbyActivity {
             oldUserCredentials = intent
                     .getParcelableExtra(SipuadaApplication.KEY_USER_CREDENTIALS);
             if (oldUserCredentials != null) {
-                actionTitleMessage = "Update this user' Credentials";
+                actionTitleMessage = "Update user Credentials";
                 actionTitle.setText(actionTitleMessage);
                 usernameEditText.setText(oldUserCredentials.getUsername());
                 primaryHostEditText.setText(oldUserCredentials.getPrimaryHost());

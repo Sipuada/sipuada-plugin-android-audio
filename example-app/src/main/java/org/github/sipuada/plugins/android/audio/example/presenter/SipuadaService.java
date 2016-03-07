@@ -220,36 +220,16 @@ public class SipuadaService extends Service {
 
     protected class InviteUserOperation {
 
-        private final String username;
-        private final String primaryHost;
-        private final String remoteUsername;
-        private final String remoteHost;
+        private final SipuadaCallData callData;
         private final SipuadaApi.CallInvitationCallback callback;
 
-        public InviteUserOperation(String username, String primaryHost,
-                                   String remoteUsername, String remoteHost,
-                                   SipuadaApi.CallInvitationCallback callback) {
-            this.username = username;
-            this.primaryHost = primaryHost;
-            this.remoteUsername = remoteUsername;
-            this.remoteHost = remoteHost;
+        public InviteUserOperation(SipuadaCallData callData, SipuadaApi.CallInvitationCallback callback) {
+            this.callData = callData;
             this.callback = callback;
         }
 
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPrimaryHost() {
-            return primaryHost;
-        }
-
-        public String getRemoteUsername() {
-            return remoteUsername;
-        }
-
-        public String getRemoteHost() {
-            return remoteHost;
+        public SipuadaCallData getCallData() {
+            return callData;
         }
 
         public SipuadaApi.CallInvitationCallback getCallback() {
@@ -258,13 +238,9 @@ public class SipuadaService extends Service {
 
     }
 
-    public void inviteUser(String username, String primaryHost, String remoteUser,
-                           SipuadaApi.CallInvitationCallback callback) {
+    public void inviteUser(SipuadaCallData callData, SipuadaApi.CallInvitationCallback callback) {
         Message message = serviceHandler.obtainMessage(INVITE_USER);
-        String remoteUsername = remoteUser.split("@")[0];
-        String remoteHost = remoteUser.split("@")[1];
-        message.obj = new InviteUserOperation(username, primaryHost,
-                remoteUsername, remoteHost, callback);
+        message.obj = new InviteUserOperation(callData, callback);
         serviceHandler.sendMessage(message);
     }
 
@@ -466,9 +442,15 @@ public class SipuadaService extends Service {
     }
 
     private void doInviteUser(InviteUserOperation operation) {
-        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
-        sipuada.inviteToCall(operation.getRemoteUsername(), operation.getRemoteHost(),
-                operation.getCallback());
+        SipuadaCallData sipuadaCallData = operation.getCallData();
+        String username = sipuadaCallData.getUsername();
+        String primaryHost = sipuadaCallData.getPrimaryHost();
+        String remoteUsername = sipuadaCallData.getRemoteUsername();
+        String remoteHost = sipuadaCallData.getRemoteHost();
+        Sipuada sipuada = getSipuada(username, primaryHost);
+        String callId = sipuada.inviteToCall(remoteUsername, remoteHost, operation.getCallback());
+        sipuadaCallData.setCallId(callId);
+        eventBus.post(new CallPresenterApi.CallInvitationSent(sipuadaCallData));
     }
 
     public void doCancelInviteToUser(SipuadaCallData operation) {

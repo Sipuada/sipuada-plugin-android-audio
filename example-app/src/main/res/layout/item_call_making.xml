@@ -10,7 +10,7 @@
     android:gravity="center">
 
     <TextView
-        android:id="@+id/sipuplug_andrdio_example_EntryRemoteUsernameAtAddress"
+        android:id="@+id/sipuplug_andrdio_example_EntryLocalUsernameAtAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -34,7 +34,7 @@
         tools:ignore="HardcodedText"/>
 
     <TextView
-        android:id="@+id/sipuplug_andrdio_example_EntryLocalUsernameAtAddress"
+        android:id="@+id/sipuplug_andrdio_example_EntryRemoteUsernameAtAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
