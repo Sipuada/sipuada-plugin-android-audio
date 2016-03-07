@@ -28,4 +28,6 @@ public interface CallViewApi extends SipuadaViewApi {
 
     void showCallFinished(SipuadaCallData sipuadaCallData);
 
+    void dismissCall(SipuadaCallData sipuadaCallData);
+
 }

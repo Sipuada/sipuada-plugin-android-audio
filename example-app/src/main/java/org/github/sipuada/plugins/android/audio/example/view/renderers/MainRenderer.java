@@ -18,7 +18,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials> {
+public class MainRenderer extends Renderer<SipuadaUserCredentials> {
 
     @Bind(R.id.sipuplug_andrdio_example_EntryUsernameAtAddress) TextView usernameAtPrimaryHost;
     @Bind(R.id.sipuplug_andrdio_example_RegisterButton) Button registerButton;
@@ -30,7 +30,7 @@ public class UserOperationsEntryRenderer extends Renderer<SipuadaUserCredentials
 
     private final MainPresenterApi presenter;
 
-    public UserOperationsEntryRenderer(MainPresenterApi presenter) {
+    public MainRenderer(MainPresenterApi presenter) {
         this.presenter = presenter;
     }
 

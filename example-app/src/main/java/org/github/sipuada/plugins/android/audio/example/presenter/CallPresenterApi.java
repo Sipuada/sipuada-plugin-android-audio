@@ -33,6 +33,8 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void finishCall(SipuadaCallData sipuadaCallData);
 
+    void closeCall(SipuadaCallData sipuadaCallData);
+
     class CallInvitationCanceled {
 
         private final String reason;

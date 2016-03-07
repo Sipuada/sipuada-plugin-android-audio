@@ -9,20 +9,20 @@ import org.github.sipuada.plugins.android.audio.example.presenter.MainPresenterA
 import java.util.LinkedList;
 import java.util.List;
 
-public class UserOperationsEntriesRendererBuilder extends RendererBuilder<SipuadaUserCredentials> {
+public class MainRendererBuilder extends RendererBuilder<SipuadaUserCredentials> {
 
-    public UserOperationsEntriesRendererBuilder(MainPresenterApi presenter) {
+    public MainRendererBuilder(MainPresenterApi presenter) {
         setPrototypes(getPrototypes(presenter));
     }
 
     @Override
     protected Class getPrototypeClass(SipuadaUserCredentials content) {
-        return UserOperationsEntryRenderer.class;
+        return MainRenderer.class;
     }
 
     private List<Renderer<SipuadaUserCredentials>> getPrototypes(MainPresenterApi presenter) {
         List<Renderer<SipuadaUserCredentials>> prototypes = new LinkedList<>();
-        prototypes.add(new UserOperationsEntryRenderer(presenter));
+        prototypes.add(new MainRenderer(presenter));
         return prototypes;
     }
 

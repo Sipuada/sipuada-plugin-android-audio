@@ -12,7 +12,7 @@ import java.util.Map;
 public class CallPresenter extends SipuadaPresenter<CallViewApi> implements CallPresenterApi {
 
     public enum CallAction {
-        MAKE_CALL, RECEIVE_CALL, FINISH_CALL
+        MAKE_CALL, RECEIVE_CALL
     }
 
     @Override
@@ -27,13 +27,9 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
             case MAKE_CALL:
                 makeCall(sipuadaCallData);
                 break;
+            default:
             case RECEIVE_CALL:
                 receiveCall(sipuadaCallData);
-                break;
-            case FINISH_CALL:
-                finishCall(sipuadaCallData);
-                break;
-            default:
                 break;
         }
     }
@@ -152,6 +148,14 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
 //        mSipuadaService.finishCall(sipuadaCallData.getUsername(),
 //                sipuadaCallData.getPrimaryHost(), sipuadaCallData.getCallId());
 //        }
+    }
+
+    @Override
+    public void closeCall(SipuadaCallData sipuadaCallData) {
+        if (isViewAttached()) {
+            //noinspection ConstantConditions
+            getView().dismissCall(sipuadaCallData);
+        }
     }
 
     @Override

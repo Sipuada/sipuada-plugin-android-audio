@@ -19,7 +19,7 @@ import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.presenter.MainPresenter;
 import org.github.sipuada.plugins.android.audio.example.presenter.MainPresenterApi;
-import org.github.sipuada.plugins.android.audio.example.view.renderers.UserOperationsEntriesRendererBuilder;
+import org.github.sipuada.plugins.android.audio.example.view.renderers.MainRendererBuilder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +51,7 @@ public class MainActivity extends SipuadaActivity<MainViewApi, MainPresenterApi>
                 .actionBarSize().colorRes(android.R.color.black);
         floatingActionButton.setImageDrawable(iconDrawable);
         adapter = new RVRendererAdapter<>(getLayoutInflater(),
-                new UserOperationsEntriesRendererBuilder(getPresenter()),
+                new MainRendererBuilder(getPresenter()),
                 new ListAdapteeCollection<>(Arrays.asList(new SipuadaUserCredentials[]{})));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);

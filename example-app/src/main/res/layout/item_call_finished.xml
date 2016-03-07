@@ -21,12 +21,12 @@
         android:ellipsize="marquee"/>
 
     <TextView
+        android:id="@+id/sipuplug_andrdio_example_CallRelationship"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:singleLine="true"
         android:lines="1"
-        android:text="is calling"
         android:textSize="14sp"
         android:textStyle="bold|italic"
         android:textColor="@color/colorAccent"
@@ -52,30 +52,6 @@
         android:paddingRight="@dimen/activity_horizontal_margin">
 
         <Button
-            android:id="@+id/sipuplug_andrdio_example_AcceptButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:text="Accept"
-            android:textColor="@color/colorAccent"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:gravity="center"
-            tools:ignore="ButtonStyle,HardcodedText"/>
-
-        <Button
-            android:id="@+id/sipuplug_andrdio_example_DeclineButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:text="Decline"
-            android:textColor="@android:color/holo_red_dark"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:gravity="center"
-            tools:ignore="ButtonStyle,HardcodedText"/>
-
-        <Button
             style="?attr/borderlessButtonStyle"
             android:id="@+id/sipuplug_andrdio_example_CloseButton"
             android:layout_width="0dp"
@@ -86,13 +62,12 @@
             android:textAllCaps="true"
             android:textStyle="bold"
             android:gravity="center"
-            android:visibility="gone"
             tools:ignore="ButtonStyle,HardcodedText"/>
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/sipuplug_andrdio_example_IncomingCallStatus"
+        android:id="@+id/sipuplug_andrdio_example_CallStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
