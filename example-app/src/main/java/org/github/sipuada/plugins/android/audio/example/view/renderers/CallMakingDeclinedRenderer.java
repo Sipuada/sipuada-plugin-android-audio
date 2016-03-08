@@ -17,7 +17,7 @@ public class CallMakingDeclinedRenderer extends CallFinishedRenderer {
         String callRelationshipMessage = "was calling";
         callRelationship.setText(callRelationshipMessage);
         if (presenter.sipuadaServiceIsConnected()) {
-            String statusMessage = "Declined.";
+            String statusMessage = "Call was declined.";
             callStatus.setText(statusMessage);
             callStatus.setSelected(true);
         }
