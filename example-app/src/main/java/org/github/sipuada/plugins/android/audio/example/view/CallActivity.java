@@ -3,12 +3,18 @@ package org.github.sipuada.plugins.android.audio.example.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.RestoreableViewState;
+import com.joanzapata.iconify.IconDrawable;
 import com.pedrogomez.renderers.ListAdapteeCollection;
 import com.pedrogomez.renderers.RVRendererAdapter;
 
@@ -27,6 +33,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView callsSummary;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
+    @Bind(R.id.sipuplug_andrdio_example_FloatingActionButton) FloatingActionButton floatingActionButton;
 
     private RVRendererAdapter<CallViewState.SipuadaCall> adapter;
 
@@ -40,6 +47,20 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         recyclerView.setEnabled(false);
+        IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-refresh")
+                .actionBarSize().colorRes(android.R.color.black);
+        floatingActionButton.setImageDrawable(iconDrawable);
+        floatingActionButton.setBackgroundColor(ContextCompat
+                .getColor(getApplicationContext(), R.color.colorAccent));
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                CallViewState callsViewState = (CallViewState) getViewState();
+                refreshCallDataList(callsViewState);
+            }
+
+        });
     }
 
     @Override

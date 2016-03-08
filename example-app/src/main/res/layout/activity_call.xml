@@ -1,38 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/sipuplug_andrdio_example_CoordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:background="@color/colorPrimary">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/sipuplug_andrdio_example_IncomingCallsSummary"
+    <LinearLayout
+        android:id="@+id/sipuplug_andrdio_example_LinearLayout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.3"
-        android:gravity="center|bottom"
-        android:paddingBottom="35dp"
-        android:textSize="20sp"
-        android:textColor="@android:color/white"
-        android:background="@color/colorPrimaryDark"
-        tools:ignore="HardcodedText"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/white"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/sipuplug_andrdio_example_RecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.6"
-        android:layout_gravity="center"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:paddingTop="?attr/actionBarSize"
-        android:clipToPadding="false"/>
+        android:background="@color/colorPrimary">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/sipuplug_andrdio_example_IncomingCallsSummary"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.3"
+            android:gravity="center|bottom"
+            android:paddingBottom="35dp"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimaryDark"
+            tools:ignore="HardcodedText"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/white"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sipuplug_andrdio_example_RecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingTop="?attr/actionBarSize"
+            android:clipToPadding="false"/>
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/sipuplug_andrdio_example_FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        app:layout_anchor="@id/sipuplug_andrdio_example_LinearLayout"
+        app:layout_anchorGravity="bottom|center_horizontal"
+        app:layout_behavior="org.github.sipuada.plugins.android.audio.example.view.behaviors.ScrollAwareFABBehavior"
+        app:pressedTranslationZ="12dp"
+        app:elevation="6dp"/>
+
+</android.support.design.widget.CoordinatorLayout>

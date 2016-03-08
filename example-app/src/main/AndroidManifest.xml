@@ -30,7 +30,6 @@
 
         <activity
             android:name=".view.CallActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:launchMode="singleTop"/>
 
         <service
