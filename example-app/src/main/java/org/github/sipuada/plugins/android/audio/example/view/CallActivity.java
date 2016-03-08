@@ -279,7 +279,6 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 case CALL_MAKING_CANCELABLE:
                 case CALL_MAKING_RINGING:
                 case CALL_MAKING_ACCEPTED:
-                case CALL_MAKING_DECLINED:
                     pendingOutgoingCallsNumber++;
                     break;
                 case CALL_RECEIVING:
@@ -290,6 +289,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 case CALL_IN_PROGRESS:
                     establishedCallsNumber++;
                     break;
+                case CALL_MAKING_DECLINED:
                 case CALL_MAKING_CANCEL:
                 case CALL_MAKING_CANCELED:
                 case CALL_MAKING_FAILED:
