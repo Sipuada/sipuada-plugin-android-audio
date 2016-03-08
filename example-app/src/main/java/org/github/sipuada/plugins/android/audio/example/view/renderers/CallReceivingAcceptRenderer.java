@@ -12,7 +12,7 @@ public class CallReceivingAcceptRenderer extends CallReceivingRenderer {
     public void render() {
         super.render();
         if (presenter.sipuadaServiceIsConnected()) {
-            acceptButton.setEnabled(true);
+            acceptButton.setEnabled(false);
             acceptButton.setOnClickListener(null);
             acceptButton.setAlpha(0.65f);
             declineButton.setEnabled(false);

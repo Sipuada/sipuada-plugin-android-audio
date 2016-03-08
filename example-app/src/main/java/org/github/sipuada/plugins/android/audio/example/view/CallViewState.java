@@ -228,19 +228,19 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
         callsInformation.add(new SipuadaCall(sipuadaCallState, sipuadaCallData));
         final SipuadaCallState[] statesPriority = new SipuadaCallState[]{
                 SipuadaCallState.CALL_IN_PROGRESS,
-                SipuadaCallState.CALL_RECEIVING_ACCEPT,
+                SipuadaCallState.CALL_RECEIVING,
+                SipuadaCallState.CALL_MAKING_CANCELABLE,
+                SipuadaCallState.CALL_MAKING,
                 SipuadaCallState.CALL_MAKING_ACCEPTED,
-                SipuadaCallState.CALL_RECEIVING_DECLINE,
                 SipuadaCallState.CALL_MAKING_RINGING,
                 SipuadaCallState.CALL_MAKING_DECLINED,
+                SipuadaCallState.CALL_RECEIVING_ACCEPT,
+                SipuadaCallState.CALL_RECEIVING_DECLINE,
                 SipuadaCallState.CALL_RECEIVING_CANCELED,
                 SipuadaCallState.CALL_RECEIVING_FAILED,
                 SipuadaCallState.CALL_MAKING_CANCEL,
                 SipuadaCallState.CALL_MAKING_CANCELED,
                 SipuadaCallState.CALL_MAKING_FAILED,
-                SipuadaCallState.CALL_RECEIVING,
-                SipuadaCallState.CALL_MAKING_CANCELABLE,
-                SipuadaCallState.CALL_MAKING,
                 SipuadaCallState.CALL_FINISHED
         };
         Collections.sort(callsInformation, new Comparator<SipuadaCall>() {

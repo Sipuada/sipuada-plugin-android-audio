@@ -15,7 +15,7 @@ public class CallReceivingDeclineRenderer extends CallReceivingRenderer {
             acceptButton.setEnabled(false);
             acceptButton.setOnClickListener(null);
             acceptButton.setAlpha(0.35f);
-            declineButton.setEnabled(true);
+            declineButton.setEnabled(false);
             declineButton.setOnClickListener(null);
             declineButton.setAlpha(0.65f);
             String statusMessage = "Declining call...";

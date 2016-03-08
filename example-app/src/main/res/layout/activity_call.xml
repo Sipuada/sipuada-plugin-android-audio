@@ -54,7 +54,7 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_horizontal_margin"
         app:layout_anchor="@id/sipuplug_andrdio_example_LinearLayout"
-        app:layout_anchorGravity="bottom|center_horizontal"
+        app:layout_anchorGravity="bottom|end|right"
         app:layout_behavior="org.github.sipuada.plugins.android.audio.example.view.behaviors.ScrollAwareFABBehavior"
         app:pressedTranslationZ="12dp"
         app:elevation="6dp"/>

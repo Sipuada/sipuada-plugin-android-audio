@@ -8,6 +8,9 @@ import org.github.sipuada.plugins.android.audio.example.view.CallViewApi;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,25 +28,37 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
         MAKE_CALL, RECEIVE_CALL
     }
 
-    private CallAction scheduledCallAction;
-    private SipuadaCallData scheduledCallActionData;
+    protected class ScheduledSipuadaCallAction {
+
+        private CallAction scheduledCallAction;
+        private SipuadaCallData scheduledCallActionData;
+
+        public ScheduledSipuadaCallAction(CallAction callAction, SipuadaCallData callData) {
+            this.scheduledCallAction = callAction;
+            this.scheduledCallActionData = callData;
+        }
+
+        public CallAction getAction() {
+            return scheduledCallAction;
+        }
+
+        public SipuadaCallData getActionData() {
+            return scheduledCallActionData;
+        }
+
+    }
+    private List<ScheduledSipuadaCallAction> scheduledCallActions = new LinkedList<>();
 
     @Override
     protected void doUponServiceConnected() {
-        if (scheduledCallAction == null || scheduledCallActionData == null) {
-            return;
+        Iterator<ScheduledSipuadaCallAction> iterator = scheduledCallActions.iterator();
+        while (iterator.hasNext()) {
+            ScheduledSipuadaCallAction scheduledSipuadaCallAction = iterator.next();
+            CallAction callAction = scheduledSipuadaCallAction.getAction();
+            SipuadaCallData sipuadaCallData = scheduledSipuadaCallAction.getActionData();
+            doPerformCallAction(callAction, sipuadaCallData);
+            iterator.remove();
         }
-        switch (scheduledCallAction) {
-            case MAKE_CALL:
-                makeCall(scheduledCallActionData);
-                break;
-            default:
-            case RECEIVE_CALL:
-                receiveCall(scheduledCallActionData);
-                break;
-        }
-        scheduledCallAction = null;
-        scheduledCallActionData = null;
     }
 
     @Override
@@ -51,8 +66,23 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
 
     @Override
     public void performAction(CallAction callAction, SipuadaCallData sipuadaCallData) {
-        scheduledCallAction = callAction;
-        scheduledCallActionData = sipuadaCallData;
+        if (sipuadaServiceIsConnected()) {
+            doPerformCallAction(callAction, sipuadaCallData);
+        } else {
+            scheduledCallActions.add(new ScheduledSipuadaCallAction(callAction, sipuadaCallData));
+        }
+    }
+
+    private void doPerformCallAction(CallAction callAction, SipuadaCallData sipuadaCallData) {
+        switch (callAction) {
+            case MAKE_CALL:
+                makeCall(sipuadaCallData);
+                break;
+            default:
+            case RECEIVE_CALL:
+                receiveCall(sipuadaCallData);
+                break;
+        }
     }
 
     @Override
@@ -340,11 +370,11 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     @Override
     @Subscribe
     public void onCallInvitationCanceled(final CallInvitationCanceled event) {
-        SipuadaCallData incomingSipuadaCallData = incomingCalls.remove(event.getCallId());
+        SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
         if (incomingSipuadaCallData != null) {
             incomingCallCanceled(incomingSipuadaCallData);
         }
-        final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.remove(event.getCallId());
+        final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
             outgoingCallCanceled(outgoingSipuadaCallData);
         }
@@ -353,11 +383,11 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     @Override
     @Subscribe
     public void onCallInvitationFailed(final CallInvitationFailed event) {
-        SipuadaCallData incomingSipuadaCallData = incomingCalls.remove(event.getCallId());
+        SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
         if (incomingSipuadaCallData != null) {
             incomingCallFailed(incomingSipuadaCallData);
         }
-        final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.remove(event.getCallId());
+        final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
             outgoingCallFailed(outgoingSipuadaCallData);
         }
@@ -366,11 +396,11 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     @Override
     @Subscribe
     public void onCallEstablished(final EstablishedCallStarted event) {
-        SipuadaCallData incomingSipuadaCallData = incomingCalls.remove(event.getCallId());
+        SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
         if (incomingSipuadaCallData != null) {
             establishCall(incomingSipuadaCallData);
         }
-        final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.remove(event.getCallId());
+        final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
             callAccepted(outgoingSipuadaCallData);
             Timer timer = new Timer();
@@ -388,7 +418,7 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     @Override
     @Subscribe
     public void onCallFinished(EstablishedCallFinished event) {
-        SipuadaCallData sipuadaCallData = establishedCalls.remove(event.getCallId());
+        SipuadaCallData sipuadaCallData = establishedCalls.get(event.getCallId());
         if (sipuadaCallData != null) {
             finishCall(sipuadaCallData, false);
         }
@@ -397,7 +427,10 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     @Override
     @Subscribe
     public void onCallFailure(EstablishedCallFailed event) {
-
+        SipuadaCallData sipuadaCallData = establishedCalls.get(event.getCallId());
+        if (sipuadaCallData != null) {
+            finishCall(sipuadaCallData, false);
+        }
     }
 
 }

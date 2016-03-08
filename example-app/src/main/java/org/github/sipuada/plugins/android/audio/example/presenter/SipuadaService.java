@@ -14,7 +14,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.activeandroid.query.Select;
+import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
@@ -122,6 +124,7 @@ public class SipuadaService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        eventBus.register(this);
         serviceHandler.sendMessage(serviceHandler.obtainMessage(INITIALIZE_SIPUADAS));
         return START_STICKY;
     }
@@ -134,6 +137,7 @@ public class SipuadaService extends Service {
 
     @Override
     public void onDestroy() {
+        eventBus.unregister(this);
         for (String usernameAtPrimaryHost : sipuadaInstances.keySet()) {
             Sipuada sipuada = sipuadaInstances.get(usernameAtPrimaryHost);
             sipuada.destroySipuada();
@@ -551,6 +555,19 @@ public class SipuadaService extends Service {
         @Override
         public void onMessageReceived(String callId, ContentTypeHeader contentType, String content) {}
 
+    }
+
+    @Subscribe
+    public void onEventCouldNotBeReceivedByAPresenter(final DeadEvent event) {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                eventBus.post(event.getEvent());
+            }
+
+        }, 1000);
     }
 
 }
