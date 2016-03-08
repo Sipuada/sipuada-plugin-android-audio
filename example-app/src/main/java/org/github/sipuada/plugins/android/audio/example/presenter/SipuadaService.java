@@ -559,6 +559,8 @@ public class SipuadaService extends Service {
 
     @Subscribe
     public void onEventCouldNotBeReceivedByAPresenter(final DeadEvent event) {
+        Log.w(SipuadaApplication.TAG, String.format("[onEventCouldNotBeReceivedByAPresenter;" +
+                " event:{%s}]", event.getEvent()));
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
 
