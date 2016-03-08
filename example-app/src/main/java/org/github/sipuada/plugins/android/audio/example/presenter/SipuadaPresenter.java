@@ -8,7 +8,10 @@ import android.os.Looper;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
+
+import java.util.List;
 
 public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBasePresenter<V>
         implements SipuadaPresenterApi<V> {
@@ -66,5 +69,27 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
     protected abstract void doUponServiceConnected();
 
     protected abstract void doUponServiceDisconnected();
+
+    @Override
+    public void fetchLocalUsersThenRefresh() {
+        sipuadaService.fetchCurrentUsersCredentials(new FetchUsersCredentialsCallback() {
+
+            @Override
+            public void onSuccess(final List<SipuadaUserCredentials> usersCredentials) {
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (isViewAttached()) {
+                            //noinspection ConstantConditions
+                            getView().refreshUsersCredentialsList(usersCredentials);
+                        }
+                    }
+
+                });
+            }
+
+        });
+    }
 
 }

@@ -10,12 +10,12 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="NewUserCredentialsLabelledMarqueeEditTextAppearance">
+    <style name="LabelledMarqueeEditTextAppearanceLight">
         <item name="baseColor">@android:color/white</item>
         <item name="highlightColor">@color/colorAccent</item>
     </style>
 
-    <style name="OperationsEntryLabelledMarqueeEditTextAppearance">
+    <style name="LabelledMarqueeEditTextAppearanceDark">
         <item name="baseColor">@android:color/black</item>
         <item name="highlightColor">@color/colorPrimary</item>
     </style>

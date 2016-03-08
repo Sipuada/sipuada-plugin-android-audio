@@ -8,11 +8,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText;
 import com.hannesdorfmann.mosby.mvp.viewstate.RestoreableViewState;
 import com.joanzapata.iconify.IconDrawable;
 import com.pedrogomez.renderers.ListAdapteeCollection;
@@ -20,11 +22,13 @@ import com.pedrogomez.renderers.RVRendererAdapter;
 
 import org.github.sipuada.plugins.android.audio.example.R;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
+import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenter;
 import org.github.sipuada.plugins.android.audio.example.presenter.CallPresenterApi;
 import org.github.sipuada.plugins.android.audio.example.view.renderers.CallRendererBuilder;
 
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.Bind;
 
@@ -34,6 +38,9 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView callsSummary;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
     @Bind(R.id.sipuplug_andrdio_example_FloatingActionButton) FloatingActionButton floatingActionButton;
+    @Bind(R.id.sipuplug_andrdio_example_FooterFrameLayout) FrameLayout footerFrame;
+    @Bind(R.id.sipuplug_andrdio_example_LocalUserSpinner) Spinner localUserCaller;
+    @Bind(R.id.sipuplug_andrdio_example_RemoteUserMarqueeto) LabelledMarqueeEditText remoteUserCallee;
 
     private RVRendererAdapter<CallViewState.SipuadaCall> adapter;
 
@@ -47,7 +54,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         recyclerView.setEnabled(false);
-        IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-refresh")
+        IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-phone")
                 .actionBarSize().colorRes(android.R.color.black);
         floatingActionButton.setImageDrawable(iconDrawable);
         floatingActionButton.setBackgroundColor(ContextCompat
@@ -56,8 +63,31 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
             @Override
             public void onClick(View view) {
-                CallViewState callsViewState = (CallViewState) getViewState();
-                refreshCallDataList(callsViewState);
+                if (footerFrame.getVisibility() != View.VISIBLE) {
+                    footerFrame.setVisibility(View.VISIBLE);
+                } else {
+                    if (remoteUserCallee.getText().contains("@")) {
+                        SipuadaUserCredentials userCredentials = (SipuadaUserCredentials)
+                                localUserCaller.getSelectedItem();
+                        String username = userCredentials.getUsername();
+                        String primaryHost = userCredentials.getPrimaryHost();
+                        String remoteUsername = remoteUserCallee.getText().split("@")[0];
+                        String remoteHost = remoteUserCallee.getText().split("@")[1];
+                        Intent intent = new Intent(getApplicationContext(), CallActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra(SipuadaApplication.KEY_CALL_ACTION,
+                                CallPresenter.CallAction.MAKE_CALL);
+                        intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
+                        intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
+                        intent.putExtra(SipuadaApplication.KEY_REMOTE_USERNAME, remoteUsername);
+                        intent.putExtra(SipuadaApplication.KEY_REMOTE_HOST, remoteHost);
+                        startActivity(intent);
+                        footerFrame.setVisibility(View.INVISIBLE);
+                    } else {
+                        remoteUserCallee.setText("192.168.130.207:5060");
+                        footerFrame.setVisibility(View.INVISIBLE);
+                    }
+                }
             }
 
         });
@@ -76,6 +106,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Override
     protected void onSipuadaServiceConnected() {
+        getPresenter().fetchLocalUsersThenRefresh();
         callsSummary.setEnabled(true);
         recyclerView.setEnabled(true);
         adapter.notifyDataSetChanged();
@@ -104,6 +135,14 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         return keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0
                 || super.onKeyDown(keyCode, event);
     }
+
+    @Override
+    public void refreshUsersCredentialsList(List<SipuadaUserCredentials> usersCredentials) {
+        localUserCaller.setAdapter(new ArrayAdapter<>(getApplicationContext(),
+                R.layout.item_caller_spinner, R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress,
+                usersCredentials));
+    }
+
 
     private void handleCallActionIntent(Intent intent) {
         CallPresenter.CallAction sipuadaCallAction = (CallPresenter.CallAction) intent

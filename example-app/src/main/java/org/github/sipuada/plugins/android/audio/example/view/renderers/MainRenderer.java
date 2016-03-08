@@ -31,7 +31,6 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
     @Bind(R.id.sipuplug_andrdio_example_RegisterOutput) TextView registerOutput;
     @Bind(R.id.sipuplug_andrdio_example_InviteButton) Button inviteButton;
     @Bind(R.id.sipuplug_andrdio_example_InviteUser) LabelledMarqueeEditText inviteUser;
-    @Bind(R.id.sipuplug_andrdio_example_InviteOutput) TextView inviteOutput;
     @Bind(R.id.sipuplug_andrdio_example_CancelButton) Button cancelButton;
 
     private final MainPresenterApi presenter;
@@ -131,9 +130,6 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
     }
 
     private void renderInvite(final String username, final String primaryHost) {
-        String statusMessage = "Waiting for your command...";
-        inviteOutput.setText(statusMessage);
-        inviteOutput.setSelected(true);
         inviteUser.setEnabled(true);
         inviteButton.setEnabled(true);
         inviteButton.setVisibility(View.VISIBLE);
@@ -156,84 +152,9 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                 intent.putExtra(SipuadaApplication.KEY_REMOTE_USERNAME, remoteUsername);
                 intent.putExtra(SipuadaApplication.KEY_REMOTE_HOST, remoteHost);
                 activity.startActivity(intent);
-//                inviteOutput.setText(String.format("Inviting %s...", remoteUser));
-//                inviteOutput.setSelected(true);
-//                inviteUser.setEnabled(false);
-//                inviteButton.setEnabled(false);
-//                presenter.inviteUser(username, primaryHost, remoteUser,
-//                    new MainPresenterApi.OutgoingCallInvitationCallback() {
-//
-//                        @Override
-//                        public void onWaiting(final String callId) {
-//                            inviteOutput.setText(String
-//                                    .format("Waiting for answer from: %s", remoteUser));
-//                            inviteOutput.setSelected(true);
-//                            inviteButton.setVisibility(View.GONE);
-//                            cancelButton.setEnabled(true);
-//                            cancelButton.setVisibility(View.VISIBLE);
-//                            cancelButton.setOnClickListener(new View.OnClickListener() {
-//
-//                                @Override
-//                                public void onClick(View view) {
-//                                    presenter.cancelInviteToUser(username, primaryHost, callId);
-//                                }
-//
-//                            });
-//                        }
-//
-//                        @Override
-//                        public void onRinging(String callId) {
-//                            inviteOutput.setText(String
-//                                    .format("%s's softphone is ringing!", remoteUser));
-//                            inviteOutput.setSelected(true);
-//                        }
-//
-//                        @Override
-//                        public void onDeclined() {
-//                            inviteOutput.setText(String
-//                                    .format("%s' declined your invite.", remoteUser));
-//                            resetInvite();
-//                        }
-//
-//                        @Override
-//                        public void onAccepted(String callId) {
-//                            inviteOutput.setText(String
-//                                    .format("%s' accepted your invite.", remoteUser));
-//                            resetInvite();
-//                        }
-//
-//                        @Override
-//                        public void onFailed(final String reason) {
-//                            inviteOutput.setText(String
-//                                    .format("Failed: %s", reason));
-//                            resetInvite();
-//                        }
-//
-//                        @Override
-//                        public void onCanceled(final String reason) {
-//                            inviteOutput.setText(String
-//                                    .format("Canceled: %s", reason));
-//                            resetInvite();
-//                        }
-//
-//                    }
-//                );
             }
 
         });
-//        cancelButton.setEnabled(false);
-//        cancelButton.setVisibility(View.GONE);
-//        cancelButton.setOnClickListener(null);
     }
-
-//    private void resetInvite() {
-//        inviteOutput.setSelected(true);
-//        inviteUser.setEnabled(true);
-//        inviteButton.setEnabled(true);
-//        inviteButton.setVisibility(View.VISIBLE);
-//        cancelButton.setEnabled(false);
-//        cancelButton.setVisibility(View.GONE);
-//        cancelButton.setOnClickListener(null);
-//    }
 
 }

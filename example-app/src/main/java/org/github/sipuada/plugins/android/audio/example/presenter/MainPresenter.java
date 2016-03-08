@@ -4,16 +4,16 @@ import android.util.Log;
 
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
-import org.github.sipuada.plugins.android.audio.example.view.MainViewApi;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
+import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
 import java.util.List;
 
-public class MainPresenter extends SipuadaPresenter<MainViewApi> implements MainPresenterApi {
+public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements MainPresenterApi {
 
     @Override
     protected void doUponServiceConnected() {
-        fetchCurrentUsersCredentialsThenRefresh();
+        fetchLocalUsersThenRefresh();
     }
 
     @Override
@@ -22,7 +22,7 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
     @Override
     public void createSipuada(String username, String primaryHost, String password) {
         sipuadaService.createSipuada(new SipuadaUserCredentials(username, primaryHost, password));
-        fetchCurrentUsersCredentialsThenRefresh();
+        fetchLocalUsersThenRefresh();
     }
 
     @Override
@@ -30,7 +30,7 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
                               String primaryHost, String password) {
         sipuadaService.updateSipuada(oldUserCredentials, new SipuadaUserCredentials(username,
                 primaryHost, password));
-        fetchCurrentUsersCredentialsThenRefresh();
+        fetchLocalUsersThenRefresh();
     }
 
     @Override
@@ -61,27 +61,6 @@ public class MainPresenter extends SipuadaPresenter<MainViewApi> implements Main
                     @Override
                     public void run() {
                         callback.onFailed(reason);
-                    }
-
-                });
-            }
-
-        });
-    }
-
-    private void fetchCurrentUsersCredentialsThenRefresh() {
-        sipuadaService.fetchCurrentUsersCredentials(new FetchUsersCredentialsCallback() {
-
-            @Override
-            public void onSuccess(final List<SipuadaUserCredentials> usersCredentials) {
-                mainHandler.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (isViewAttached()) {
-                            //noinspection ConstantConditions
-                            getView().refreshUsersCredentialsList(usersCredentials);
-                        }
                     }
 
                 });

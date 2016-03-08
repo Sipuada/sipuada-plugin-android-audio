@@ -27,7 +27,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends SipuadaActivity<MainViewApi, MainPresenterApi> implements MainViewApi {
+public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterApi>
+        implements SipuadaViewApi {
 
     public static final int REQUEST_NEW_USER_CREDENTIALS = 1;
     public static final int REQUEST_UPDATE_USER_CREDENTIALS = 2;

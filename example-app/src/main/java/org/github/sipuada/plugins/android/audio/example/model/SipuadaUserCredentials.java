@@ -76,4 +76,9 @@ public class SipuadaUserCredentials extends Model implements Parcelable {
         return password;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s@%s", username, primaryHost);
+    }
+
 }
