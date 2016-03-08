@@ -165,37 +165,37 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Override
     public void showMakingCallCancelable(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELABLE, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELABLE, sipuadaCallData, null);
     }
 
     @Override
     public void showCancelingCall(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCEL, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCEL, sipuadaCallData, null);
     }
 
     @Override
-    public void showMakingCallCanceled(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELED, sipuadaCallData);
+    public void showMakingCallCanceled(SipuadaCallData sipuadaCallData, String reason) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELED, sipuadaCallData, reason);
     }
 
     @Override
-    public void showMakingCallFailed(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_FAILED, sipuadaCallData);
+    public void showMakingCallFailed(SipuadaCallData sipuadaCallData, String reason) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_FAILED, sipuadaCallData, reason);
     }
 
     @Override
     public void showMakingCallRinging(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_RINGING, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_RINGING, sipuadaCallData, null);
     }
 
     @Override
     public void showMakingCallAccepted(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_ACCEPTED, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_ACCEPTED, sipuadaCallData, null);
     }
 
     @Override
     public void showMakingCallDeclined(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_DECLINED, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_DECLINED, sipuadaCallData, null);
     }
 
     @Override
@@ -204,33 +204,33 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     }
 
     @Override
-    public void showReceivingCallCanceled(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_CANCELED, sipuadaCallData);
+    public void showReceivingCallCanceled(SipuadaCallData sipuadaCallData, String reason) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_CANCELED, sipuadaCallData, reason);
     }
 
     @Override
-    public void showReceivingCallFailed(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_FAILED, sipuadaCallData);
+    public void showReceivingCallFailed(SipuadaCallData sipuadaCallData, String reason) {
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_FAILED, sipuadaCallData, reason);
     }
 
     @Override
     public void showReceivingCallAccept(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_ACCEPT, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_ACCEPT, sipuadaCallData, null);
     }
 
     @Override
     public void showReceivingCallDecline(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_DECLINE, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_DECLINE, sipuadaCallData, null);
     }
 
     @Override
     public void showCallInProgress(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_IN_PROGRESS, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_IN_PROGRESS, sipuadaCallData, null);
     }
 
     @Override
     public void showCallFinished(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_FINISHED, sipuadaCallData);
+        setSipuadaCall(CallViewState.SipuadaCallState.CALL_FINISHED, sipuadaCallData, null);
     }
 
     @Override
@@ -251,14 +251,14 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 sipuadaCallState = CallViewState.SipuadaCallState.CALL_RECEIVING;
                 break;
         }
-        callsViewState.addOrModifySipuadaCall(sipuadaCallState, sipuadaCallData);
+        callsViewState.addOrModifySipuadaCall(sipuadaCallState, sipuadaCallData, null);
         refreshCallDataList(callsViewState);
     }
 
     private void setSipuadaCall(CallViewState.SipuadaCallState sipuadaCallState,
-                                SipuadaCallData sipuadaCallData) {
+                                SipuadaCallData sipuadaCallData, String stateInformation) {
         CallViewState callsViewState = (CallViewState) getViewState();
-        callsViewState.addOrModifySipuadaCall(sipuadaCallState, sipuadaCallData);
+        callsViewState.addOrModifySipuadaCall(sipuadaCallState, sipuadaCallData, stateInformation);
         refreshCallDataList(callsViewState);
     }
 

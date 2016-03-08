@@ -15,9 +15,9 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void cancelCall(SipuadaCallData sipuadaCallData);
 
-    void outgoingCallCanceled(SipuadaCallData sipuadaCallData);
+    void outgoingCallCanceled(SipuadaCallData sipuadaCallData, String reason);
 
-    void outgoingCallFailed(SipuadaCallData sipuadaCallData);
+    void outgoingCallFailed(SipuadaCallData sipuadaCallData, String reason);
 
     void callRinging(SipuadaCallData sipuadaCallData);
 
@@ -27,9 +27,9 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void receiveCall(SipuadaCallData sipuadaCallData);
 
-    void incomingCallCanceled(SipuadaCallData sipuadaCallData);
+    void incomingCallCanceled(SipuadaCallData sipuadaCallData, String reason);
 
-    void incomingCallFailed(SipuadaCallData sipuadaCallData);
+    void incomingCallFailed(SipuadaCallData sipuadaCallData, String reason);
 
     void acceptCall(SipuadaCallData sipuadaCallData);
 

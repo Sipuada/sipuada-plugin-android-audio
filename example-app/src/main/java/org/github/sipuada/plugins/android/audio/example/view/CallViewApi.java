@@ -10,9 +10,9 @@ public interface CallViewApi extends SipuadaViewApi {
 
     void showCancelingCall(SipuadaCallData sipuadaCallData);
 
-    void showMakingCallCanceled(SipuadaCallData sipuadaCallData);
+    void showMakingCallCanceled(SipuadaCallData sipuadaCallData, String reason);
 
-    void showMakingCallFailed(SipuadaCallData sipuadaCallData);
+    void showMakingCallFailed(SipuadaCallData sipuadaCallData, String reason);
 
     void showMakingCallRinging(SipuadaCallData sipuadaCallData);
 
@@ -22,9 +22,9 @@ public interface CallViewApi extends SipuadaViewApi {
 
     void showReceivingCall(SipuadaCallData sipuadaCallData);
 
-    void showReceivingCallCanceled(SipuadaCallData sipuadaCallData);
+    void showReceivingCallCanceled(SipuadaCallData sipuadaCallData, String reason);
 
-    void showReceivingCallFailed(SipuadaCallData sipuadaCallData);
+    void showReceivingCallFailed(SipuadaCallData sipuadaCallData, String reason);
 
     void showReceivingCallAccept(SipuadaCallData sipuadaCallData);
 

@@ -32,10 +32,12 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 
         private SipuadaCallState callState;
         private SipuadaCallData callData;
+        private String stateInformation;
 
-        public SipuadaCall(SipuadaCallState state, SipuadaCallData data) {
+        public SipuadaCall(SipuadaCallState state, SipuadaCallData data, String information) {
             callState = state;
             callData = data;
+            stateInformation = information;
         }
 
         protected SipuadaCall(Parcel in) {
@@ -74,6 +76,10 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
             return callData;
         }
 
+        public String getStateInformation() {
+            return stateInformation;
+        }
+
     }
 
     @Override
@@ -94,6 +100,7 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 //        boolean notifyInsteadOfShow = false;
         for (SipuadaCall sipuadaCall : callsInformation) {
             SipuadaCallData sipuadaCallData = sipuadaCall.getCallData();
+            String information = sipuadaCall.getStateInformation();
             switch (sipuadaCall.getCallState()) {
                 case CALL_IN_PROGRESS:
 //                    if (notifyInsteadOfShow) {
@@ -147,14 +154,14 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyReceivingCallCanceled(sipuadaCallData);
 //                    } else {
-                        sipuadaCallView.showReceivingCallCanceled(sipuadaCallData);
+                        sipuadaCallView.showReceivingCallCanceled(sipuadaCallData, information);
 //                    }
                     break;
                 case CALL_RECEIVING_FAILED:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyReceivingCallFailed(sipuadaCallData);
 //                    } else {
-                        sipuadaCallView.showReceivingCallFailed(sipuadaCallData);
+                        sipuadaCallView.showReceivingCallFailed(sipuadaCallData, information);
 //                    }
                     break;
                 case CALL_MAKING_CANCEL:
@@ -168,14 +175,14 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCallCanceled(sipuadaCallData);
 //                    } else {
-                        sipuadaCallView.showMakingCallCanceled(sipuadaCallData);
+                        sipuadaCallView.showMakingCallCanceled(sipuadaCallData, information);
 //                    }
                     break;
                 case CALL_MAKING_FAILED:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCallFailed(sipuadaCallData);
 //                    } else {
-                        sipuadaCallView.showMakingCallFailed(sipuadaCallData);
+                        sipuadaCallView.showMakingCallFailed(sipuadaCallData, information);
 //                    }
                     break;
                 case CALL_RECEIVING:
@@ -209,7 +216,7 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
     }
 
     public void addOrModifySipuadaCall(SipuadaCallState sipuadaCallState,
-                                       SipuadaCallData sipuadaCallData) {
+                                       SipuadaCallData sipuadaCallData, String stateInformation) {
         Iterator<SipuadaCall> iterator = callsInformation.iterator();
         while (iterator.hasNext()) {
             SipuadaCall sipuadaCall = iterator.next();
@@ -225,7 +232,7 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
                 iterator.remove();
             }
         }
-        callsInformation.add(new SipuadaCall(sipuadaCallState, sipuadaCallData));
+        callsInformation.add(new SipuadaCall(sipuadaCallState, sipuadaCallData, stateInformation));
         final SipuadaCallState[] statesPriority = new SipuadaCallState[]{
                 SipuadaCallState.CALL_IN_PROGRESS,
                 SipuadaCallState.CALL_RECEIVING,

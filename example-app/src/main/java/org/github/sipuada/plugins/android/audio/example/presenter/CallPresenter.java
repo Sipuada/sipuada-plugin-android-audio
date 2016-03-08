@@ -152,14 +152,14 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     }
 
     @Override
-    public void outgoingCallCanceled(final SipuadaCallData sipuadaCallData) {
+    public void outgoingCallCanceled(final SipuadaCallData sipuadaCallData, final String reason) {
         mainHandler.post(new Runnable() {
 
             @Override
             public void run() {
                 if (isViewAttached()) {
                     //noinspection ConstantConditions
-                    getView().showMakingCallCanceled(sipuadaCallData);
+                    getView().showMakingCallCanceled(sipuadaCallData, reason);
                 }
             }
 
@@ -167,14 +167,14 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     }
 
     @Override
-    public void outgoingCallFailed(final SipuadaCallData sipuadaCallData) {
+    public void outgoingCallFailed(final SipuadaCallData sipuadaCallData, final String reason) {
         mainHandler.post(new Runnable() {
 
             @Override
             public void run() {
                 if (isViewAttached()) {
                     //noinspection ConstantConditions
-                    getView().showMakingCallFailed(sipuadaCallData);
+                    getView().showMakingCallFailed(sipuadaCallData, reason);
                 }
             }
 
@@ -213,7 +213,6 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
 
     @Override
     public void callDeclined(final SipuadaCallData sipuadaCallData) {
-        outgoingCalls.remove(sipuadaCallData.getCallId());
         mainHandler.post(new Runnable() {
 
             @Override
@@ -244,14 +243,14 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     }
 
     @Override
-    public void incomingCallCanceled(final SipuadaCallData sipuadaCallData) {
+    public void incomingCallCanceled(final SipuadaCallData sipuadaCallData, final String reason) {
         mainHandler.post(new Runnable() {
 
             @Override
             public void run() {
                 if (isViewAttached()) {
                     //noinspection ConstantConditions
-                    getView().showReceivingCallCanceled(sipuadaCallData);
+                    getView().showReceivingCallCanceled(sipuadaCallData, reason);
                 }
             }
 
@@ -259,14 +258,14 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     }
 
     @Override
-    public void incomingCallFailed(final SipuadaCallData sipuadaCallData) {
+    public void incomingCallFailed(final SipuadaCallData sipuadaCallData, final String reason) {
         mainHandler.post(new Runnable() {
 
             @Override
             public void run() {
                 if (isViewAttached()) {
                     //noinspection ConstantConditions
-                    getView().showReceivingCallFailed(sipuadaCallData);
+                    getView().showReceivingCallFailed(sipuadaCallData, reason);
                 }
             }
 
@@ -372,11 +371,11 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     public void onCallInvitationCanceled(final CallInvitationCanceled event) {
         SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
         if (incomingSipuadaCallData != null) {
-            incomingCallCanceled(incomingSipuadaCallData);
+            incomingCallCanceled(incomingSipuadaCallData, event.getReason());
         }
         final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
-            outgoingCallCanceled(outgoingSipuadaCallData);
+            outgoingCallCanceled(outgoingSipuadaCallData, event.getReason());
         }
     }
 
@@ -385,11 +384,11 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     public void onCallInvitationFailed(final CallInvitationFailed event) {
         SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
         if (incomingSipuadaCallData != null) {
-            incomingCallFailed(incomingSipuadaCallData);
+            incomingCallFailed(incomingSipuadaCallData, event.getReason());
         }
         final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
-            outgoingCallFailed(outgoingSipuadaCallData);
+            outgoingCallFailed(outgoingSipuadaCallData, event.getReason());
         }
     }
 
