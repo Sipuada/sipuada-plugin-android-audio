@@ -115,3 +115,9 @@ fabric.properties
 #J2OBJC gen
 j2objc_sources
 j2objc_gen
+
+
+#gstreamer auto generated
+library/gst-build-armeabi-v7a/
+library/gst-build-armeabi/
+library/src/org/

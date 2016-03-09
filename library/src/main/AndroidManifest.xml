@@ -1,1 +1,10 @@
-<manifest package="org.github.sipuada.plugins.android.audio"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.github.sipuada.plugins.android.audio">
+    <uses-feature android:glEsVersion="0x00020000" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+</manifest>
