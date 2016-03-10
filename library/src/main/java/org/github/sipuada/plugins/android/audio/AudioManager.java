@@ -161,12 +161,8 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
     }
 
     @Override
-    public void onError(String streamerName) {
-        if(streamerName.equals(audioSender.getmName())){
-            mListener.onError(audioSender.getmName(), "Failed to receive audio streaming" );
-        }else{
-            mListener.onError(audioSender.getmName(), "Failed to send audio streaming" );
-        }
+    public void onError(String streamerName, String message) {
+            mListener.onError(streamerName, message );
     }
 
     public interface OnErrorListener {
