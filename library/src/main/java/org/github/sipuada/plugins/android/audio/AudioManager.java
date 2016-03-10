@@ -1,6 +1,7 @@
 package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
+import android.net.rtp.AudioStream;
 import android.util.Log;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.util.Random;
 /**
  * Created by renan on 02/03/16.
  */
-public class AudioManager {
+public class AudioManager implements AudioStreamer.OnErrorListener{
 
     public static int SPEEX = 97;
     public static int PCMA = 8;
@@ -34,11 +35,13 @@ public class AudioManager {
     private String senderPipeline;
     private String receiverPipeline;
     private String TAG = "AudioManager";
+    private OnErrorListener mListener;
 
-    public AudioManager(Context context) {
+    public AudioManager(Context context,OnErrorListener listener ) {
         this.mContext = context;
-        audioSender = new AudioStreamer(mContext, "audioSender");
-        audioReceiver = new AudioStreamer(mContext, "audioReceiver");
+        this.mListener = listener;
+        audioSender = new AudioStreamer(mContext, "audioSender", this);
+        audioReceiver = new AudioStreamer(mContext, "audioReceiver", this);
     }
 
     public void startVOIPStreaming(int remoteRtpPort, String remoteIp, int localPort, int codecPayloadType, Map<String, String> properties) {
@@ -51,8 +54,9 @@ public class AudioManager {
 
         if (codecPayloadType == SPEEX) {
             String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ",encoding-name=(string)SPEEX,encoding-params=(string)1,octet-align=(string)1\"";
+            Log.wtf(TAG, audioReceiverCaps);
 
-            String speexEnc = "speexenc " + getPropertyString(AudioManager.MODE, properties, "");
+            String speexEnc = "speexenc " + getPropertyString(AudioManager.MODE, properties, null);
 
             senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
@@ -156,4 +160,16 @@ public class AudioManager {
         return 0;
     }
 
+    @Override
+    public void onError(String streamerName) {
+        if(streamerName.equals(audioSender.getmName())){
+            mListener.onError(audioSender.getmName(), "Failed to receive audio streaming" );
+        }else{
+            mListener.onError(audioSender.getmName(), "Failed to send audio streaming" );
+        }
+    }
+
+    public interface OnErrorListener {
+        void onError(String streamerName, String message);
+    }
 }
