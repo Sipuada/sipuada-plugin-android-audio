@@ -3,8 +3,11 @@ package org.github.sipuada.plugins.android.audio;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by renan on 02/03/16.
@@ -126,4 +129,31 @@ public class AudioManager {
             audioSender.resume();
         }
     }
+
+    public SipuadaAudioCodec[] getCodecs() {
+        SipuadaAudioCodec[] myCodecs = new SipuadaAudioCodec[2];
+        myCodecs[0] = SipuadaAudioCodec.PCMA;
+        myCodecs[1] = SipuadaAudioCodec.SPEEX;
+        return myCodecs;
+    }
+
+    public int getAudioStreamPort() {
+        Random rand = new Random();
+        int tries = 50;
+
+        for (int i = 0; i < tries; i++) {
+            int randomPort = rand.nextInt((32767 - 16384)) + 16384;
+            ServerSocket tempServer;
+            try {
+                tempServer = new ServerSocket(randomPort);
+                tempServer.close();
+                return randomPort;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return 0;
+    }
+
 }

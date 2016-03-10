@@ -4,7 +4,6 @@ import android.content.Context;
 import android.gov.nist.gnjvx.sdp.MediaDescriptionImpl;
 import android.gov.nist.gnjvx.sdp.fields.*;
 import android.javax.sdp.*;
-import android.net.rtp.AudioCodec;
 import android.util.Pair;
 import org.github.sipuada.Constants.RequestMethod;
 import org.github.sipuada.UserAgent;
@@ -44,21 +43,19 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 	private final Map<String, CallRole> roles = new HashMap<>();
 	private final Map<String, Record> records = new HashMap<>();
-	private SipuadaAudioManager mSipuadaAudioManager;
-	private AudioCodec[] myCodecs;
-	private ArrayList<Pair<AudioCodec,Integer>> matchCodecs;
-	AndroidAudioSipuadaPluginConfig config;
+	private String mUsername;
+	private String mAddressType = SDPKeywords.IPV4;
+	private String mNetworkType = SDPKeywords.IN;
+	private AudioManager mSipuadaAudioManager;
+	private SipuadaAudioCodec[] myCodecs;
+	private ArrayList<Pair<SipuadaAudioCodec,Integer>> matchCodecs;
 	Map<String, String> sessionsIds = new HashMap<>();
 
-	public AndroidAudioSipuadaPlugin(String username, String localAddress, Context context) {
+	public AndroidAudioSipuadaPlugin(String username, Context context) {
 
-		mSipuadaAudioManager = new SipuadaAudioManager(context, localAddress);
-		mSipuadaAudioManager.setupAudioStream();
+		mSipuadaAudioManager = new AudioManager(context);
 		myCodecs = mSipuadaAudioManager.getCodecs();
-
-		config = new AndroidAudioSipuadaPluginConfig();
-		config.setUsername(username);
-		config.setLocalAddress(localAddress);
+		mUsername = username;
 	}
 
 	@Override
@@ -70,47 +67,51 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			 * "s" (session name) = -
 			 * "t" (time) = 0
 			 */
-			SessionDescription offer = SdpFactory.getInstance().createSessionDescription(config.getLocalAddress());
+			SessionDescription offer = SdpFactory.getInstance().createSessionDescription(localAddress);
 
 			// Origin ("o")
 			// o=<user name> <sess-id> <sess-version> <net type> <addr type> <unicast-address> 
 			OriginField originField = new OriginField();
-			originField.setUsername(config.getUsername());
+			originField.setUsername(mUsername);
 			String sessionId = Long.toString(System.currentTimeMillis() / 1000L);
 			sessionsIds.put(callId,sessionId);
 			originField.setSessionId(sessionId);
 			originField.setSessVersion(0L);
-			originField.setNetworkType(config.getNetworkType());
-			originField.setAddressType(config.getAddressType());
-			originField.setAddress(config.getLocalAddress());
+			originField.setNetworkType(mNetworkType);
+			originField.setAddressType(mAddressType);
+			originField.setAddress(localAddress);
 
 			// Connection ("c")
 			// c=<net type> <addr type> <connection-address>
 			ConnectionField connectionField = new ConnectionField();
-			connectionField.setNetworkType(config.getNetworkType());
-			connectionField.setAddressType(config.getAddressType());
-			connectionField.setAddress(config.getLocalAddress());
+			connectionField.setNetworkType(mNetworkType);
+			connectionField.setAddressType(mAddressType);
+			connectionField.setAddress(localAddress);
 
 			// Media Descriptions ("m=")
 			// m=<media> <port> <protocol> <fmt> ...
 			// <media> is the media type.  Currently defined media are "audio","video", "text", "application", and "message"
 			Vector<Object> mediaDescriptions = new Vector<>();
 
-			for (AudioCodec codec : myCodecs) {
+			for (SipuadaAudioCodec codec : myCodecs) {
 				MediaDescriptionImpl audioDescription = new MediaDescriptionImpl();
-				AttributeField attributeField = new AttributeField();
-				attributeField.setName(SdpConstants.RTPMAP);
 
 				MediaField audioField = new MediaField();
 				audioField.setMedia("audio");
-				audioField.setPort(mSipuadaAudioManager.getAudioStreamPort());
+				//TODO TRATAMENTO DE PORTA = 0
+				int port = mSipuadaAudioManager.getAudioStreamPort();
+				SipuadaLog.verbose("Codec: " + codec.rtpmap + ", " + port);
+				audioField.setPort(port);
 				audioField.setProtocol(SdpConstants.RTP_AVP);
+				audioField.setMediaType(Integer.toString(codec.type));
 
 				Vector<String> audioFormats = new Vector<>();
 				audioFormats.add(Integer.toString(codec.type));
 				audioField.setFormats(audioFormats);
 
-				attributeField.setValue(Integer.toString(codec.type) + " "+ codec.rtpmap);
+				AttributeField attributeField = new AttributeField();
+				attributeField.setName(SdpConstants.RTPMAP);
+				attributeField.setValue(Integer.toString(codec.type) + " " + codec.rtpmap);
 				audioDescription.addAttribute(attributeField);
 
 				AttributeField sendReceive = new AttributeField();
@@ -119,7 +120,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 				AttributeField rtcpAttribute = new AttributeField();
 				rtcpAttribute.setName("rtcp");
-				rtcpAttribute.setValue(Integer.toString(mSipuadaAudioManager.getAudioStreamPort()));
+				rtcpAttribute.setValue(Integer.toString(port + 1));
 				audioDescription.addAttribute(rtcpAttribute);
 
 				mediaDescriptions.add(audioField);
@@ -131,6 +132,8 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			offer.setMediaDescriptions(mediaDescriptions);
 
 			records.put(callId, new Record(offer));
+			SipuadaLog.verbose("Generation Offer");
+
 			return offer;
 
 		} catch (SdpException e) {
@@ -156,7 +159,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			 * "s" (session name) = -
 			 * "t" (time) = 0
 			 */
-			SessionDescription answer = SdpFactory.getInstance().createSessionDescription(config.getLocalAddress());
+			SessionDescription answer = SdpFactory.getInstance().createSessionDescription(localAddress);
 
 			SessionNameField sessionNameField = new SessionNameField();
 			sessionNameField.setSessionName(offer.getSessionName().getValue());
@@ -164,19 +167,19 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			// Origin ("o")
 			// o=<user name> <sess-id> <sess-version> <net type> <addr type> <unicast-address> 
 			OriginField originField = new OriginField();
-			originField.setUsername(config.getUsername());
+			originField.setUsername(mUsername);
 			originField.setSessionId(offer.getOrigin().getSessionId());
 			originField.setSessVersion(offer.getOrigin().getSessionVersion());
-			originField.setNetworkType(config.getNetworkType());
-			originField.setAddressType(config.getAddressType());
-			originField.setAddress(config.getLocalAddress());
+			originField.setNetworkType(mNetworkType);
+			originField.setAddressType(mAddressType);
+			originField.setAddress(localAddress);
 
 			// Connection ("c")
 			// c=<net type> <addr type> <connection-address>
 			ConnectionField connectionField = new ConnectionField();
-			connectionField.setNetworkType(config.getNetworkType());
-			connectionField.setAddressType(config.getAddressType());
-			connectionField.setAddress(config.getLocalAddress());
+			connectionField.setNetworkType(mNetworkType);
+			connectionField.setAddressType(mAddressType);
+			connectionField.setAddress(localAddress);
 
 			// Check codecs
 			matchCodecs = new ArrayList<>();
@@ -191,7 +194,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 					if (offerFormats != null) {
 						for (Object offerFormat : offerFormats) {
 							SipuadaLog.verbose("myCodecs size: " + myCodecs.length);
-							for (AudioCodec codec : myCodecs) {
+							for (SipuadaAudioCodec codec : myCodecs) {
 								if (offerFormat.equals(Integer.toString(codec.type))) {
 									SipuadaLog.verbose("Codec: " + codec.rtpmap);
 									SipuadaLog.verbose("Port: " + port);
@@ -216,16 +219,20 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 			// <media> is the media type.  Currently defined media are "audio","video", "text", "application", and "message"
 			Vector<Object> mediaDescriptions = new Vector<>();
 
-			for (Pair<AudioCodec,Integer> codecAndPort : matchCodecs) {
-				AudioCodec codec = codecAndPort.first;
+			for (Pair<SipuadaAudioCodec,Integer> codecAndPort : matchCodecs) {
+				SipuadaAudioCodec codec = codecAndPort.first;
 				MediaDescriptionImpl audioDescription = new MediaDescriptionImpl();
 				AttributeField attributeField = new AttributeField();
 				attributeField.setName(SdpConstants.RTPMAP);
 
 				MediaField audioField = new MediaField();
 				audioField.setMedia("audio");
-				audioField.setPort(mSipuadaAudioManager.getAudioStreamPort());
+				//TODO TRATAMENTO DE PORTA = 0
+				int port = mSipuadaAudioManager.getAudioStreamPort();
+				SipuadaLog.verbose("Codec: " + codec.rtpmap + ", " + port);
+				audioField.setPort(port);
 				audioField.setProtocol(SdpConstants.RTP_AVP);
+				audioField.setMediaType(Integer.toString(codec.type));
 
 				Vector<String> audioFormats = new Vector<>();
 				audioFormats.add(Integer.toString(codec.type));
@@ -240,7 +247,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 				AttributeField rtcpAttribute = new AttributeField();
 				rtcpAttribute.setName("rtcp");
-				rtcpAttribute.setValue(Integer.toString(mSipuadaAudioManager.getAudioStreamPort()));
+				rtcpAttribute.setValue(Integer.toString(port + 1));
 				audioDescription.addAttribute(rtcpAttribute);
 
 				mediaDescriptions.add(audioField);
@@ -262,36 +269,125 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 
 	@Override
 	public boolean performSessionSetup(String callId, UserAgent userAgent) {
+		SipuadaLog.verbose("PerformSessionSetup");
 		Record record = records.get(callId);
 		SessionDescription offer = record.getOffer();
 		SessionDescription answer = record.getAnswer();
 		int audioRtpPort = 5060;
+		int codecType = 0;
+		int localAudioPort = 5060;
 
 		switch (roles.get(callId)) {
 			case CALLEE:
+//				for (Pair<SipuadaAudioCodec, Integer> codec : matchCodecs) {
+//					if ("SPEEX/8000".equals(codec.first.rtpmap)) {
+//						audioRtpPort = codec.second;
+//						codecType = codec.first.type;
+//					}
+//				}
+
+				ArrayList<Pair<Integer,Integer>> answerCodecsCallee = new ArrayList<>();
+
+//				try {
+//					@SuppressWarnings("unchecked")
+//					Vector<MediaDescription> answerMediasDescription = answer.getMediaDescriptions(false);
+//					SipuadaLog.verbose("size: " + answerMediasDescription.size());
+//					for (MediaDescription item : answerMediasDescription) {
+//						answerCodecsCallee.add(new Pair<>(Integer.parseInt(item.getMedia().getMediaType()), item.getMedia().getMediaPort()));
+//					}
+//					for (Pair<Integer,Integer> a : answerCodecsCallee) {
+//						SipuadaLog.verbose("Resposta: Codec: " + a.first + ", porta: " + a.second);
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					SipuadaLog.error("Failed to extract media from answer.", e);
+//				}
+
+
 				try {
-					mSipuadaAudioManager.startStreaming(matchCodecs.get(0).second,offer.getConnection().getAddress(), matchCodecs.get(0).first);
+					//ArrayList<Pair<Type,Port>>
+					Vector offerMediaDescriptions = answer.getMediaDescriptions(false);
+					for (Object offerMediaDescription : offerMediaDescriptions) {
+						if (offerMediaDescription instanceof MediaField) {
+							answerCodecsCallee.add(new Pair<>(Integer.parseInt(((MediaField) offerMediaDescription).getMediaType()),((MediaField) offerMediaDescription).getMediaPort()));
+						}
+					}
+					for (Pair<Integer,Integer> a : answerCodecsCallee) {
+						SipuadaLog.verbose("Oferta: Codec: " + a.first + ", porta: " + a.second);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					SipuadaLog.error("Failed to extract media from answer.", e);
+				}
+
+
+				Map<String, String> calleeProperties = new HashMap<>();
+				calleeProperties.put(AudioManager.RATE, "8000");
+
+//				try {
+//					@SuppressWarnings("unchecked")
+//					Vector<MediaDescription> answerMediasDescription = answer.getMediaDescriptions(false);
+//					for (MediaDescription item : answerMediasDescription) {
+//						SipuadaLog.verbose(item.getMedia().getMediaType());
+//						if (item.getMedia().getMediaType().contains("SPEEX")) {
+//							localAudioPort = item.getMedia().getMediaPort();
+//						}
+//					}
+//				} catch (SdpException e) {
+//					e.printStackTrace();
+//					SipuadaLog.error("Failed to extract media from answer.", e);
+//				}
+
+				try {
+					mSipuadaAudioManager.startVOIPStreaming(matchCodecs.get(1).second, offer.getConnection().getAddress(), answerCodecsCallee.get(1).second, answerCodecsCallee.get(1).first, calleeProperties);
 				} catch (SdpParseException e) {
 					e.printStackTrace();
 					SipuadaLog.error("Failed to start audio streaming.", e);
 				}
 				return true;
-			case CALLER:
-				try {
-					@SuppressWarnings("unchecked")
-					Vector<MediaDescription> answerMediasDescription = answer.getMediaDescriptions(false);
 
-					for (MediaDescription item : answerMediasDescription) {
-						if (item.getMedia().getMediaType().contains("audio")) {
-							audioRtpPort = item.getMedia().getMediaPort();
+			case CALLER:
+				//ArrayList<Pair<Type,Port>>
+				ArrayList<Pair<Integer,Integer>> offerCodecs = new ArrayList<>();
+				ArrayList<Pair<Integer,Integer>> answerCodecs = new ArrayList<>();
+				try {
+					//ArrayList<Pair<Type,Port>>
+					Vector offerMediaDescriptions = offer.getMediaDescriptions(false);
+					for (Object offerMediaDescription : offerMediaDescriptions) {
+						if (offerMediaDescription instanceof MediaField) {
+							offerCodecs.add(new Pair<>(Integer.parseInt(((MediaField) offerMediaDescription).getMediaType()),((MediaField) offerMediaDescription).getMediaPort()));
 						}
 					}
-				} catch (SdpException e) {
+					for (Pair<Integer,Integer> a : offerCodecs) {
+						SipuadaLog.verbose("Oferta: Codec: " + a.first + ", porta: " + a.second);
+					}
+				} catch (Exception e) {
 					e.printStackTrace();
 					SipuadaLog.error("Failed to extract media from answer.", e);
 				}
+
 				try {
-					mSipuadaAudioManager.startStreaming(audioRtpPort,answer.getConnection().getAddress(), myCodecs[0]);
+					@SuppressWarnings("unchecked")
+					Vector<MediaDescription> answerMediasDescription = answer.getMediaDescriptions(false);
+					SipuadaLog.verbose("size: " + answerMediasDescription.size());
+					for (MediaDescription item : answerMediasDescription) {
+						answerCodecs.add(new Pair<>(Integer.parseInt(item.getMedia().getMediaType()), item.getMedia().getMediaPort()));
+					}
+					for (Pair<Integer,Integer> a : answerCodecs) {
+						SipuadaLog.verbose("Resposta: Codec: " + a.first + ", porta: " + a.second);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					SipuadaLog.error("Failed to extract media from answer.", e);
+				}
+
+				//TODO TEMP MOCK
+				Map<String, String> callerProperties = new HashMap<>();
+				callerProperties.put(AudioManager.RATE,"8000");
+
+				try {
+					//int remoteRtpPort, String remoteIp, int localPort, int codecPayloadType, Map<String, String> properties
+					mSipuadaAudioManager.startVOIPStreaming(answerCodecs.get(1).second, answer.getConnection().getAddress(), offerCodecs.get(1).second, offerCodecs.get(1).first, callerProperties);
 				} catch (SdpParseException e) {
 					e.printStackTrace();
 					SipuadaLog.error("Failed to start audio streaming.", e);
@@ -308,4 +404,8 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 		return false;
 	}
 
+	public int getCodecSampleRate(String rtpmap) {
+		String a = rtpmap.split("/")[0];
+		return Integer.parseInt(a);
+	}
 }

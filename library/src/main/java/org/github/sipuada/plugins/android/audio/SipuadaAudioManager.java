@@ -48,6 +48,8 @@ public class SipuadaAudioManager {
 
     public AudioCodec[] getCodecs() {
         AudioCodec codecs[] = AudioCodec.getCodecs();
+//        AudioCodec teste = new AudioCodec();
+        
         AudioCodec[] availableCodecs = new AudioCodec[1];
 
         for (AudioCodec codec : codecs) {
