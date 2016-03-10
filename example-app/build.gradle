@@ -13,6 +13,7 @@ android {
         versionName "1.0"
         multiDexEnabled true
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -27,6 +28,7 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
+        exclude 'AndroidManifest.xml'
     }
 }
 
@@ -47,5 +49,4 @@ dependencies {
     compile project(':library')
     compile files('libs/slf4j-android-1.6.1-RC1.jar')
     compile files('libs/guava-19.0.jar')
-    compile files('libs/sipuada-plugin-nop.jar')
 }
