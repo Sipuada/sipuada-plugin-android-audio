@@ -123,7 +123,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 				rtcpAttribute.setValue(Integer.toString(port + 1));
 				audioDescription.addAttribute(rtcpAttribute);
 
-				mediaDescriptions.add(audioField);
+				audioDescription.setMediaField(audioField);
 				mediaDescriptions.add(audioDescription);
 			}
 
@@ -250,7 +250,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 				rtcpAttribute.setValue(Integer.toString(port + 1));
 				audioDescription.addAttribute(rtcpAttribute);
 
-				mediaDescriptions.add(audioField);
+				audioDescription.setMediaField(audioField);
 				mediaDescriptions.add(audioDescription);
 			}
 
@@ -273,9 +273,6 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 		Record record = records.get(callId);
 		SessionDescription offer = record.getOffer();
 		SessionDescription answer = record.getAnswer();
-		int audioRtpPort = 5060;
-		int codecType = 0;
-		int localAudioPort = 5060;
 
 		switch (roles.get(callId)) {
 			case CALLEE:
@@ -356,6 +353,10 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin {
 					for (Object offerMediaDescription : offerMediaDescriptions) {
 						if (offerMediaDescription instanceof MediaField) {
 							offerCodecs.add(new Pair<>(Integer.parseInt(((MediaField) offerMediaDescription).getMediaType()),((MediaField) offerMediaDescription).getMediaPort()));
+						}
+
+						if (offerMediaDescription instanceof MediaDescriptionImpl) {
+							SipuadaLog.verbose(">>>>>: " + ((MediaDescriptionImpl) offerMediaDescription).getMediaField().getMedia() + ", " + ((MediaDescriptionImpl) offerMediaDescription).getMediaField().getMediaType());
 						}
 					}
 					for (Pair<Integer,Integer> a : offerCodecs) {
