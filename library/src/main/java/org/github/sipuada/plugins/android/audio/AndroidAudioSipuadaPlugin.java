@@ -267,7 +267,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 		int codecPayloadType = 0;
 		Map<String, String> properties = new HashMap<>();
 		//TODO DEFINIR PRIORIDADES DE ESCOLHA DE CODEC
-		SipuadaAudioCodec priorityCodec = SipuadaAudioCodec.SPEEX;
+		SipuadaAudioCodec priorityCodec = SipuadaAudioCodec.PCMA;
 
 		switch (roles.get(callId)) {
 			case CALLEE:
@@ -339,13 +339,17 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 				}
 
 				for (SipuadaAudioCodec codec : answerCodecs1) {
-					if (codec.rtpmap.toLowerCase().equals(priorityCodec.rtpmap.toLowerCase())) {
-						codecPayloadType = codec.type;
-						properties.put(AudioManager.RATE,getCodecSampleRate(codec.rtpmap));
-						break;
-					} else {
-						codecPayloadType = answerCodecs1.get(0).type;
-						properties.put(AudioManager.RATE,getCodecSampleRate(answerCodecs1.get(0).rtpmap));
+					for (SipuadaAudioCodec myCodec : myCodecs) {
+						if (codec.rtpmap.toLowerCase().equals(myCodec.rtpmap.toLowerCase())) {
+							if (myCodec.rtpmap.toLowerCase().equals(priorityCodec.rtpmap.toLowerCase())) {
+								codecPayloadType = myCodec.type;
+								properties.put(AudioManager.RATE,getCodecSampleRate(myCodec.rtpmap));
+								break;
+							} else {
+								codecPayloadType = myCodecs[0].type;
+								properties.put(AudioManager.RATE,getCodecSampleRate(myCodecs[0].rtpmap));
+							}
+						}
 					}
 				}
 

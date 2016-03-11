@@ -6,12 +6,6 @@ android {
 
     sourceSets {
         main {
-            java.srcDirs = ['src/main']
-            resources.srcDirs = ['src/main']
-            aidl.srcDirs = ['src/main']
-            renderscript.srcDirs = ['src/main']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
             jni.srcDirs = []
         }
     }
