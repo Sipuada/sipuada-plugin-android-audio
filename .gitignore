@@ -120,4 +120,5 @@ j2objc_gen
 #gstreamer auto generated
 library/gst-build-armeabi-v7a/
 library/gst-build-armeabi/
+library/gst-build-x86/
 library/src/org/
