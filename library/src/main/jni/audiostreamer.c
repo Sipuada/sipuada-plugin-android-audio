@@ -40,8 +40,9 @@ static pthread_t gst_app_thread;
 static pthread_key_t current_jni_env;
 static JavaVM *java_vm;
 static jfieldID custom_data_field_id;
-static jmethodID set_message_method_id;
 static jmethodID on_gstreamer_initialized_method_id;
+static jmethodID  on_state_changed_id;
+static jmethodID  on_error_id;
 static char custon_pipeline[500];
 GstElement *my_pipeline;
 /*
@@ -84,18 +85,18 @@ static JNIEnv *get_jni_env(void) {
     return env;
 }
 
-/* Change the content of the UI's TextView */
-static void set_ui_message(const gchar *message, CustomData *data) {
+static void call_error_cb(const gchar *message, CustomData *data) {
     JNIEnv *env = get_jni_env();
-    GST_DEBUG("Setting message to: %s", message);
+    GST_DEBUG("State changed to: %s", message);
     jstring jmessage = (*env)->NewStringUTF(env, message);
-    (*env)->CallVoidMethod(env, data->app, set_message_method_id, jmessage);
+    (*env)->CallVoidMethod(env, data->app, on_error_id, jmessage);
     if ((*env)->ExceptionCheck(env)) {
         GST_ERROR("Failed to call Java method");
         (*env)->ExceptionClear(env);
     }
     (*env)->DeleteLocalRef(env, jmessage);
 }
+
 
 /* Retrieve errors from the bus and show them on the UI */
 static void error_cb(GstBus *bus, GstMessage *msg, CustomData *data) {
@@ -108,9 +109,21 @@ static void error_cb(GstBus *bus, GstMessage *msg, CustomData *data) {
                                      GST_OBJECT_NAME(msg->src), err->message);
     g_clear_error(&err);
     g_free(debug_info);
-    set_ui_message(message_string, data);
+    call_error_cb(message_string, data);
     g_free(message_string);
     gst_element_set_state(data->pipeline, GST_STATE_NULL);
+}
+
+static void new_state_cb(const gchar *message, CustomData *data) {
+    JNIEnv *env = get_jni_env();
+    GST_DEBUG("State changed to: %s", message);
+    jstring jmessage = (*env)->NewStringUTF(env, message);
+    (*env)->CallVoidMethod(env, data->app, on_state_changed_id, jmessage);
+    if ((*env)->ExceptionCheck(env)) {
+        GST_ERROR("Failed to call Java method");
+        (*env)->ExceptionClear(env);
+    }
+    (*env)->DeleteLocalRef(env, jmessage);
 }
 
 /* Notify UI about pipeline state changes */
@@ -119,12 +132,13 @@ static void state_changed_cb(GstBus *bus, GstMessage *msg, CustomData *data) {
     gst_message_parse_state_changed(msg, &old_state, &new_state, &pending_state);
     /* Only pay attention to messages coming from the pipeline, not its children */
     if (GST_MESSAGE_SRC(msg) == GST_OBJECT(data->pipeline)) {
-        gchar *message = g_strdup_printf("State changed to %s",
+        gchar *message = g_strdup_printf("%s",
                                          gst_element_state_get_name(new_state));
-        set_ui_message(message, data);
+        new_state_cb(message, data);
         g_free(message);
     }
 }
+
 
 /* Check if all conditions are met to report GStreamer as initialized.
  * These conditions will change depending on the application */
@@ -252,28 +266,37 @@ static void gst_native_play(JNIEnv *env, jobject thiz) {
     if (!data) return;
     GST_DEBUG("Setting state to PLAYING");
     gst_element_set_state(data->pipeline, GST_STATE_PLAYING);
+    jclass klass = (*env)->FindClass(env, "org/github/sipuada/plugins/android/audio/AudioStreamer");
+    jmethodID on_start;
+    on_start = (*env)->GetMethodID(env, klass, "onStart", "()V");
+    (*env)->CallVoidMethod(env, data->app, on_start);
 }
 
 /* Set pipeline to PAUSED state */
 static void gst_native_pause(JNIEnv *env, jobject thiz) {
     CustomData *data = GET_CUSTOM_DATA (env, thiz, custom_data_field_id);
     if (!data) return;
-    GST_DEBUG("Setting state to PAUSED");
+    GST_DEBUG("Setting state to PAUSED!");
     gst_element_set_state(data->pipeline, GST_STATE_PAUSED);
+    jclass klass = (*env)->FindClass(env, "org/github/sipuada/plugins/android/audio/AudioStreamer");
+    jmethodID on_pause;
+    on_pause = (*env)->GetMethodID(env, klass, "onPause", "()V");
+    (*env)->CallVoidMethod(env, data->app, on_pause);
 }
 
 /* Static class initializer: retrieve method and field IDs */
 static jboolean gst_native_class_init(JNIEnv *env, jclass klass) {
     custom_data_field_id = (*env)->GetFieldID(env, klass, "native_custom_data", "J");
-    set_message_method_id = (*env)->GetMethodID(env, klass, "setMessage", "(Ljava/lang/String;)V");
+    on_state_changed_id = (*env)->GetMethodID(env, klass, "onStateChanged", "(Ljava/lang/String;)V");
+    on_error_id = (*env)->GetMethodID(env, klass, "onError", "(Ljava/lang/String;)V");
     on_gstreamer_initialized_method_id = (*env)->GetMethodID(env, klass, "onGStreamerInitialized",
                                                              "()V");
 
-    if (!custom_data_field_id || !set_message_method_id || !on_gstreamer_initialized_method_id) {
+    if (!custom_data_field_id | !on_state_changed_id | !on_gstreamer_initialized_method_id) {
         /* We emit this message through the Android log instead of the GStreamer log because the later
          * has not been initialized yet.
          */
-        __android_log_print(ANDROID_LOG_ERROR, "tutorial-2",
+        __android_log_print(ANDROID_LOG_ERROR, "audiostreamer",
                             "The calling class does not implement all necessary interface methods");
         return JNI_FALSE;
     }
@@ -282,12 +305,12 @@ static jboolean gst_native_class_init(JNIEnv *env, jclass klass) {
 
 /* List of implemented native methods */
 static JNINativeMethod native_methods[] = {
-        {"nativeInit",              "()V",                                     (void *) gst_native_init},
-        {"nativeFinalize",          "()V",                                     (void *) gst_native_finalize},
-        {"nativePlay",              "()V",                                     (void *) gst_native_play},
-        {"nativeInitPipeline",      "(Ljava/lang/String;)V",                   (void *) gst_init_pipeline},
-        {"nativePause",             "()V",                                     (void *) gst_native_pause},
-        {"nativeClassInit",         "()Z",                                     (void *) gst_native_class_init}
+        {"nativeInit",         "()V",                   (void *) gst_native_init},
+        {"nativeFinalize",     "()V",                   (void *) gst_native_finalize},
+        {"nativePlay",         "()V",                   (void *) gst_native_play},
+        {"nativeInitPipeline", "(Ljava/lang/String;)V", (void *) gst_init_pipeline},
+        {"nativePause",        "()V",                   (void *) gst_native_pause},
+        {"nativeClassInit",    "()Z",                   (void *) gst_native_class_init}
 };
 
 /* Library initializer */
