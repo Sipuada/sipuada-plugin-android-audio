@@ -10,11 +10,11 @@ public class AudioStreamer {
 
     private static final String TAG = "AudioStreamer";
 
-    private static final String STATE_PAUSED = "STATE_PAUSED";
+    private static final String STATE_PAUSED = "PAUSED";
 
-    private static final String STATE_READY = "STATE_READY";
+    private static final String STATE_READY = "READY";
 
-    private static final String STATE_PLAYING = "STATE_PLAYING";
+    private static final String STATE_PLAYING = "PLAYING";
 
     private static final String STATE_NULL = "NULL";
 
@@ -69,22 +69,22 @@ public class AudioStreamer {
         mListener.onError(mName, message);
     }
 
-    private void onStateChanged(final String newState) {
+    public void onStateChanged(final String newState) {
         Log.wtf(TAG, mName + " new state:" + newState);
         if (newState.equals(STATE_PAUSED) && is_playing_desired) {
             if (playPipelineTries >= 4) {
                 mListener.onError(mName, "Number of playing attempts exceeded.");
             } else {
-                Log.wtf(TAG, "onPause else!!!");
+                Log.wtf(TAG, mName + " onPause else!!!");
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         if (!is_playing) {
+                            Log.wtf(TAG, "nativePlay!!!");
                             nativePlay();
                             playPipelineTries++;
-                            Log.wtf(TAG, "nativePlay!!!");
                         }
                     }
                 }, 500);
@@ -96,9 +96,6 @@ public class AudioStreamer {
         }
     }
 
-    private void onStateChanged() {
-        Log.wtf(TAG, "onStateChanged");
-    }
 
     // Called from native code. Native code calls this once it has created its pipeline and
     // the main loop is running, so it is ready to accept commands.

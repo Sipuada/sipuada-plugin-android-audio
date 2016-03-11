@@ -58,10 +58,10 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
 
             String speexEnc = "speexenc " + getPropertyString(AudioManager.MODE, properties, null);
 
-            senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
-            audioSender.startVOIPStreaming(senderPipeline);
             receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + " ! rtpspeexdepay ! speexdec ! audioconvert ! audioresample ! openslessink name=openslessink stream-type=voice";
             audioReceiver.startVOIPStreaming(receiverPipeline);
+            senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
+            audioSender.startVOIPStreaming(senderPipeline);
 
         } else if (codecPayloadType == PCMA) {
             String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ",encoding-name=(string)PCMA\" ";
