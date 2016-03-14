@@ -361,6 +361,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 				}
 
 				for (SipuadaAudioCodec codec : answerCodecs) {
+					SipuadaLog.verbose("Offer answer codecs: " + codec.rtpmap);
 					if (codec.type >= 0 && codec.type <= 34) {
 						for (SipuadaAudioCodec myCodec : myCodecs) {
 							if (codec.type == myCodec.type) {
@@ -379,13 +380,14 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 				}
 
 				for (SipuadaAudioCodec codec : answerMatchCodecs) {
+					SipuadaLog.verbose("Offer answer Matches Codecs: " + codec.rtpmap);
 					if (codec.rtpmap.toLowerCase().equals(priorityCodec.rtpmap.toLowerCase())) {
 						codecPayloadType = codec.type;
 						properties.put(AudioManager.RATE,getCodecSampleRate(codec.rtpmap));
 						break;
 					} else {
-						codecPayloadType = myCodecs[0].type;
-						properties.put(AudioManager.RATE,getCodecSampleRate(myCodecs[0].rtpmap));
+						codecPayloadType = answerMatchCodecs.get(0).type;
+						properties.put(AudioManager.RATE,getCodecSampleRate(answerMatchCodecs.get(0).rtpmap));
 					}
 				}
 
