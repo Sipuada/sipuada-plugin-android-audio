@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
-//apply plugin: 'net.vrallev.jarjar'
 
 android {
     compileSdkVersion 23
@@ -33,32 +32,6 @@ android {
     }
 }
 
-//jarjar {
-//    jarJarFile 'libs/jarjar-1.4.jar'
-//    rules = [
-//            'zap java.**',
-//            'zap javax.**',
-//            'zap com.android.**',
-//            'zap dalvik.**',
-//            'rule libcore.icu.** org.github.sipuada.plugins.android.audio.example.repackaged.libcore.icu.@1',
-//            'rule libcore.internal.** org.github.sipuada.plugins.android.audio.example.repackaged.libcore.internal.@1',
-//            'rule libcore.io.** org.github.sipuada.plugins.android.audio.example.repackaged.libcore.io.@1',
-//            'rule libcore.math.** org.github.sipuada.plugins.android.audio.example.repackaged.libcore.math.@1',
-//            'rule libcore.net.** org.github.sipuada.plugins.android.audio.example.repackaged.libcore.net.@1',
-//            'rule libcore.reflect.** org.github.sipuada.plugins.android.audio.example.repackaged.libcore.reflect.@1',
-//            'rule libcore.util.** org.github.sipuada.plugins.android.audio.example.repackaged.libcore.util.@1'
-//    ]
-//    srcExcludes = [
-//            'META-INF/**',
-//            'META-INF/MANIFEST.MF',
-//            'java/security/security.properties',
-//            'java/util/logging/logging.properties'
-//    ]
-//    outputName 'libcore_repackaged.jar'
-//    outputDir 'libs'
-//    ignoreJarJarResult false
-//}
-
 dependencies {
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'
@@ -76,7 +49,4 @@ dependencies {
     compile project(':library')
     compile files('libs/slf4j-android-1.6.1-RC1.jar')
     compile files('libs/guava-19.0.jar')
-//    compile files('libs/jarjar-1.4.jar')
-//    compile files('libs/libcore_repackaged.jar')
-//    jarjar 'org.robovm:robovm-rt:1.8.0'
 }

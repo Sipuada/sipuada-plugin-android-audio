@@ -33,7 +33,6 @@ import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -465,12 +464,15 @@ public class SipuadaService extends Service {
     private boolean isAddressReachable(InetAddress destination, int destinationPort,
                                        InetAddress source, int sourcePort) throws IOException {
         Socket socket = new Socket();
+        socket.setReuseAddress(true);
         socket.bind(new InetSocketAddress(source, sourcePort));
         socket.connect(new InetSocketAddress(destination, destinationPort), 5000);
         //noinspection TryFinallyCanBeTryWithResources
         try {
             return socket.isConnected();
         } finally {
+            socket.shutdownInput();
+            socket.shutdownOutput();
             socket.close();
         }
     }
