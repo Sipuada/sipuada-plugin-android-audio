@@ -434,23 +434,19 @@ public class SipuadaService extends Service {
                     List<InterfaceAddress> addresses = networkInterface.getInterfaceAddresses();
                     for (InterfaceAddress interfaceAddress : addresses) {
                         InetAddress inetAddress = interfaceAddress.getAddress();
-                        Log.wtf(SipuadaApplication.TAG, "IS " + inetAddress + " REACHABLE?");
                         if (inetAddress instanceof Inet4Address) {
                             int localPort = 50000 + (new Random()).nextInt(10000);
                             boolean isReachable;
                             try {
-                                isReachable = canAddressReachPrimaryHost(primaryHostAddress, primaryHostPort,
-                                        inetAddress, localPort);
+                                isReachable = canAddressReachPrimaryHost(primaryHostAddress,
+                                        primaryHostPort, inetAddress, localPort);
                             } catch (IOException ioException) {
                                 isReachable = false;
                             }
-                            Log.wtf(SipuadaApplication.TAG, "VEREDICT: " + isReachable);
                             if (isReachable) {
                                 String localIpAddress = inetAddress.getHostAddress();
                                 localAdresses.add(String.format("%s:%s/TCP", localIpAddress, localPort));
                             }
-                        } else {
-                            Log.wtf(SipuadaApplication.TAG, "VEREDICT: false, is IPv6");
                         }
                     }
                 }
