@@ -16,6 +16,13 @@
         android:gravity="center"
         tools:context=".view.MainActivity">
 
+        <ProgressBar
+            android:id="@+id/sipuplug_andrdio_example_ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/sipuplug_andrdio_example_RecyclerView"
             android:layout_width="match_parent"
@@ -33,6 +40,7 @@
             android:textColor="@color/colorAccent"
             android:gravity="center"
             android:padding="30dp"
+            android:visibility="gone"
             tools:ignore="HardcodedText"/>
 
     </RelativeLayout>

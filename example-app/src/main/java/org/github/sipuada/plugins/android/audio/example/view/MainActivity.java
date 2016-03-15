@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.joanzapata.iconify.IconDrawable;
@@ -35,6 +36,7 @@ public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterA
 
     @Bind(R.id.sipuplug_andrdio_example_AppToolbar) Toolbar appToolbar;
     @Bind(R.id.sipuplug_andrdio_example_FloatingActionButton) FloatingActionButton floatingActionButton;
+    @Bind(R.id.sipuplug_andrdio_example_ProgressBar) ProgressBar progressBar;
     @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
     @Bind(R.id.sipuplug_andrdio_example_EmptyTextView) TextView emptyView;
 
@@ -78,12 +80,14 @@ public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterA
             }
 
         });
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onSipuadaServiceDisconnected() {
         floatingActionButton.setEnabled(false);
         floatingActionButton.setOnClickListener(null);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @NonNull
@@ -100,6 +104,10 @@ public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterA
             String primaryHost = data.getStringExtra(SipuadaApplication.KEY_PRIMARY_HOST);
             String password = data.getStringExtra(SipuadaApplication.KEY_PASSWORD);
             getPresenter().createSipuada(username, primaryHost, password);
+            adapter.clear();
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
         } else if (requestCode == REQUEST_UPDATE_USER_CREDENTIALS
             && resultCode == RESULT_OK) {
             String username = data.getStringExtra(SipuadaApplication.KEY_USERNAME);
@@ -108,6 +116,10 @@ public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterA
             SipuadaUserCredentials oldUserCredentials = data.getParcelableExtra(SipuadaApplication
                     .KEY_USER_CREDENTIALS);
             getPresenter().updateSipuada(oldUserCredentials, username, primaryHost, password);
+            adapter.clear();
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -120,6 +132,7 @@ public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterA
         } else {
             emptyView.setVisibility(View.GONE);
         }
+        progressBar.setVisibility(View.GONE);
         adapter.notifyDataSetChanged();
     }
 
