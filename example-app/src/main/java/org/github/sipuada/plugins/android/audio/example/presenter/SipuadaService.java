@@ -1,7 +1,6 @@
 package org.github.sipuada.plugins.android.audio.example.presenter;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.javax.sip.header.ContentTypeHeader;
 import android.os.Binder;
@@ -21,17 +20,22 @@ import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.Sipuada;
 import org.github.sipuada.SipuadaApi;
+import org.github.sipuada.exceptions.SipuadaException;
 import org.github.sipuada.plugins.android.audio.AndroidAudioSipuadaPlugin;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
 import org.github.sipuada.plugins.android.audio.example.view.CallActivity;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -61,6 +65,7 @@ public class SipuadaService extends Service {
     private static final int DECLINE_USER_INVITE = 8;
     private static final int FINISH_CALL = 9;
 
+    private static final int NUM_SIPUADA_INSTANCE_CREATION_RETRIES = 2;
     private final class SipuadaServiceHandler extends Handler {
 
         public SipuadaServiceHandler(Looper looper) {
@@ -71,17 +76,19 @@ public class SipuadaService extends Service {
         public void handleMessage(Message message) {
             switch(message.what) {
                 case INITIALIZE_SIPUADAS:
-                    initialize();
+                    initialize(NUM_SIPUADA_INSTANCE_CREATION_RETRIES);
                     break;
                 case FETCH_USERS_CREDENTIALS:
                     doFetchCurrentUsersCredentials((MainPresenterApi
                             .FetchUsersCredentialsCallback) message.obj);
                     break;
                 case ADD_NEW_SIPUADA:
-                    doCreateSipuada((SipuadaUserCredentials) message.obj);
+                    doCreateSipuada((SipuadaUserCredentials) message.obj,
+                            NUM_SIPUADA_INSTANCE_CREATION_RETRIES);
                     break;
                 case UPDATE_SIPUADA:
-                    doUpdateSipuada((UpdateSipuadaOperation) message.obj);
+                    doUpdateSipuada((UpdateSipuadaOperation) message.obj,
+                            NUM_SIPUADA_INSTANCE_CREATION_RETRIES);
                     break;
                 case REGISTER_ADDRESSES:
                     doRegisterAddresses((RegisterAddressesOperation) message.obj);
@@ -290,31 +297,42 @@ public class SipuadaService extends Service {
 
     };
 
-    private void initialize() {
+    private void initialize(int attemptsLeft) {
         List<SipuadaUserCredentials> usersCredentials = new Select()
                 .from(SipuadaUserCredentials.class).execute();
         for (SipuadaUserCredentials userCredentials : usersCredentials) {
-            String[] localAddresses = getLocalAddresses();
-            AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
-                    new AndroidAudioSipuadaPlugin(userCredentials.getUsername(), getApplicationContext());
             final String username = userCredentials.getUsername();
             final String primaryHost = userCredentials.getPrimaryHost();
-            String password = userCredentials.getPassword();
-            Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
+            final String password = userCredentials.getPassword();
+            String[] localAddresses = getLocalAddresses(primaryHost);
+            AndroidAudioSipuadaPlugin sipuadaPluginForAudio =
+                    new AndroidAudioSipuadaPlugin(userCredentials.getUsername(), getApplicationContext());
+            try {
+                Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
 
-                @Override
-                public boolean onCallInvitationArrived(final String callId, final String remoteUsername,
-                                                       final String remoteHost) {
-                    Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
-                            " callId:{%s}]", callId));
-                    return handleIncomingCallInvitation(callId, username, primaryHost,
-                            remoteUsername, remoteHost);
+                    @Override
+                    public boolean onCallInvitationArrived(final String callId, final String remoteUsername,
+                                                           final String remoteHost) {
+                        Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
+                                " callId:{%s}]", callId));
+                        return handleIncomingCallInvitation(callId, username, primaryHost,
+                                remoteUsername, remoteHost);
+                    }
+
+                }, username, primaryHost, password, localAddresses);
+                sipuada.registerPlugin(sipuadaPluginForAudio);
+                sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
+                sipuada.registerAddresses(registrationCallback);
+            } catch (SipuadaException sipuadaException) {
+                if (attemptsLeft > 0) {
+                    initialize(attemptsLeft - 1);
+                } else {
+                    Log.e(SipuadaApplication.TAG, String.format("Serious issue trying to create a " +
+                                    "Sipuada instance for %s:%s@%s bound to addresses %s: %s",
+                            username, password, primaryHost, Arrays.toString(localAddresses),
+                            sipuadaException.getMessage()));
                 }
-
-            }, username, primaryHost, password, localAddresses);
-            sipuada.registerPlugin(sipuadaPluginForAudio);
-            sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
-            sipuada.registerAddresses(registrationCallback);
+            }
         }
     }
 
@@ -326,31 +344,42 @@ public class SipuadaService extends Service {
 
     private final Map<String, Timer> callInvitationDispatchers = new HashMap<>();
 
-    private void doCreateSipuada(SipuadaUserCredentials userCredentials) {
-        String[] localAddresses = getLocalAddresses();
+    private void doCreateSipuada(SipuadaUserCredentials userCredentials, int attemptsLeft) {
         final String username = userCredentials.getUsername();
         final String primaryHost = userCredentials.getPrimaryHost();
         final String password = userCredentials.getPassword();
-        AndroidAudioSipuadaPlugin sipuadaPluginForAudio = new AndroidAudioSipuadaPlugin(username, getApplicationContext());
-        Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
+        String[] localAddresses = getLocalAddresses(primaryHost);
+        AndroidAudioSipuadaPlugin sipuadaPluginForAudio = new AndroidAudioSipuadaPlugin(username,
+                getApplicationContext());
+        try {
+            Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
 
-            @Override
-            public boolean onCallInvitationArrived(String callId, String remoteUsername,
-                                                   String remoteHost) {
-                Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
-                        " callId:{%s}]", callId));
-                return handleIncomingCallInvitation(callId, username, primaryHost,
-                        remoteUsername, remoteHost);
+                @Override
+                public boolean onCallInvitationArrived(String callId, String remoteUsername,
+                                                       String remoteHost) {
+                    Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
+                            " callId:{%s}]", callId));
+                    return handleIncomingCallInvitation(callId, username, primaryHost,
+                            remoteUsername, remoteHost);
+                }
+
+            }, username, primaryHost, password, localAddresses);
+            sipuada.registerPlugin(sipuadaPluginForAudio);
+            sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
+            sipuada.registerAddresses(registrationCallback);
+        } catch (SipuadaException sipuadaException) {
+            if (attemptsLeft > 0) {
+                doCreateSipuada(userCredentials, attemptsLeft - 1);
+            } else {
+                Log.e(SipuadaApplication.TAG, String.format("Serious issue trying to create a " +
+                                "Sipuada instance for %s:%s@%s bound to addresses %s: %s",
+                        username, password, primaryHost, Arrays.toString(localAddresses),
+                        sipuadaException.getMessage()));
             }
-
-        }, username, primaryHost, password, localAddresses);
-        sipuada.registerPlugin(sipuadaPluginForAudio);
-        sipuadaInstances.put(getSipuadaKey(username, primaryHost), sipuada);
-        sipuada.registerAddresses(registrationCallback);
+        }
     }
 
-    private void doUpdateSipuada(UpdateSipuadaOperation operation) {
-        String[] localAddresses = getLocalAddresses();
+    private void doUpdateSipuada(UpdateSipuadaOperation operation, int attemptsLeft) {
         SipuadaUserCredentials oldUserCredentials = operation.getOldUserCredentials();
         final String oldUsername = oldUserCredentials.getUsername();
         final String oldPrimaryHost = oldUserCredentials.getPrimaryHost();
@@ -359,24 +388,36 @@ public class SipuadaService extends Service {
         final String newUsername = newUserCredentials.getUsername();
         final String newPrimaryHost = newUserCredentials.getPrimaryHost();
         final String newPassword = newUserCredentials.getPassword();
-        Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
+        String[] localAddresses = getLocalAddresses(newPrimaryHost);
+        try {
+            Sipuada sipuada = new Sipuada(new SipuadaServiceListener() {
 
-            @Override
-            public boolean onCallInvitationArrived(String callId, String remoteUsername,
-                                                   String remoteHost) {
-                Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
-                        " callId:{%s}]", callId));
-                return handleIncomingCallInvitation(callId, newUsername, newPrimaryHost,
-                        remoteUsername, remoteHost);
+                @Override
+                public boolean onCallInvitationArrived(String callId, String remoteUsername,
+                                                       String remoteHost) {
+                    Log.d(SipuadaApplication.TAG, String.format("[onCallInvitationArrived;" +
+                            " callId:{%s}]", callId));
+                    return handleIncomingCallInvitation(callId, newUsername, newPrimaryHost,
+                            remoteUsername, remoteHost);
+                }
+
+            }, newUsername, newPrimaryHost, newPassword, localAddresses);
+            sipuadaInstances.put(getSipuadaKey(newUsername, newPrimaryHost), sipuada);
+            sipuada.registerAddresses(registrationCallback);
+        } catch (SipuadaException sipuadaException) {
+            if (attemptsLeft > 0) {
+                doUpdateSipuada(operation, attemptsLeft - 1);
+            } else {
+                Log.e(SipuadaApplication.TAG, String.format("Serious issue trying to create a " +
+                        "Sipuada instance for %s:%s@%s bound to addresses %s: %s",
+                        newUsername, newPassword, newPrimaryHost, Arrays.toString(localAddresses),
+                        sipuadaException.getMessage()));
             }
-
-        }, newUsername, newPrimaryHost, newPassword, localAddresses);
-        sipuadaInstances.put(getSipuadaKey(newUsername, newPrimaryHost), sipuada);
-        sipuada.registerAddresses(registrationCallback);
+        }
     }
 
     private boolean handleIncomingCallInvitation(final String callId, final String username,
-                                                 final String primaryHost, final String remoteUsername, final String remoteHost) {
+                final String primaryHost, final String remoteUsername, final String remoteHost) {
 //        if (!SipuadaApplication.CURRENTLY_BUSY_FROM_DB) {
         Timer timer = new Timer();
         callInvitationDispatchers.put(callId, timer);
@@ -406,7 +447,19 @@ public class SipuadaService extends Service {
         return false;
     }
 
-    private String[] getLocalAddresses() {
+    private String[] getLocalAddresses(String primaryHost) {
+        int primaryHostPort = 5060;
+        InetAddress primaryHostAddress;
+        try {
+            if (primaryHost.contains(":")) {
+                primaryHostAddress = InetAddress.getByName(primaryHost.split(":")[0]);
+                primaryHostPort = Integer.parseInt(primaryHost.split(":")[1].split(";")[0]);
+            } else {
+                primaryHostAddress = InetAddress.getByName(primaryHost);
+            }
+        } catch (UnknownHostException invalidHost) {
+            return new String[0];
+        }
         List<String> localAdresses = new LinkedList<>();
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -420,9 +473,18 @@ public class SipuadaService extends Service {
                     for (InterfaceAddress interfaceAddress : addresses) {
                         InetAddress inetAddress = interfaceAddress.getAddress();
                         if (inetAddress instanceof Inet4Address) {
-                            String localIpAddress = inetAddress.getHostAddress();
                             int localPort = 50000 + (new Random()).nextInt(10000);
-                            localAdresses.add(String.format("%s:%s/TCP", localIpAddress, localPort));
+                            boolean isReachable;
+                            try {
+                                isReachable = canAddressReachPrimaryHost(primaryHostAddress,
+                                        primaryHostPort, inetAddress, localPort);
+                            } catch (IOException ioException) {
+                                isReachable = false;
+                            }
+                            if (isReachable) {
+                                String localIpAddress = inetAddress.getHostAddress();
+                                localAdresses.add(String.format("%s:%s/TCP", localIpAddress, localPort));
+                            }
                         }
                     }
                 }
@@ -431,6 +493,20 @@ public class SipuadaService extends Service {
             return new String[0];
         }
         return localAdresses.toArray(new String[localAdresses.size()]);
+    }
+
+    private boolean canAddressReachPrimaryHost(InetAddress destination, int destinationPort,
+                                               InetAddress source, int sourcePort) throws IOException {
+        Socket socket = new Socket();
+        socket.setReuseAddress(true);
+        socket.bind(new InetSocketAddress(source, sourcePort));
+        socket.connect(new InetSocketAddress(destination, destinationPort), 5000);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            return socket.isConnected();
+        } finally {
+            socket.close();
+        }
     }
 
     private String getSipuadaKey(String username, String primaryHost) {
