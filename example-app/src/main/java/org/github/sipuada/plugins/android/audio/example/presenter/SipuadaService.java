@@ -64,6 +64,7 @@ public class SipuadaService extends Service {
     private static final int ACCEPT_USER_INVITE = 7;
     private static final int DECLINE_USER_INVITE = 8;
     private static final int FINISH_CALL = 9;
+    private static final int QUERY_OPTIONS = 10;
 
     private static final int NUM_SIPUADA_INSTANCE_CREATION_RETRIES = 2;
     private final class SipuadaServiceHandler extends Handler {
@@ -107,6 +108,9 @@ public class SipuadaService extends Service {
                     break;
                 case FINISH_CALL:
                     doFinishCall((SipuadaCallData) message.obj);
+                    break;
+                case QUERY_OPTIONS:
+                    doQueryOptions((QueryingOptionsOperation) message.obj);
                     break;
                 default:
                     break;
@@ -296,6 +300,50 @@ public class SipuadaService extends Service {
         }
 
     };
+
+    protected class QueryingOptionsOperation {
+
+        private final String username;
+        private final String primaryHost;
+        private final String remoteUsername;
+        private final String remoteHost;
+        private final SipuadaApi.OptionsQueryingCallback callback;
+
+        public QueryingOptionsOperation(String username, String primaryHost, String remoteUsername, String remoteHost, SipuadaApi.OptionsQueryingCallback callback) {
+            this.username = username;
+            this.primaryHost = primaryHost;
+            this.remoteUsername = remoteUsername;
+            this.remoteHost = remoteHost;
+            this.callback = callback;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPrimaryHost() {
+            return primaryHost;
+        }
+
+        public String getRemoteUsername() {
+            return remoteUsername;
+        }
+
+        public String getRemoteHost() {
+            return remoteHost;
+        }
+
+        public SipuadaApi.OptionsQueryingCallback getCallback() {
+            return callback;
+        }
+
+    }
+
+    public void queryOptions(String username, String primaryHost, String remoteUsername, String remoteHost, SipuadaApi.OptionsQueryingCallback callback) {
+        Message message = serviceHandler.obtainMessage(QUERY_OPTIONS);
+        message.obj = new QueryingOptionsOperation(username, primaryHost, remoteUsername, remoteHost, callback);
+        serviceHandler.sendMessage(message);
+    }
 
     private void initialize(int attemptsLeft) {
         List<SipuadaUserCredentials> usersCredentials = new Select()
@@ -582,6 +630,20 @@ public class SipuadaService extends Service {
             }
 //        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
         }
+    }
+
+
+    public void doQueryOptions(QueryingOptionsOperation operation) {
+        String username = operation.getUsername();
+        String primaryHost = operation.getPrimaryHost();
+        String remoteUsername = operation.getRemoteUsername();
+        String remoteHost = operation.getRemoteHost();
+        Sipuada sipuada = getSipuada(username, primaryHost);
+
+        boolean success = sipuada.queryOptions(remoteUsername, remoteHost, operation.getCallback());
+        Log.d(SipuadaApplication.TAG, String.format("[doQueryOptions;" +
+                " success:{%s}]", (success ? "True" : "False")));
+        eventBus.post(new MainPresenterApi.OptionsQueryingSent(username, primaryHost, remoteUsername, remoteHost));
     }
 
     private Sipuada getSipuada(String username, String primaryHost) {

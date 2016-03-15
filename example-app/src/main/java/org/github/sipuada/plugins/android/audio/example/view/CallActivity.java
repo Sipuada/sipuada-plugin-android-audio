@@ -36,8 +36,8 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         implements CallViewApi {
 
     @Bind(R.id.sipuplug_andrdio_example_IncomingCallsSummary) TextView callsSummary;
-    @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
-    @Bind(R.id.sipuplug_andrdio_example_FloatingActionButton) FloatingActionButton floatingActionButton;
+    @Bind(R.id.sipuada_plugin_android_example_RecyclerView) RecyclerView recyclerView;
+    @Bind(R.id.sipuada_plugin_android_example_FloatingActionButton) FloatingActionButton floatingActionButton;
     @Bind(R.id.sipuplug_andrdio_example_FooterFrameLayout) FrameLayout footerFrame;
     @Bind(R.id.sipuplug_andrdio_example_LocalUserSpinner) Spinner localUserCaller;
     @Bind(R.id.sipuplug_andrdio_example_RemoteUserMarqueeto) LabelledMarqueeEditText remoteUserCallee;

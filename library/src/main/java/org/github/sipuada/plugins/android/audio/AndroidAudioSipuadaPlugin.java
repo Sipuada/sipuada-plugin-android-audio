@@ -361,6 +361,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 				}
 
 				for (SipuadaAudioCodec codec : answerCodecs) {
+
 					SipuadaLog.verbose("Offer answer codecs: " + codec.rtpmap);
 					if (codec.type >= 0 && codec.type <= 34) {
 						for (SipuadaAudioCodec myCodec : myCodecs) {
