@@ -31,7 +31,6 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
     @Bind(R.id.sipuplug_andrdio_example_RegisterOutput) TextView registerOutput;
     @Bind(R.id.sipuplug_andrdio_example_InviteButton) Button inviteButton;
     @Bind(R.id.sipuplug_andrdio_example_InviteUser) LabelledMarqueeEditText inviteUser;
-    @Bind(R.id.sipuplug_andrdio_example_CancelButton) Button cancelButton;
 
     private final MainPresenterApi presenter;
     private final MainActivity activity;
