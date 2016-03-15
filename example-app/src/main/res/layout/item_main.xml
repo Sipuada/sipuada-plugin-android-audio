@@ -60,17 +60,6 @@
 
         <Button
             style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/sipuada_plugin_android_example_InviteButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.4"
-            android:text="Invite"
-            android:textAllCaps="true"
-            android:gravity="start|center_vertical"
-            tools:ignore="HardcodedText"/>
-
-        <Button
-            style="?android:attr/borderlessButtonStyle"
             android:id="@+id/sipuada_plugin_android_example_CancelButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -79,6 +68,17 @@
             android:textAllCaps="true"
             android:gravity="start|center_vertical"
             android:visibility="gone"
+            tools:ignore="HardcodedText"/>
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/sipuada_plugin_android_example_InviteButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Invite"
+            android:textAllCaps="true"
+            android:gravity="start|center_vertical"
             tools:ignore="HardcodedText"/>
 
         <com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText
@@ -128,18 +128,19 @@
             marqueeto:labelledMarqueeEditTextStyle="@style/LabelledMarqueeEditTextAppearanceDark"
             tools:ignore="HardcodedText"/>
 
-        <TextView
-            android:id="@+id/sipuada_plugin_android_example_OptionsOutput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.6"
-            android:gravity="center"
-            android:singleLine="true"
-            android:lines="1"
-            android:ellipsize="marquee"
-            android:padding="15dp"/>
-
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/sipuada_plugin_android_example_OptionsOutput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:ellipsize="marquee"
+        android:padding="15dp"/>
 
     <View
         android:layout_width="match_parent"
