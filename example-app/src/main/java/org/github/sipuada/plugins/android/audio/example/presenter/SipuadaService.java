@@ -526,30 +526,50 @@ public class SipuadaService extends Service {
         String remoteHost = sipuadaCallData.getRemoteHost();
         Sipuada sipuada = getSipuada(username, primaryHost);
         String callId = sipuada.inviteToCall(remoteUsername, remoteHost, operation.getCallback());
-        sipuadaCallData.setCallId(callId);
-        eventBus.post(new CallPresenterApi.CallInvitationSent(sipuadaCallData));
+        if (callId != null) {
+            sipuadaCallData.setCallId(callId);
+            eventBus.post(new CallPresenterApi.CallInvitationSent(sipuadaCallData));
+        } else {
+            eventBus.post(new CallPresenterApi.CallInvitationCouldNotBeSent(sipuadaCallData));
+        }
     }
 
     public void doCancelInviteToUser(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
-        sipuada.cancelCallInvitation(operation.getCallId());
+        String callId = operation.getCallId();
+        boolean operationSent = sipuada.cancelCallInvitation(callId);
+        if (!operationSent) {
+            eventBus.post(new CallPresenterApi.CallInvitationCancelCouldNotBeSent(callId));
+        }
     }
 
     public void doAcceptInviteFromUser(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
-        sipuada.acceptCallInvitation(operation.getCallId());
+        String callId = operation.getCallId();
+        boolean answerSent = sipuada.acceptCallInvitation(callId);
+        if (!answerSent) {
+            eventBus.post(new CallPresenterApi.CallInvitationCancelCouldNotBeSent(callId));
+        }
 //        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = true;
-    }
-
-    public void doFinishCall(SipuadaCallData operation) {
-        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
-        sipuada.finishCall(operation.getCallId());
-//        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
     }
 
     public void doDeclineInviteFromUser(SipuadaCallData operation) {
         Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
-        sipuada.declineCallInvitation(operation.getCallId());
+        String callId = operation.getCallId();
+        boolean answerSent = sipuada.declineCallInvitation(callId);
+        if (!answerSent) {
+            eventBus.post(new CallPresenterApi.CallInvitationCancelCouldNotBeSent(callId));
+        }
+    }
+
+    public void doFinishCall(SipuadaCallData operation) {
+        Sipuada sipuada = getSipuada(operation.getUsername(), operation.getPrimaryHost());
+        String callId = operation.getCallId();
+        boolean operationSent = sipuada.finishCall(callId);
+        if (!operationSent) {
+            eventBus.post(new CallPresenterApi.EstablishedCallFinishCouldNotBeSent(callId));
+        }
+//        SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
     }
 
     private Sipuada getSipuada(String username, String primaryHost) {
@@ -618,7 +638,7 @@ public class SipuadaService extends Service {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFailure;" +
                     " reason:{%s}, callId:{%s}]", reason, callId));
 //            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
-            eventBus.post(new CallPresenterApi.EstablishedCallFailed(reason, callId));
+            eventBus.post(new CallPresenterApi.EstablishedCallFailed(callId));
         }
 
         @Override

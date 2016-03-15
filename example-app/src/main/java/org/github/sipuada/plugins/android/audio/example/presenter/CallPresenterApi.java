@@ -57,6 +57,22 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
     @Subscribe
     void onCallInvitationSent(CallInvitationSent event);
 
+    class CallInvitationCouldNotBeSent {
+
+        private final SipuadaCallData callData;
+
+        public CallInvitationCouldNotBeSent(SipuadaCallData callData) {
+            this.callData = callData;
+        }
+
+        public SipuadaCallData getCallData() {
+            return callData;
+        }
+
+    }
+    @Subscribe
+    void onCallInvitationCouldNotBeSent(CallInvitationCouldNotBeSent event);
+
     class CallInvitationCanceled {
 
         private final String reason;
@@ -79,6 +95,22 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
     @Subscribe
     void onCallInvitationCanceled(CallInvitationCanceled event);
 
+    class CallInvitationCancelCouldNotBeSent {
+
+        private final String callId;
+
+        public CallInvitationCancelCouldNotBeSent(String callId) {
+            this.callId = callId;
+        }
+
+        public String getCallId() {
+            return callId;
+        }
+
+    }
+    @Subscribe
+    void onCallInvitationCancelCouldNotBeSent(CallInvitationCancelCouldNotBeSent event);
+
     class CallInvitationFailed {
 
         private final String reason;
@@ -100,6 +132,22 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
     }
     @Subscribe
     void onCallInvitationFailed(CallInvitationFailed event);
+
+    class CallInvitationAnswerCouldNotBeSent {
+
+        private final String callId;
+
+        public CallInvitationAnswerCouldNotBeSent(String callId) {
+            this.callId = callId;
+        }
+
+        public String getCallId() {
+            return callId;
+        }
+
+    }
+    @Subscribe
+    void onCallInvitationAnswerCouldNotBeSent(CallInvitationAnswerCouldNotBeSent event);
 
     class EstablishedCallStarted {
 
@@ -133,18 +181,28 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
     @Subscribe
     void onCallFinished(EstablishedCallFinished event);
 
-    class EstablishedCallFailed {
+    class EstablishedCallFinishCouldNotBeSent {
 
-        private final String reason;
         private final String callId;
 
-        public EstablishedCallFailed(String reason, String callId) {
-            this.reason = reason;
+        public EstablishedCallFinishCouldNotBeSent(String callId) {
             this.callId = callId;
         }
 
-        public String getReason() {
-            return reason;
+        public String getCallId() {
+            return callId;
+        }
+
+    }
+    @Subscribe
+    void onEstablishedCallFinishCouldNotBeSent(EstablishedCallFinishCouldNotBeSent event);
+
+    class EstablishedCallFailed {
+
+        private final String callId;
+
+        public EstablishedCallFailed(String callId) {
+            this.callId = callId;
         }
 
         public String getCallId() {
