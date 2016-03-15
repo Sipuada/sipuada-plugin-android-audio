@@ -439,7 +439,7 @@ public class SipuadaService extends Service {
                             int localPort = 50000 + (new Random()).nextInt(10000);
                             boolean isReachable;
                             try {
-                                isReachable = isAddressReachable(primaryHostAddress, primaryHostPort,
+                                isReachable = canAddressReachPrimaryHost(primaryHostAddress, primaryHostPort,
                                         inetAddress, localPort);
                             } catch (IOException ioException) {
                                 isReachable = false;
@@ -461,8 +461,8 @@ public class SipuadaService extends Service {
         return localAdresses.toArray(new String[localAdresses.size()]);
     }
 
-    private boolean isAddressReachable(InetAddress destination, int destinationPort,
-                                       InetAddress source, int sourcePort) throws IOException {
+    private boolean canAddressReachPrimaryHost(InetAddress destination, int destinationPort,
+                                               InetAddress source, int sourcePort) throws IOException {
         Socket socket = new Socket();
         socket.setReuseAddress(true);
         socket.bind(new InetSocketAddress(source, sourcePort));
