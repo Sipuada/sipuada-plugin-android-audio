@@ -45,29 +45,30 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
     }
 
     public void startVOIPStreaming(int remoteRtpPort, String remoteIp, int localPort, int codecPayloadType, Map<String, String> properties) {
-        Log.d(TAG, "startVOIPStreaming() called with: " + "remoteRtpPort = [" + remoteRtpPort + "], remoteIp = [" + remoteIp + "], localPort = [" + localPort + "], codec = [" + codecPayloadType + "]");
-
+        Log.d(TAG, "startVOIPStreaming() called with: " + "remoteRtpPort = [" + remoteRtpPort + "], remoteIp = [" + remoteIp + "], localPort = [" + localPort + "], codecPayloadType = [" + codecPayloadType + "], properties = [" + properties + "]");
         if (audioSender != null) audioSender.stop();
         if (audioReceiver != null) audioReceiver.stop();
 
         String audioSenderCaps = "audio/x-raw, channels=1, rate=" + getSampleRate(properties, DEFAULT_SAMPLE_RATE);
 
         if (codecPayloadType == SPEEX) {
-            String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ",encoding-name=(string)SPEEX,encoding-params=(string)1,octet-align=(string)1\"";
+            String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ", encoding-name=(string)SPEEX, encoding-params=(string)1, payload=(int)97\"";
             Log.wtf(TAG, audioReceiverCaps);
 
             String speexEnc = "speexenc " + getPropertyString(AudioManager.MODE, properties, null);
 
-            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + " ! rtpspeexdepay ! speexdec ! audioconvert ! audioresample ! openslessink name=openslessink stream-type=voice";
+            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + " ! rtpjitterbuffer latency=200 ! rtpspeexdepay ! speexdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=0.6 stream-type=voice";
+            Log.wtf(TAG, receiverPipeline);
             audioReceiver.startVOIPStreaming(receiverPipeline);
             senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
+
 
         } else if (codecPayloadType == PCMA) {
             String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ",encoding-name=(string)PCMA\" ";
             senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample ! " + audioSenderCaps + " ! alawenc ! rtppcmapay pt=8 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
-            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + " ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! openslessink name=openslessink stream-type=voice";
+            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + "! rtpjitterbuffer latency=200 ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! openslessink name=openslessink stream-type=voice";
             audioReceiver.startVOIPStreaming(receiverPipeline);
         }
     }

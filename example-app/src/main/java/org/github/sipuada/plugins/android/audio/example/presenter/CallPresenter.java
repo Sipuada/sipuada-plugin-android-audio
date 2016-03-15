@@ -12,10 +12,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class CallPresenter extends SipuadaPresenter<CallViewApi> implements CallPresenterApi {
+
+    private static final String REASON_SEND_FAILED = "Operation could not be sent.";
 
     private final Map<String, SipuadaCallData> outgoingCalls = Collections
             .synchronizedMap(new HashMap<String, SipuadaCallData>());
@@ -197,21 +197,6 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     }
 
     @Override
-    public void callAccepted(final SipuadaCallData sipuadaCallData) {
-        mainHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                if (isViewAttached()) {
-                    //noinspection ConstantConditions
-                    getView().showMakingCallAccepted(sipuadaCallData);
-                }
-            }
-
-        });
-    }
-
-    @Override
     public void callDeclined(final SipuadaCallData sipuadaCallData) {
         mainHandler.post(new Runnable() {
 
@@ -368,6 +353,12 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
 
     @Override
     @Subscribe
+    public void onCallInvitationCouldNotBeSent(final CallInvitationCouldNotBeSent event) {
+        outgoingCallFailed(event.getCallData(), REASON_SEND_FAILED);
+    }
+
+    @Override
+    @Subscribe
     public void onCallInvitationCanceled(final CallInvitationCanceled event) {
         SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
         if (incomingSipuadaCallData != null) {
@@ -376,6 +367,15 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
         final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
             outgoingCallCanceled(outgoingSipuadaCallData, event.getReason());
+        }
+    }
+
+    @Override
+    @Subscribe
+    public void onCallInvitationCancelCouldNotBeSent(final CallInvitationCancelCouldNotBeSent event) {
+        final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
+        if (outgoingSipuadaCallData != null) {
+            outgoingCallFailed(outgoingSipuadaCallData, REASON_SEND_FAILED);
         }
     }
 
@@ -394,6 +394,15 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
 
     @Override
     @Subscribe
+    public void onCallInvitationAnswerCouldNotBeSent(final CallInvitationAnswerCouldNotBeSent event) {
+        final SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
+        if (incomingSipuadaCallData != null) {
+            incomingCallFailed(incomingSipuadaCallData, REASON_SEND_FAILED);
+        }
+    }
+
+    @Override
+    @Subscribe
     public void onCallEstablished(final EstablishedCallStarted event) {
         SipuadaCallData incomingSipuadaCallData = incomingCalls.get(event.getCallId());
         if (incomingSipuadaCallData != null) {
@@ -401,22 +410,22 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
         }
         final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
-            callAccepted(outgoingSipuadaCallData);
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-
-                @Override
-                public void run() {
-                    establishCall(outgoingSipuadaCallData);
-                }
-
-            }, 300);
+            establishCall(outgoingSipuadaCallData);
         }
     }
 
     @Override
     @Subscribe
     public void onCallFinished(EstablishedCallFinished event) {
+        SipuadaCallData sipuadaCallData = establishedCalls.get(event.getCallId());
+        if (sipuadaCallData != null) {
+            finishCall(sipuadaCallData, false);
+        }
+    }
+
+    @Override
+    @Subscribe
+    public void onEstablishedCallFinishCouldNotBeSent(EstablishedCallFinishCouldNotBeSent event) {
         SipuadaCallData sipuadaCallData = establishedCalls.get(event.getCallId());
         if (sipuadaCallData != null) {
             finishCall(sipuadaCallData, false);

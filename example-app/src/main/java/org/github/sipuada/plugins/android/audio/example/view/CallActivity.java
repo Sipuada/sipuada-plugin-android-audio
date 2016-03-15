@@ -189,11 +189,6 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     }
 
     @Override
-    public void showMakingCallAccepted(SipuadaCallData sipuadaCallData) {
-        setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_ACCEPTED, sipuadaCallData, null);
-    }
-
-    @Override
     public void showMakingCallDeclined(SipuadaCallData sipuadaCallData) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_DECLINED, sipuadaCallData, null);
     }
@@ -278,7 +273,6 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 case CALL_MAKING:
                 case CALL_MAKING_CANCELABLE:
                 case CALL_MAKING_RINGING:
-                case CALL_MAKING_ACCEPTED:
                     pendingOutgoingCallsNumber++;
                     break;
                 case CALL_RECEIVING:
