@@ -34,11 +34,11 @@ public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterA
     public static final int REQUEST_NEW_USER_CREDENTIALS = 1;
     public static final int REQUEST_UPDATE_USER_CREDENTIALS = 2;
 
-    @Bind(R.id.sipuplug_andrdio_example_AppToolbar) Toolbar appToolbar;
-    @Bind(R.id.sipuplug_andrdio_example_FloatingActionButton) FloatingActionButton floatingActionButton;
-    @Bind(R.id.sipuplug_andrdio_example_ProgressBar) ProgressBar progressBar;
-    @Bind(R.id.sipuplug_andrdio_example_RecyclerView) RecyclerView recyclerView;
-    @Bind(R.id.sipuplug_andrdio_example_EmptyTextView) TextView emptyView;
+    @Bind(R.id.sipuada_plugin_android_example_AppToolbar) Toolbar appToolbar;
+    @Bind(R.id.sipuada_plugin_android_example_FloatingActionButton) FloatingActionButton floatingActionButton;
+    @Bind(R.id.sipuada_plugin_android_example_ProgressBar) ProgressBar progressBar;
+    @Bind(R.id.sipuada_plugin_android_example_RecyclerView) RecyclerView recyclerView;
+    @Bind(R.id.sipuada_plugin_android_example_EmptyTextView) TextView emptyView;
 
     private RVRendererAdapter<SipuadaUserCredentials> adapter;
 

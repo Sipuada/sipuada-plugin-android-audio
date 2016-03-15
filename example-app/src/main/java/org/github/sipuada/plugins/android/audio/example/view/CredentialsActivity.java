@@ -17,11 +17,11 @@ import butterknife.Bind;
 
 public class CredentialsActivity extends MosbyActivity {
 
-    @Bind(R.id.sipuplug_andrdio_example_ActionTitle) TextView actionTitle;
-    @Bind(R.id.sipuplug_andrdio_example_UsernameMarqueeto) LabelledMarqueeEditText usernameEditText;
-    @Bind(R.id.sipuplug_andrdio_example_PrimaryHostMarqueeto) LabelledMarqueeEditText primaryHostEditText;
-    @Bind(R.id.sipuplug_andrdio_example_PasswordMarqueeto) LabelledMarqueeEditText passwordEditText;
-    @Bind(R.id.sipuplug_andrdio_example_SubmitButton) Button submitButton;
+    @Bind(R.id.sipuada_plugin_android_example_ActionTitle) TextView actionTitle;
+    @Bind(R.id.sipuada_plugin_android_example_UsernameMarqueeto) LabelledMarqueeEditText usernameEditText;
+    @Bind(R.id.sipuada_plugin_android_example_PrimaryHostMarqueeto) LabelledMarqueeEditText primaryHostEditText;
+    @Bind(R.id.sipuada_plugin_android_example_PasswordMarqueeto) LabelledMarqueeEditText passwordEditText;
+    @Bind(R.id.sipuada_plugin_android_example_SubmitButton) Button submitButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -17,10 +17,10 @@ import butterknife.ButterKnife;
 
 public class CallInProgressRenderer extends Renderer<CallViewState.SipuadaCall> {
 
-    @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUsernameAtHost;
-    @Bind(R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress) TextView localUsernameAtHost;
-    @Bind(R.id.sipuplug_andrdio_example_FinishButton) TextView finishButton;
-    @Bind(R.id.sipuplug_andrdio_example_CallStatus) TextView incomingCallStatus;
+    @Bind(R.id.sipuada_plugin_android_example_EntryRemoteUsernameAtAddress) TextView remoteUsernameAtHost;
+    @Bind(R.id.sipuada_plugin_android_example_EntryLocalUsernameAtAddress) TextView localUsernameAtHost;
+    @Bind(R.id.sipuada_plugin_android_example_FinishButton) TextView finishButton;
+    @Bind(R.id.sipuada_plugin_android_example_CallStatus) TextView incomingCallStatus;
 
     private final CallPresenterApi presenter;
 

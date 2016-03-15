@@ -17,7 +17,7 @@
         tools:context=".view.MainActivity">
 
         <ProgressBar
-            android:id="@+id/sipuplug_andrdio_example_ProgressBar"
+            android:id="@+id/sipuada_plugin_android_example_ProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"

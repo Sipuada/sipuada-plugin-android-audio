@@ -18,11 +18,11 @@ import butterknife.ButterKnife;
 
 public class CallReceivingRenderer extends Renderer<CallViewState.SipuadaCall> {
 
-    @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUser;
-    @Bind(R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress) TextView localUser;
-    @Bind(R.id.sipuplug_andrdio_example_AcceptButton) Button acceptButton;
-    @Bind(R.id.sipuplug_andrdio_example_DeclineButton) TextView declineButton;
-    @Bind(R.id.sipuplug_andrdio_example_CallStatus) TextView callStatus;
+    @Bind(R.id.sipuada_plugin_android_example_EntryRemoteUsernameAtAddress) TextView remoteUser;
+    @Bind(R.id.sipuada_plugin_android_example_EntryLocalUsernameAtAddress) TextView localUser;
+    @Bind(R.id.sipuada_plugin_android_example_AcceptButton) Button acceptButton;
+    @Bind(R.id.sipuada_plugin_android_example_DeclineButton) TextView declineButton;
+    @Bind(R.id.sipuada_plugin_android_example_CallStatus) TextView callStatus;
 
     protected final CallPresenterApi presenter;
 
