@@ -179,8 +179,8 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                 String remoteHost = remoteUser.split("@")[1];
 
                 String statusMessage = "Querying options...";
-                registerOutput.setText(statusMessage);
-                registerButton.setEnabled(false);
+                optionsOutput.setText(statusMessage);
+                optionsButton.setEnabled(false);
 
                 // TODO - working - BEGIN
                 presenter.queryingOptions(username, primaryHost, remoteUsername, remoteHost, new MainPresenterApi.OptionsQueryingCallback() {
@@ -211,8 +211,6 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
             }
 
         });
-
-
 
     }
 

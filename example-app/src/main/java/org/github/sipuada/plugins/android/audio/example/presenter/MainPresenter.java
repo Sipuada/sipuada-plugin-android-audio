@@ -81,7 +81,7 @@ public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements M
             public void onOptionsQueryingSuccess(final String callId, final SessionDescription sessionDescription) {
                 Log.d(SipuadaApplication.TAG,
                         String.format("[onOptionsQueryingSuccess; callId:{%s}, sessionDescription:{%s}]",
-                                callId, sessionDescription.toString()));
+                                callId, sessionDescription));
                 mainHandler.post(new Runnable() {
 
                     @Override
