@@ -10,7 +10,7 @@
     android:gravity="center|center_horizontal">
 
     <TextView
-        android:id="@+id/sipuplug_andrdio_example_EntryUsernameAtAddress"
+        android:id="@+id/sipuada_plugin_android_example_EntryUsernameAtAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -29,7 +29,7 @@
 
         <Button
             style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/sipuplug_andrdio_example_RegisterButton"
+            android:id="@+id/sipuada_plugin_android_example_RegisterButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.4"
@@ -39,7 +39,7 @@
             tools:ignore="HardcodedText"/>
 
         <TextView
-            android:id="@+id/sipuplug_andrdio_example_RegisterOutput"
+            android:id="@+id/sipuada_plugin_android_example_RegisterOutput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
@@ -60,7 +60,7 @@
 
         <Button
             style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/sipuplug_andrdio_example_InviteButton"
+            android:id="@+id/sipuada_plugin_android_example_InviteButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.4"
@@ -71,7 +71,7 @@
 
         <Button
             style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/sipuplug_andrdio_example_CancelButton"
+            android:id="@+id/sipuada_plugin_android_example_CancelButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.4"
@@ -82,7 +82,7 @@
             tools:ignore="HardcodedText"/>
 
         <com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText
-            android:id="@+id/sipuplug_andrdio_example_InviteUser"
+            android:id="@+id/sipuada_plugin_android_example_InviteUser"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
@@ -93,6 +93,51 @@
             marqueeto:mode="edit"
             marqueeto:labelledMarqueeEditTextStyle="@style/LabelledMarqueeEditTextAppearanceDark"
             tools:ignore="HardcodedText"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/sipuada_plugin_android_example_OptionsButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Options"
+            android:textAllCaps="true"
+            android:gravity="start|center_vertical"
+            tools:ignore="HardcodedText"/>
+
+
+        <com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText
+            android:id="@+id/sipuada_plugin_android_example_OptionsUser"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:inputType="text"
+            android:hint="Remote User @ Host:"
+            android:text="192.168.130.207:5060"
+            android:textColor="@android:color/darker_gray"
+            marqueeto:mode="edit"
+            marqueeto:labelledMarqueeEditTextStyle="@style/LabelledMarqueeEditTextAppearanceDark"
+            tools:ignore="HardcodedText"/>
+
+        <TextView
+            android:id="@+id/sipuada_plugin_android_example_OptionsOutput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:gravity="center"
+            android:singleLine="true"
+            android:lines="1"
+            android:ellipsize="marquee"
+            android:padding="15dp"/>
 
     </LinearLayout>
 

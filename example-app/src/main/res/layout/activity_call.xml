@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:marqueeto="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/sipuplug_andrdio_example_CoordinatorLayout"
+    android:id="@+id/sipuada_plugin_android_example_CoordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -34,7 +34,7 @@
             android:background="@android:color/white"/>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/sipuplug_andrdio_example_RecyclerView"
+            android:id="@+id/sipuada_plugin_android_example_RecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.6"
@@ -114,7 +114,7 @@
     </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/sipuplug_andrdio_example_FloatingActionButton"
+        android:id="@+id/sipuada_plugin_android_example_FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"

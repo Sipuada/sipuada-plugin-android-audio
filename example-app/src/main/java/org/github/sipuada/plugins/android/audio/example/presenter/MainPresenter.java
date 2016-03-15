@@ -1,6 +1,9 @@
 package org.github.sipuada.plugins.android.audio.example.presenter;
 
+import android.javax.sdp.SessionDescription;
 import android.util.Log;
+
+import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
@@ -67,6 +70,47 @@ public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements M
             }
 
         });
+    }
+
+
+    @Override
+    public void queryingOptions(String username, String primaryHost, String remoteUsername, String remoteHost, final OptionsQueryingCallback callback) {
+        sipuadaService.queryOptions(username, primaryHost, remoteUsername, remoteHost, new SipuadaApi.OptionsQueryingCallback() {
+
+            @Override
+            public void onOptionsQueryingSuccess(final String callId, final SessionDescription sessionDescription) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onOptionsQueryingSuccess; callId:{%s}, sessionDescription:{%s}]",
+                                callId, sessionDescription.toString()));
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onOptionsQueryingSuccess(callId, sessionDescription);
+                    }
+                });
+            }
+
+            @Override
+            public void onOptionsQueryingFailed(final String reason) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onOptionsQueryingFailed; reason:{%s}]", reason));
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onOptionsQueryingFailed(reason);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    @Subscribe
+    public void onOptionsQueryingSent(OptionsQueryingSent event) {
+        Log.d(SipuadaApplication.TAG,
+                String.format("[onOptionsQueryingSent...]"));
     }
 
 }

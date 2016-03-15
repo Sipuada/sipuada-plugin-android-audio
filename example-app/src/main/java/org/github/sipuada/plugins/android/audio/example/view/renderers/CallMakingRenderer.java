@@ -20,7 +20,7 @@ public class CallMakingRenderer extends Renderer<CallViewState.SipuadaCall> {
 
     @Bind(R.id.sipuplug_andrdio_example_EntryLocalUsernameAtAddress) TextView localUser;
     @Bind(R.id.sipuplug_andrdio_example_EntryRemoteUsernameAtAddress) TextView remoteUser;
-    @Bind(R.id.sipuplug_andrdio_example_CancelButton) Button cancelButton;
+    @Bind(R.id.sipuada_plugin_android_example_CancelButton) Button cancelButton;
     @Bind(R.id.sipuplug_andrdio_example_CallStatus) TextView callStatus;
 
     protected final CallPresenterApi presenter;

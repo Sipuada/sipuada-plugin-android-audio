@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/sipuplug_andrdio_example_CoordinatorLayout"
+    android:id="@+id/sipuada_plugin_android_example_CoordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
-        android:id="@+id/sipuplug_andrdio_example_RelativeLayout"
+        android:id="@+id/sipuada_plugin_android_example_RelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="@dimen/activity_vertical_margin"
@@ -17,7 +17,7 @@
         tools:context=".view.MainActivity">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/sipuplug_andrdio_example_RecyclerView"
+            android:id="@+id/sipuada_plugin_android_example_RecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
@@ -25,7 +25,7 @@
             android:paddingTop="?attr/actionBarSize"/>
 
         <TextView
-            android:id="@+id/sipuplug_andrdio_example_EmptyTextView"
+            android:id="@+id/sipuada_plugin_android_example_EmptyTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -43,7 +43,7 @@
         app:elevation="4dp">
 
          <android.support.v7.widget.Toolbar
-            android:id="@+id/sipuplug_andrdio_example_AppToolbar"
+            android:id="@+id/sipuada_plugin_android_example_AppToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -52,7 +52,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/sipuplug_andrdio_example_FloatingActionButton"
+        android:id="@+id/sipuada_plugin_android_example_FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"
@@ -60,7 +60,7 @@
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_horizontal_margin"
-        app:layout_anchor="@id/sipuplug_andrdio_example_RelativeLayout"
+        app:layout_anchor="@id/sipuada_plugin_android_example_RelativeLayout"
         app:layout_anchorGravity="bottom|end|right"
         app:layout_behavior="org.github.sipuada.plugins.android.audio.example.view.behaviors.ScrollAwareFABBehavior"
         app:pressedTranslationZ="12dp"

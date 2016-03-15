@@ -305,7 +305,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 				return true;
 
 			case CALLER:
-				ArrayList<SipuadaAudioCodec> answerCodecs1 = new ArrayList<>();
+				ArrayList<SipuadaAudioCodec> answerCodecs = new ArrayList<>();
 
 				try {
 					Vector offerMediaDescriptions = offer.getMediaDescriptions(false);
@@ -328,7 +328,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 							Vector attributeFields = ((MediaDescription) answerMediaDescription).getAttributes(false);
 							for (Object attributeField : attributeFields) {
 								if (SdpConstants.RTPMAP.equals(((AttributeField) attributeField).getName())) {
-									answerCodecs1.add(getCodec(((AttributeField) attributeField).getValue()));
+									answerCodecs.add(getCodec(((AttributeField) attributeField).getValue()));
 								}
 							}
 						}
@@ -338,7 +338,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 					SipuadaLog.error("Failed to extract media from answer.", e);
 				}
 
-				for (SipuadaAudioCodec codec : answerCodecs1) {
+				for (SipuadaAudioCodec codec : answerCodecs) {
 					for (SipuadaAudioCodec myCodec : myCodecs) {
 						if (codec.rtpmap.toLowerCase().equals(myCodec.rtpmap.toLowerCase())) {
 							if (myCodec.rtpmap.toLowerCase().equals(priorityCodec.rtpmap.toLowerCase())) {
