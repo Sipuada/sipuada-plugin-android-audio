@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class CallPresenter extends SipuadaPresenter<CallViewApi> implements CallPresenterApi {
 
@@ -192,21 +190,6 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
                 if (isViewAttached()) {
                     //noinspection ConstantConditions
                     getView().showMakingCallRinging(sipuadaCallData);
-                }
-            }
-
-        });
-    }
-
-    @Override
-    public void callAccepted(final SipuadaCallData sipuadaCallData) {
-        mainHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                if (isViewAttached()) {
-                    //noinspection ConstantConditions
-                    getView().showMakingCallAccepted(sipuadaCallData);
                 }
             }
 
@@ -427,16 +410,7 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
         }
         final SipuadaCallData outgoingSipuadaCallData = outgoingCalls.get(event.getCallId());
         if (outgoingSipuadaCallData != null) {
-            callAccepted(outgoingSipuadaCallData);
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-
-                @Override
-                public void run() {
-                    establishCall(outgoingSipuadaCallData);
-                }
-
-            }, 300);
+            establishCall(outgoingSipuadaCallData);
         }
     }
 

@@ -33,8 +33,6 @@ public class CallRendererBuilder
                 return CallMakingFailedRenderer.class;
             case CALL_MAKING_DECLINED:
                 return CallMakingDeclinedRenderer.class;
-            case CALL_MAKING_ACCEPTED:
-                return CallMakingAcceptedRenderer.class;
             default:
             case CALL_RECEIVING:
                 return CallReceivingRenderer.class;
@@ -63,7 +61,6 @@ public class CallRendererBuilder
         prototypes.add(new CallMakingCanceledRenderer(presenter));
         prototypes.add(new CallMakingFailedRenderer(presenter));
         prototypes.add(new CallMakingDeclinedRenderer(presenter));
-        prototypes.add(new CallMakingAcceptedRenderer(presenter));
         prototypes.add(new CallReceivingRenderer(presenter));
         prototypes.add(new CallReceivingCanceledRenderer(presenter));
         prototypes.add(new CallReceivingFailedRenderer(presenter));

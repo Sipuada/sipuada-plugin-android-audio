@@ -16,8 +16,6 @@ public interface CallViewApi extends SipuadaViewApi {
 
     void showMakingCallRinging(SipuadaCallData sipuadaCallData);
 
-    void showMakingCallAccepted(SipuadaCallData sipuadaCallData);
-
     void showMakingCallDeclined(SipuadaCallData sipuadaCallData);
 
     void showReceivingCall(SipuadaCallData sipuadaCallData);

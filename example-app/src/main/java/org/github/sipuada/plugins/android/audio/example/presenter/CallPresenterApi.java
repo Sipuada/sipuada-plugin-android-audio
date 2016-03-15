@@ -21,8 +21,6 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void callRinging(SipuadaCallData sipuadaCallData);
 
-    void callAccepted(SipuadaCallData sipuadaCallData);
-
     void callDeclined(SipuadaCallData sipuadaCallData);
 
     void receiveCall(SipuadaCallData sipuadaCallData);

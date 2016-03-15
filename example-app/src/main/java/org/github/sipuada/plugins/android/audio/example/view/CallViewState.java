@@ -21,7 +21,7 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
     public enum SipuadaCallState {
 
         CALL_MAKING, CALL_MAKING_CANCELABLE, CALL_MAKING_RINGING, CALL_MAKING_CANCEL,
-        CALL_MAKING_CANCELED, CALL_MAKING_FAILED, CALL_MAKING_ACCEPTED, CALL_MAKING_DECLINED,
+        CALL_MAKING_CANCELED, CALL_MAKING_FAILED, CALL_MAKING_DECLINED,
         CALL_RECEIVING, CALL_RECEIVING_CANCELED, CALL_RECEIVING_FAILED,
         CALL_RECEIVING_ACCEPT, CALL_RECEIVING_DECLINE,
         CALL_IN_PROGRESS, CALL_FINISHED
@@ -116,14 +116,6 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 //                    } else {
 //                        notifyInsteadOfShow = true;
                         sipuadaCallView.showReceivingCallAccept(sipuadaCallData);
-//                    }
-                    break;
-                case CALL_MAKING_ACCEPTED:
-//                    if (notifyInsteadOfShow) {
-//                        //sipuadaCallView.notifyMakingCallAccepted(sipuadaCallData);
-//                    } else {
-//                        notifyInsteadOfShow = true;
-                        sipuadaCallView.showMakingCallAccepted(sipuadaCallData);
 //                    }
                     break;
                 case CALL_RECEIVING_DECLINE:
@@ -238,7 +230,6 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
                 SipuadaCallState.CALL_RECEIVING,
                 SipuadaCallState.CALL_MAKING_CANCELABLE,
                 SipuadaCallState.CALL_MAKING,
-                SipuadaCallState.CALL_MAKING_ACCEPTED,
                 SipuadaCallState.CALL_MAKING_RINGING,
                 SipuadaCallState.CALL_MAKING_DECLINED,
                 SipuadaCallState.CALL_RECEIVING_ACCEPT,
