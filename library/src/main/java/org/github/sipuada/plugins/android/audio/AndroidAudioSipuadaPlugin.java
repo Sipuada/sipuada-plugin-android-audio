@@ -2,17 +2,30 @@ package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
 import android.gov.nist.gnjvx.sdp.MediaDescriptionImpl;
-import android.gov.nist.gnjvx.sdp.fields.*;
-import android.javax.sdp.*;
+import android.gov.nist.gnjvx.sdp.fields.AttributeField;
+import android.gov.nist.gnjvx.sdp.fields.ConnectionField;
+import android.gov.nist.gnjvx.sdp.fields.MediaField;
+import android.gov.nist.gnjvx.sdp.fields.OriginField;
+import android.gov.nist.gnjvx.sdp.fields.SDPKeywords;
+import android.gov.nist.gnjvx.sdp.fields.SessionNameField;
+import android.javax.sdp.MediaDescription;
+import android.javax.sdp.SdpConstants;
+import android.javax.sdp.SdpException;
+import android.javax.sdp.SdpFactory;
+import android.javax.sdp.SdpParseException;
+import android.javax.sdp.SessionDescription;
 import android.util.Log;
 import android.util.Pair;
 
 import org.github.sipuada.Constants.RequestMethod;
-import org.github.sipuada.UserAgent;
-import org.github.sipuada.plugins.android.audio.utils.SipuadaLog;
+import org.github.sipuada.SipUserAgent;
 import org.github.sipuada.plugins.SipuadaPlugin;
+import org.github.sipuada.plugins.android.audio.utils.SipuadaLog;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.OnErrorListener {
 
@@ -278,7 +291,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 	}
 
 	@Override
-	public boolean performSessionSetup(String callId, UserAgent userAgent) {
+	public boolean performSessionSetup(String callId, SipUserAgent userAgent) {
 		SipuadaLog.verbose("PerformSessionSetup");
 		Record record = records.get(callId);
 		SessionDescription offer = record.getOffer();
@@ -408,7 +421,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 	public boolean performSessionTermination(String callId) {
 		mSipuadaAudioManager.stopStreaming();
 		records.remove(callId);
-		return false;
+		return true;
 	}
 
 	public String getCodecSampleRate(String rtpmap) {
