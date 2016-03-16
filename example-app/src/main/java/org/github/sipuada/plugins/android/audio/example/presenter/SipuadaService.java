@@ -13,7 +13,7 @@ import android.os.Process;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.activeandroid.query.;
+import com.activeandroid.query.Select;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
