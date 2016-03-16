@@ -301,7 +301,7 @@ public class AndroidAudioSipuadaPlugin implements SipuadaPlugin, AudioManager.On
 		int codecPayloadType = 0;
 		Map<String, String> properties = new HashMap<>();
 		//TODO DEFINIR PRIORIDADES DE ESCOLHA DE CODEC
-		SipuadaAudioCodec priorityCodec = SipuadaAudioCodec.SPEEX;
+		SipuadaAudioCodec priorityCodec = SipuadaAudioCodec.SPEEX_8000;
 
 		switch (roles.get(callId)) {
 			case CALLEE:

@@ -42,8 +42,6 @@ public class AudioStreamer {
 
     private String currentPipeline;
 
-    private int playPipelineTries;
-
     private OnErrorListener mListener;
 
     public AudioStreamer(Context context, String name, OnErrorListener listener) {
@@ -71,28 +69,26 @@ public class AudioStreamer {
 
     public void onStateChanged(final String newState) {
         Log.wtf(TAG, mName + " new state:" + newState);
-        if (newState.equals(STATE_PAUSED) && is_playing_desired) {
-            if (playPipelineTries >= 4) {
-                mListener.onError(mName, "Number of playing attempts exceeded.");
-            } else {
-                Log.wtf(TAG, mName + " onPause else!!!");
-
+        if (newState.equals(STATE_PAUSED)) {
+            if (is_playing_desired) {
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         if (!is_playing) {
-                            Log.wtf(TAG, "nativePlay!!!");
                             nativePlay();
-                            playPipelineTries++;
                         }
                     }
-                }, 500);
+                }, 1000);
+            } else {
+                onPause();
             }
         } else if (newState.equals(STATE_PLAYING)) {
             is_playing = true;
+            onStart();
         } else if (newState.equals(STATE_NULL)) {
             is_playing = false;
+            onStop();
         }
     }
 
@@ -111,19 +107,18 @@ public class AudioStreamer {
 
     public void onPause() {
         Log.wtf(TAG, "onPause()");
-        if (is_playing_desired) {
-
-        }
     }
 
     public void onStart() {
-        Log.wtf(TAG, "onStart");
-        this.playPipelineTries = 0;
+        Log.wtf(TAG, "onStart()");
+    }
+
+    public void onStop() {
+        Log.wtf(TAG, "onStop()");
     }
 
     public void startVOIPStreaming(String pipeline) {
         is_playing_desired = true;
-        this.playPipelineTries = 0;
         is_playing = false;
         this.currentPipeline = pipeline;
         nativeInitPipeline(pipeline);

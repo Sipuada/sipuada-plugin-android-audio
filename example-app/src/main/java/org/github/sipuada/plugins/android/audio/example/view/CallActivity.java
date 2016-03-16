@@ -1,12 +1,15 @@
 package org.github.sipuada.plugins.android.audio.example.view;
 
 import android.content.Intent;
+import android.media.*;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -43,6 +46,8 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     @Bind(R.id.sipuada_plugin_android_example_RemoteUserMarqueeto) LabelledMarqueeEditText remoteUserCallee;
 
     private RVRendererAdapter<CallViewState.SipuadaCall> adapter;
+    private Ringtone mRingtone;
+    private ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_DTMF, 100);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,10 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         recyclerView.setEnabled(false);
+
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        mRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+
         IconDrawable iconDrawable = new IconDrawable(getApplicationContext(), "md-phone")
                 .actionBarSize().colorRes(android.R.color.black);
         floatingActionButton.setImageDrawable(iconDrawable);
@@ -160,6 +169,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Override
     public void showMakingCall(SipuadaCallData sipuadaCallData) {
+        playRingingTone();
         addSipuadaCall(CallPresenter.CallAction.MAKE_CALL, sipuadaCallData);
     }
 
@@ -175,56 +185,69 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Override
     public void showMakingCallCanceled(SipuadaCallData sipuadaCallData, String reason) {
+        stopRingingTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELED, sipuadaCallData, reason);
     }
 
     @Override
     public void showMakingCallFailed(SipuadaCallData sipuadaCallData, String reason) {
+        playBusyTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_FAILED, sipuadaCallData, reason);
     }
 
     @Override
     public void showMakingCallRinging(SipuadaCallData sipuadaCallData) {
+        playRingingTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_RINGING, sipuadaCallData, null);
     }
 
     @Override
     public void showMakingCallDeclined(SipuadaCallData sipuadaCallData) {
+        playBusyTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_DECLINED, sipuadaCallData, null);
     }
 
     @Override
     public void showReceivingCall(SipuadaCallData sipuadaCallData) {
+        playReceivingCallTone();
         addSipuadaCall(CallPresenter.CallAction.RECEIVE_CALL, sipuadaCallData);
     }
 
     @Override
     public void showReceivingCallCanceled(SipuadaCallData sipuadaCallData, String reason) {
+        stopReceivingCallTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_CANCELED, sipuadaCallData, reason);
     }
 
     @Override
     public void showReceivingCallFailed(SipuadaCallData sipuadaCallData, String reason) {
+        stopReceivingCallTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_FAILED, sipuadaCallData, reason);
     }
 
     @Override
     public void showReceivingCallAccept(SipuadaCallData sipuadaCallData) {
+        stopReceivingCallTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_ACCEPT, sipuadaCallData, null);
     }
 
     @Override
     public void showReceivingCallDecline(SipuadaCallData sipuadaCallData) {
+        stopReceivingCallTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_DECLINE, sipuadaCallData, null);
     }
 
     @Override
     public void showCallInProgress(SipuadaCallData sipuadaCallData) {
+        stopReceivingCallTone();
+        stopRingingTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_IN_PROGRESS, sipuadaCallData, null);
     }
 
     @Override
     public void showCallFinished(SipuadaCallData sipuadaCallData) {
+        stopReceivingCallTone();
+        stopRingingTone();
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_FINISHED, sipuadaCallData, null);
     }
 
@@ -344,6 +367,78 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         }
         callsSummary.setText(summary);
         adapter.notifyDataSetChanged();
+    }
+
+    public void playRingingTone() {
+        final Thread toneGeneratorThread = new Thread() {
+            @Override
+            public void run() {
+                if (toneGenerator == null) {
+                    toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
+                }
+                Log.v("JFL DEBUG", "STARTING TONE");
+                toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_USA_RINGBACK);
+            }
+        };
+        try {
+            toneGeneratorThread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void playReceivingCallTone() {
+        if (mRingtone == null ) {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            mRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        }
+
+        mRingtone.play();
+    }
+
+    public void stopReceivingCallTone() {
+        if (mRingtone != null) {
+            mRingtone.stop();
+        }
+    }
+
+    public void stopRingingTone() {
+        if (toneGenerator != null) {
+            final Thread toneGeneratorThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        toneGenerator.stopTone();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            try {
+                toneGeneratorThread.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void playBusyTone() {
+        final Thread toneGeneratorThread = new Thread() {
+            @Override
+            public void run() {
+                if (toneGenerator == null) {
+                    toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
+                }
+                try {
+                    toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_BUSY, 2000);
+                } catch (Exception ignored) {}
+            }
+        };
+        try {
+            toneGeneratorThread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

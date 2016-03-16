@@ -2,7 +2,6 @@ package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
 import android.util.Log;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
@@ -135,9 +134,11 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
     }
 
     public SipuadaAudioCodec[] getCodecs() {
-        SipuadaAudioCodec[] myCodecs = new SipuadaAudioCodec[2];
+        SipuadaAudioCodec[] myCodecs = new SipuadaAudioCodec[4];
         myCodecs[0] = SipuadaAudioCodec.PCMA;
-        myCodecs[1] = SipuadaAudioCodec.SPEEX;
+        myCodecs[1] = SipuadaAudioCodec.SPEEX_8000;
+        myCodecs[2] = SipuadaAudioCodec.SPEEX_16000;
+        myCodecs[3] = SipuadaAudioCodec.SPEEX_32000;
         return myCodecs;
     }
 
@@ -159,7 +160,6 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
 
         return 0;
     }
-
 
     @Override
     public void onError(String streamerName, String message) {
