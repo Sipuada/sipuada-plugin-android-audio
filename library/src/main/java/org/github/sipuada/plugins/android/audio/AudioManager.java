@@ -68,7 +68,7 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
             String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ",encoding-name=(string)PCMA\" ";
             senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample ! " + audioSenderCaps + " ! alawenc ! rtppcmapay pt=8 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
-            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + "! rtpjitterbuffer latency=200 ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=1 stream-type=voice";
+            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + "! rtpjitterbuffer latency=200 ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=0.8 stream-type=voice";
             audioReceiver.startVOIPStreaming(receiverPipeline);
         }
     }
