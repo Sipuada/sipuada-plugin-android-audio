@@ -60,6 +60,7 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
 
     @Override
     public void unbindFromSipuadaService() {
+        sipuadaService.unregisterSipuadaPresenter(this);
         if (isViewAttached()) {
             //noinspection ConstantConditions
             getView().doUnbindFromSipuadaService(connection);

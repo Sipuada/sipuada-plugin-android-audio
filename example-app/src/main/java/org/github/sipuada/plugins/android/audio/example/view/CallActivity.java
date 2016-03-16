@@ -76,7 +76,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                         Intent intent = new Intent(getApplicationContext(), CallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent.putExtra(SipuadaApplication.KEY_CALL_ACTION,
-                                CallPresenter.CallAction.MAKE_CALL);
+                                CallViewState.SipuadaCallAction.MAKE_CALL);
                         intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
                         intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
                         intent.putExtra(SipuadaApplication.KEY_REMOTE_USERNAME, remoteUsername);
@@ -91,6 +91,12 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
             }
 
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getPresenter().updateState((CallViewState) getViewState());
     }
 
     @Override
@@ -143,9 +149,8 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 usersCredentials));
     }
 
-
     private void handleCallActionIntent(Intent intent) {
-        CallPresenter.CallAction sipuadaCallAction = (CallPresenter.CallAction) intent
+        CallViewState.SipuadaCallAction sipuadaCallAction = (CallViewState.SipuadaCallAction) intent
                 .getSerializableExtra(SipuadaApplication.KEY_CALL_ACTION);
         String callId = intent.getStringExtra(SipuadaApplication.KEY_CALL_ID);
         String username = intent.getStringExtra(SipuadaApplication.KEY_USERNAME);
@@ -160,7 +165,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Override
     public void showMakingCall(SipuadaCallData sipuadaCallData) {
-        addSipuadaCall(CallPresenter.CallAction.MAKE_CALL, sipuadaCallData);
+        addSipuadaCall(CallViewState.SipuadaCallAction.MAKE_CALL, sipuadaCallData);
     }
 
     @Override
@@ -195,7 +200,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     @Override
     public void showReceivingCall(SipuadaCallData sipuadaCallData) {
-        addSipuadaCall(CallPresenter.CallAction.RECEIVE_CALL, sipuadaCallData);
+        addSipuadaCall(CallViewState.SipuadaCallAction.RECEIVE_CALL, sipuadaCallData);
     }
 
     @Override
@@ -233,7 +238,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         closeSipuadaCall(sipuadaCallData);
     }
 
-    private void addSipuadaCall(CallPresenter.CallAction sipuadaCallAction,
+    private void addSipuadaCall(CallViewState.SipuadaCallAction sipuadaCallAction,
                                 SipuadaCallData sipuadaCallData) {
         CallViewState callsViewState = (CallViewState) getViewState();
         CallViewState.SipuadaCallState sipuadaCallState;
@@ -267,8 +272,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         adapter.clear();
         int pendingOutgoingCallsNumber = 0, pendingIncomingCallsNumber = 0,
                 establishedCallsNumber = 0, finishedCallsNumber = 0;
-        for (int i = 0; i < callsViewState.getSipuadaCallsCount(); i++) {
-            CallViewState.SipuadaCall sipuadaCall = callsViewState.getSipuadaCall(i);
+        for (CallViewState.SipuadaCall sipuadaCall : callsViewState.getSipuadaCallsInformation()) {
             switch (sipuadaCall.getCallState()) {
                 case CALL_MAKING:
                 case CALL_MAKING_CANCELABLE:

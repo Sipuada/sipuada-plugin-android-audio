@@ -4,10 +4,13 @@ import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 import org.github.sipuada.plugins.android.audio.example.view.CallViewApi;
+import org.github.sipuada.plugins.android.audio.example.view.CallViewState;
 
 public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
-    void performAction(CallPresenter.CallAction callAction, SipuadaCallData sipuadaCallData);
+    void updateState(CallViewState viewState);
+
+    void performAction(CallViewState.SipuadaCallAction callAction, SipuadaCallData sipuadaCallData);
 
     void makeCall(SipuadaCallData sipuadaCallData);
 
@@ -70,6 +73,54 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
     }
     @Subscribe
     void onCallInvitationCouldNotBeSent(CallInvitationCouldNotBeSent event);
+
+    class CallInvitationWaiting {
+
+        private final SipuadaCallData callData;
+
+        public CallInvitationWaiting(SipuadaCallData callData) {
+            this.callData = callData;
+        }
+
+        public SipuadaCallData getCallData() {
+            return callData;
+        }
+
+    }
+    @Subscribe
+    void onCallInvitationWaiting(CallInvitationWaiting event);
+
+    class CallInvitationRinging {
+
+        private final SipuadaCallData callData;
+
+        public CallInvitationRinging(SipuadaCallData callData) {
+            this.callData = callData;
+        }
+
+        public SipuadaCallData getCallData() {
+            return callData;
+        }
+
+    }
+    @Subscribe
+    void onCallInvitationRinging(final CallInvitationRinging event);
+
+    class CallInvitationDeclined {
+
+        private final SipuadaCallData callData;
+
+        public CallInvitationDeclined(SipuadaCallData callData) {
+            this.callData = callData;
+        }
+
+        public SipuadaCallData getCallData() {
+            return callData;
+        }
+
+    }
+    @Subscribe
+    void onCallInvitationDeclined(CallInvitationDeclined event);
 
     class CallInvitationCanceled {
 

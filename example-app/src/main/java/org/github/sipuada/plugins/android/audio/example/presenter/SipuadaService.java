@@ -159,7 +159,13 @@ public class SipuadaService extends Service {
     }
 
     protected void registerSipuadaPresenter(SipuadaPresenterApi presenter) {
+        Log.wtf(SipuadaApplication.TAG, "REGISTER SIPUADA PRESENTER {" + presenter + "} , GO FOR IT!");
         eventBus.register(presenter);
+    }
+
+    protected void unregisterSipuadaPresenter(SipuadaPresenterApi presenter) {
+        Log.wtf(SipuadaApplication.TAG, "UNREGISTER SIPUADA PRESENTER {" + presenter + "}!");
+        eventBus.unregister(presenter);
     }
 
     public void fetchCurrentUsersCredentials(MainPresenterApi.FetchUsersCredentialsCallback callback) {
@@ -238,26 +244,20 @@ public class SipuadaService extends Service {
     protected class InviteUserOperation {
 
         private final SipuadaCallData callData;
-        private final SipuadaApi.CallInvitationCallback callback;
 
-        public InviteUserOperation(SipuadaCallData callData, SipuadaApi.CallInvitationCallback callback) {
+        public InviteUserOperation(SipuadaCallData callData) {
             this.callData = callData;
-            this.callback = callback;
         }
 
         public SipuadaCallData getCallData() {
             return callData;
         }
 
-        public SipuadaApi.CallInvitationCallback getCallback() {
-            return callback;
-        }
-
     }
 
-    public void inviteUser(SipuadaCallData callData, SipuadaApi.CallInvitationCallback callback) {
+    public void inviteUser(SipuadaCallData callData) {
         Message message = serviceHandler.obtainMessage(INVITE_USER);
-        message.obj = new InviteUserOperation(callData, callback);
+        message.obj = new InviteUserOperation(callData);
         serviceHandler.sendMessage(message);
     }
 
@@ -569,14 +569,32 @@ public class SipuadaService extends Service {
     }
 
     private void doInviteUser(InviteUserOperation operation) {
-        SipuadaCallData sipuadaCallData = operation.getCallData();
+        final SipuadaCallData sipuadaCallData = operation.getCallData();
         String username = sipuadaCallData.getUsername();
         String primaryHost = sipuadaCallData.getPrimaryHost();
         String remoteUsername = sipuadaCallData.getRemoteUsername();
         String remoteHost = sipuadaCallData.getRemoteHost();
         Sipuada sipuada = getSipuada(username, primaryHost);
         if (sipuada != null) {
-            String callId = sipuada.inviteToCall(remoteUsername, remoteHost, operation.getCallback());
+            String callId = sipuada.inviteToCall(remoteUsername, remoteHost, new SipuadaApi
+                    .CallInvitationCallback() {
+
+                @Override
+                public void onWaitingForCallInvitationAnswer(String callId) {
+                    eventBus.post(new CallPresenterApi.CallInvitationWaiting(sipuadaCallData));
+                }
+
+                @Override
+                public void onCallInvitationRinging(String callId) {
+                    eventBus.post(new CallPresenterApi.CallInvitationRinging(sipuadaCallData));
+                }
+
+                @Override
+                public void onCallInvitationDeclined(String callId) {
+                    eventBus.post(new CallPresenterApi.CallInvitationDeclined(sipuadaCallData));
+                }
+
+            });
             if (callId != null) {
                 sipuadaCallData.setCallId(callId);
                 eventBus.post(new CallPresenterApi.CallInvitationSent(sipuadaCallData));

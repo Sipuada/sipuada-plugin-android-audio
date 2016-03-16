@@ -13,10 +13,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class CallViewState implements RestoreableViewState<CallViewApi> {
 
     private ArrayList<SipuadaCall> callsInformation = new ArrayList<>();
+    private Lock lock = new ReentrantLock();
+
+    public enum SipuadaCallAction {
+        MAKE_CALL, RECEIVE_CALL
+    }
 
     public enum SipuadaCallState {
 
@@ -43,12 +51,14 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
         protected SipuadaCall(Parcel in) {
             callState = (SipuadaCallState) in.readSerializable();
             callData = in.readParcelable(SipuadaCallData.class.getClassLoader());
+            stateInformation = in.readString();
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeSerializable(callState);
             dest.writeParcelable(callData, flags);
+            dest.writeString(stateInformation);
         }
 
         @Override
@@ -97,187 +107,205 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 
     @Override
     public void apply(CallViewApi sipuadaCallView, boolean retained) {
+        lock.lock();
+        try {
 //        boolean notifyInsteadOfShow = false;
-        for (SipuadaCall sipuadaCall : callsInformation) {
-            SipuadaCallData sipuadaCallData = sipuadaCall.getCallData();
-            String information = sipuadaCall.getStateInformation();
-            switch (sipuadaCall.getCallState()) {
-                case CALL_IN_PROGRESS:
+            for (SipuadaCall sipuadaCall : callsInformation) {
+                SipuadaCallData sipuadaCallData = sipuadaCall.getCallData();
+                String information = sipuadaCall.getStateInformation();
+                switch (sipuadaCall.getCallState()) {
+                    case CALL_IN_PROGRESS:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyCallInProgress(sipuadaCallData);
 //                    } else {
 //                        notifyInsteadOfShow = true;
                         sipuadaCallView.showCallInProgress(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_RECEIVING_ACCEPT:
+                        break;
+                    case CALL_RECEIVING_ACCEPT:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyReceivingCallAccept(sipuadaCallData);
 //                    } else {
 //                        notifyInsteadOfShow = true;
                         sipuadaCallView.showReceivingCallAccept(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_RECEIVING_DECLINE:
+                        break;
+                    case CALL_RECEIVING_DECLINE:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyReceivingCallDecline(sipuadaCallData);
 //                    } else {
 //                        notifyInsteadOfShow = true;
                         sipuadaCallView.showReceivingCallDecline(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_MAKING_RINGING:
+                        break;
+                    case CALL_MAKING_RINGING:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCallRinging(sipuadaCallData);
 //                    } else {
 //                        notifyInsteadOfShow = true;
                         sipuadaCallView.showMakingCallRinging(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_MAKING_DECLINED:
+                        break;
+                    case CALL_MAKING_DECLINED:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCallDeclined(sipuadaCallData);
 //                    } else {
 //                        notifyInsteadOfShow = true;
                         sipuadaCallView.showMakingCallDeclined(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_RECEIVING_CANCELED:
+                        break;
+                    case CALL_RECEIVING_CANCELED:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyReceivingCallCanceled(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showReceivingCallCanceled(sipuadaCallData, information);
 //                    }
-                    break;
-                case CALL_RECEIVING_FAILED:
+                        break;
+                    case CALL_RECEIVING_FAILED:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyReceivingCallFailed(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showReceivingCallFailed(sipuadaCallData, information);
 //                    }
-                    break;
-                case CALL_MAKING_CANCEL:
+                        break;
+                    case CALL_MAKING_CANCEL:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyCancelingCall(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showCancelingCall(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_MAKING_CANCELED:
+                        break;
+                    case CALL_MAKING_CANCELED:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCallCanceled(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showMakingCallCanceled(sipuadaCallData, information);
 //                    }
-                    break;
-                case CALL_MAKING_FAILED:
+                        break;
+                    case CALL_MAKING_FAILED:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCallFailed(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showMakingCallFailed(sipuadaCallData, information);
 //                    }
-                    break;
-                case CALL_RECEIVING:
+                        break;
+                    case CALL_RECEIVING:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyReceivingCall(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showReceivingCall(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_MAKING_CANCELABLE:
+                        break;
+                    case CALL_MAKING_CANCELABLE:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCallCancelable(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showMakingCallCancelable(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_MAKING:
+                        break;
+                    case CALL_MAKING:
 //                    if (notifyInsteadOfShow) {
 //                        //sipuadaCallView.notifyMakingCall(sipuadaCallData);
 //                    } else {
                         sipuadaCallView.showMakingCall(sipuadaCallData);
 //                    }
-                    break;
-                case CALL_FINISHED:
+                        break;
+                    case CALL_FINISHED:
 //                    if (!notifyInsteadOfShow) {
                         sipuadaCallView.showCallFinished(sipuadaCallData);
 //                    }
-                    break;
+                        break;
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 
     public void addOrModifySipuadaCall(SipuadaCallState sipuadaCallState,
                                        SipuadaCallData sipuadaCallData, String stateInformation) {
-        Iterator<SipuadaCall> iterator = callsInformation.iterator();
-        while (iterator.hasNext()) {
-            SipuadaCall sipuadaCall = iterator.next();
-            String sipuadaCallId = sipuadaCall.getCallData().getCallId();
-            if (sipuadaCallId == null) {
-                if (sipuadaCallData.getUsername().equals(sipuadaCall.getCallData().getUsername()) &&
-                    sipuadaCallData.getPrimaryHost().equals(sipuadaCall.getCallData().getPrimaryHost()) &&
-                    sipuadaCallData.getRemoteUsername().equals(sipuadaCall.getCallData().getRemoteUsername()) &&
-                    sipuadaCallData.getRemoteHost().equals(sipuadaCall.getCallData().getRemoteHost())) {
+        lock.lock();
+        try {
+            Iterator<SipuadaCall> iterator = callsInformation.iterator();
+            while (iterator.hasNext()) {
+                SipuadaCall sipuadaCall = iterator.next();
+                String sipuadaCallId = sipuadaCall.getCallData().getCallId();
+                if (sipuadaCallId == null) {
+                    if (sipuadaCallData.getUsername().equals(sipuadaCall.getCallData().getUsername()) &&
+                            sipuadaCallData.getPrimaryHost().equals(sipuadaCall.getCallData().getPrimaryHost()) &&
+                            sipuadaCallData.getRemoteUsername().equals(sipuadaCall.getCallData().getRemoteUsername()) &&
+                            sipuadaCallData.getRemoteHost().equals(sipuadaCall.getCallData().getRemoteHost())) {
+                        iterator.remove();
+                    }
+                } else if (sipuadaCallId.equals(sipuadaCallData.getCallId())) {
                     iterator.remove();
                 }
-            } else if (sipuadaCallId.equals(sipuadaCallData.getCallId())) {
-                iterator.remove();
             }
-        }
-        callsInformation.add(new SipuadaCall(sipuadaCallState, sipuadaCallData, stateInformation));
-        final SipuadaCallState[] statesPriority = new SipuadaCallState[]{
-                SipuadaCallState.CALL_IN_PROGRESS,
-                SipuadaCallState.CALL_RECEIVING,
-                SipuadaCallState.CALL_MAKING_CANCELABLE,
-                SipuadaCallState.CALL_MAKING,
-                SipuadaCallState.CALL_MAKING_RINGING,
-                SipuadaCallState.CALL_MAKING_DECLINED,
-                SipuadaCallState.CALL_RECEIVING_ACCEPT,
-                SipuadaCallState.CALL_RECEIVING_DECLINE,
-                SipuadaCallState.CALL_RECEIVING_CANCELED,
-                SipuadaCallState.CALL_RECEIVING_FAILED,
-                SipuadaCallState.CALL_MAKING_CANCEL,
-                SipuadaCallState.CALL_MAKING_CANCELED,
-                SipuadaCallState.CALL_MAKING_FAILED,
-                SipuadaCallState.CALL_FINISHED
-        };
-        Collections.sort(callsInformation, new Comparator<SipuadaCall>() {
+            callsInformation.add(new SipuadaCall(sipuadaCallState, sipuadaCallData, stateInformation));
+            final SipuadaCallState[] statesPriority = new SipuadaCallState[]{
+                    SipuadaCallState.CALL_IN_PROGRESS,
+                    SipuadaCallState.CALL_RECEIVING,
+                    SipuadaCallState.CALL_MAKING_CANCELABLE,
+                    SipuadaCallState.CALL_MAKING,
+                    SipuadaCallState.CALL_MAKING_RINGING,
+                    SipuadaCallState.CALL_MAKING_DECLINED,
+                    SipuadaCallState.CALL_RECEIVING_ACCEPT,
+                    SipuadaCallState.CALL_RECEIVING_DECLINE,
+                    SipuadaCallState.CALL_RECEIVING_CANCELED,
+                    SipuadaCallState.CALL_RECEIVING_FAILED,
+                    SipuadaCallState.CALL_MAKING_CANCEL,
+                    SipuadaCallState.CALL_MAKING_CANCELED,
+                    SipuadaCallState.CALL_MAKING_FAILED,
+                    SipuadaCallState.CALL_FINISHED
+            };
+            Collections.sort(callsInformation, new Comparator<SipuadaCall>() {
 
-            @Override
-            public int compare(SipuadaCall call, SipuadaCall anotherCall) {
-                if (call.getCallState() == anotherCall.getCallState()) {
+                @Override
+                public int compare(SipuadaCall call, SipuadaCall anotherCall) {
+                    if (call.getCallState() == anotherCall.getCallState()) {
+                        return 0;
+                    }
+                    for (SipuadaCallState stateWithPriority : statesPriority) {
+                        if (call.getCallState() == stateWithPriority) {
+                            return -1;
+                        } else if (anotherCall.getCallState() == stateWithPriority) {
+                            return 1;
+                        }
+                    }
                     return 0;
                 }
-                for (SipuadaCallState stateWithPriority : statesPriority) {
-                    if (call.getCallState() == stateWithPriority) {
-                        return -1;
-                    } else if (anotherCall.getCallState() == stateWithPriority) {
-                        return 1;
-                    }
-                }
-                return 0;
-            }
 
-        });
+            });
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void removeSipuadaCall(SipuadaCallData sipuadaCallData) {
-        Iterator<SipuadaCall> iterator = callsInformation.iterator();
-        while (iterator.hasNext()) {
-            SipuadaCall sipuadaCall = iterator.next();
-            if (sipuadaCall.getCallData().getCallId().equals(sipuadaCallData.getCallId())) {
-                iterator.remove();
-                break;
+        lock.lock();
+        try {
+            Iterator<SipuadaCall> iterator = callsInformation.iterator();
+            while (iterator.hasNext()) {
+                SipuadaCall sipuadaCall = iterator.next();
+                if (sipuadaCall.getCallData().getCallId().equals(sipuadaCallData.getCallId())) {
+                    iterator.remove();
+                    break;
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 
-    public int getSipuadaCallsCount() {
-        return callsInformation.size();
-    }
-
-    public SipuadaCall getSipuadaCall(int index) {
-        return callsInformation.get(index);
+    public List<SipuadaCall> getSipuadaCallsInformation() {
+        lock.lock();
+        List<SipuadaCall> currentCallsInformation;
+        try {
+            currentCallsInformation = new ArrayList<>(callsInformation);
+        } finally {
+            lock.unlock();
+        }
+        return currentCallsInformation;
     }
 
 }
