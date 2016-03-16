@@ -151,7 +151,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                 Intent intent = new Intent(activity.getApplicationContext(), CallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(SipuadaApplication.KEY_CALL_ACTION,
-                        CallPresenter.CallAction.MAKE_CALL);
+                        CallPresenter.SipuadaCallAction.MAKE_CALL);
                 intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
                 intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);
                 intent.putExtra(SipuadaApplication.KEY_REMOTE_USERNAME, remoteUsername);

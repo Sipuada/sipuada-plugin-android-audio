@@ -22,10 +22,6 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
     private ArrayList<SipuadaCall> callsInformation = new ArrayList<>();
     private Lock lock = new ReentrantLock();
 
-    public enum SipuadaCallAction {
-        MAKE_CALL, RECEIVE_CALL
-    }
-
     public enum SipuadaCallState {
 
         CALL_MAKING, CALL_MAKING_CANCELABLE, CALL_MAKING_RINGING, CALL_MAKING_CANCEL,
@@ -107,6 +103,7 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
 
     @Override
     public void apply(CallViewApi sipuadaCallView, boolean retained) {
+        sipuadaCallView.updatePresenter(this);
         lock.lock();
         try {
 //        boolean notifyInsteadOfShow = false;

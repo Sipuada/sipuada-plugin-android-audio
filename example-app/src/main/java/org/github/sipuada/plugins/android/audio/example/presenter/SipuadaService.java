@@ -478,7 +478,7 @@ public class SipuadaService extends Service {
                         CallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(SipuadaApplication.KEY_CALL_ACTION,
-                        CallPresenter.CallAction.RECEIVE_CALL);
+                        CallPresenter.SipuadaCallAction.RECEIVE_CALL);
                 intent.putExtra(SipuadaApplication.KEY_CALL_ID, callId);
                 intent.putExtra(SipuadaApplication.KEY_USERNAME, username);
                 intent.putExtra(SipuadaApplication.KEY_PRIMARY_HOST, primaryHost);

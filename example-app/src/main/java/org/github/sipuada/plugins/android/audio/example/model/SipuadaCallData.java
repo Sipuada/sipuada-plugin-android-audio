@@ -10,6 +10,11 @@ public class SipuadaCallData implements Parcelable {
     private final String primaryHost;
     private final String remoteUsername;
     private final String remoteHost;
+    private StoredSet storedSet = StoredSet.NONE;
+
+    public enum StoredSet {
+        NONE, OUTGOING, INCOMING, ESTABLISHED
+    }
 
     public SipuadaCallData(String callId, String username, String primaryHost,
                            String remoteUsername, String remoteHost) {
@@ -26,6 +31,7 @@ public class SipuadaCallData implements Parcelable {
         primaryHost = in.readString();
         remoteUsername = in.readString();
         remoteHost = in.readString();
+        storedSet = (StoredSet) in.readSerializable();
     }
 
     @Override
@@ -40,6 +46,7 @@ public class SipuadaCallData implements Parcelable {
         dest.writeString(primaryHost);
         dest.writeString(remoteUsername);
         dest.writeString(remoteHost);
+        dest.writeSerializable(storedSet);
     }
 
     public static final Creator<SipuadaCallData> CREATOR = new Creator<SipuadaCallData>() {
@@ -76,6 +83,14 @@ public class SipuadaCallData implements Parcelable {
 
     public String getRemoteHost() {
         return remoteHost;
+    }
+
+    public StoredSet getStoredSet() {
+        return storedSet;
+    }
+
+    public void setStoredSet(StoredSet storedSet) {
+        this.storedSet = storedSet;
     }
 
 }

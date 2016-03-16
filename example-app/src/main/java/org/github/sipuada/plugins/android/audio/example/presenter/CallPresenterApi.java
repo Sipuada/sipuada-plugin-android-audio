@@ -10,7 +10,7 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void updateState(CallViewState viewState);
 
-    void performAction(CallViewState.SipuadaCallAction callAction, SipuadaCallData sipuadaCallData);
+    void performAction(CallPresenter.SipuadaCallAction callAction, SipuadaCallData sipuadaCallData);
 
     void makeCall(SipuadaCallData sipuadaCallData);
 

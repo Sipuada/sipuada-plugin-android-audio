@@ -4,6 +4,8 @@ import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 
 public interface CallViewApi extends SipuadaViewApi {
 
+    void updatePresenter(CallViewState callViewState);
+
     void showMakingCall(SipuadaCallData sipuadaCallData);
 
     void showMakingCallCancelable(SipuadaCallData sipuadaCallData);
