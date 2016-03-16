@@ -657,7 +657,7 @@ public class SipuadaService extends Service {
         }
         SipuadaUserCredentials self = new Select().from(SipuadaUserCredentials.class)
                 .where("Username = ? AND PrimaryHost = ?", username, primaryHost).executeSingle();
-        self.delete();
+        if(self != null) self.delete();
     }
 
     abstract class SipuadaServiceListener implements SipuadaApi.SipuadaListener {
