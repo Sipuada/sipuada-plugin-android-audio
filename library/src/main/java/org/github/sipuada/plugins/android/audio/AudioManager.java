@@ -2,7 +2,6 @@ package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
 import android.util.Log;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
@@ -161,7 +160,6 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
 
         return 0;
     }
-
 
     @Override
     public void onError(String streamerName, String message) {
