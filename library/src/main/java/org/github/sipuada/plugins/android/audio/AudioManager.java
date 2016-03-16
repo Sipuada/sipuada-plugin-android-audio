@@ -1,6 +1,7 @@
 package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
+import android.media.ToneGenerator;
 import android.net.rtp.AudioStream;
 import android.util.Log;
 
@@ -60,13 +61,13 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
             receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + " ! rtpjitterbuffer latency=200 ! rtpspeexdepay ! speexdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=1 stream-type=voice";
             Log.wtf(TAG, receiverPipeline);
             audioReceiver.startVOIPStreaming(receiverPipeline);
-            senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
+            senderPipeline = "openslessrc preset=voice-recognition ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
 
 
         } else if (codecPayloadType == PCMA) {
             String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ",encoding-name=(string)PCMA\" ";
-            senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample ! " + audioSenderCaps + " ! alawenc ! rtppcmapay pt=8 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
+            senderPipeline = "openslessrc preset=voice-recognition ! audioconvert noise-shaping=medium ! audioresample ! " + audioSenderCaps + " ! alawenc ! rtppcmapay pt=8 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
             receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + "! rtpjitterbuffer latency=200 ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=0.8 stream-type=voice";
             audioReceiver.startVOIPStreaming(receiverPipeline);
@@ -160,6 +161,7 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
 
         return 0;
     }
+
 
     @Override
     public void onError(String streamerName, String message) {
