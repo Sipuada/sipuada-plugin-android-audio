@@ -135,9 +135,11 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
     }
 
     public SipuadaAudioCodec[] getCodecs() {
-        SipuadaAudioCodec[] myCodecs = new SipuadaAudioCodec[2];
+        SipuadaAudioCodec[] myCodecs = new SipuadaAudioCodec[4];
         myCodecs[0] = SipuadaAudioCodec.PCMA;
-        myCodecs[1] = SipuadaAudioCodec.SPEEX;
+        myCodecs[1] = SipuadaAudioCodec.SPEEX_8000;
+        myCodecs[2] = SipuadaAudioCodec.SPEEX_16000;
+        myCodecs[3] = SipuadaAudioCodec.SPEEX_32000;
         return myCodecs;
     }
 
