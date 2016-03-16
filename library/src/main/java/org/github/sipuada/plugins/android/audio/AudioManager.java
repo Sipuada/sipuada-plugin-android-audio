@@ -1,9 +1,7 @@
 package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
-import android.net.rtp.AudioStream;
 import android.util.Log;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
@@ -57,18 +55,18 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
 
             String speexEnc = "speexenc " + getPropertyString(AudioManager.MODE, properties, null);
 
-            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + " ! rtpjitterbuffer latency=200 ! rtpspeexdepay ! speexdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=0.6 stream-type=voice";
+            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + " ! rtpjitterbuffer latency=200 ! rtpspeexdepay ! speexdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=1 stream-type=voice";
             Log.wtf(TAG, receiverPipeline);
             audioReceiver.startVOIPStreaming(receiverPipeline);
-            senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
+            senderPipeline = "openslessrc preset=voice-recognition ! audioconvert noise-shaping=medium ! audioresample !" + audioSenderCaps + " ! " + speexEnc + " ! rtpspeexpay pt=97 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
 
 
         } else if (codecPayloadType == PCMA) {
             String audioReceiverCaps = " caps=\"application/x-rtp, media=(string)audio,clock-rate=(int)" + getSampleRate(properties, DEFAULT_SAMPLE_RATE) + ",encoding-name=(string)PCMA\" ";
-            senderPipeline = "openslessrc ! audioconvert noise-shaping=medium ! audioresample ! " + audioSenderCaps + " ! alawenc ! rtppcmapay pt=8 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
+            senderPipeline = "openslessrc preset=voice-recognition ! audioconvert noise-shaping=medium ! audioresample ! " + audioSenderCaps + " ! alawenc ! rtppcmapay pt=8 ! udpsink host=" + remoteIp + " port=" + remoteRtpPort;
             audioSender.startVOIPStreaming(senderPipeline);
-            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + "! rtpjitterbuffer latency=200 ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! openslessink name=openslessink stream-type=voice";
+            receiverPipeline = "udpsrc port=" + localPort + audioReceiverCaps + "! rtpjitterbuffer latency=200 ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! openslessink name=openslessink volume=0.8 stream-type=voice";
             audioReceiver.startVOIPStreaming(receiverPipeline);
         }
     }
@@ -136,9 +134,11 @@ public class AudioManager implements AudioStreamer.OnErrorListener{
     }
 
     public SipuadaAudioCodec[] getCodecs() {
-        SipuadaAudioCodec[] myCodecs = new SipuadaAudioCodec[2];
+        SipuadaAudioCodec[] myCodecs = new SipuadaAudioCodec[4];
         myCodecs[0] = SipuadaAudioCodec.PCMA;
-        myCodecs[1] = SipuadaAudioCodec.SPEEX;
+        myCodecs[1] = SipuadaAudioCodec.SPEEX_8000;
+        myCodecs[2] = SipuadaAudioCodec.SPEEX_16000;
+        myCodecs[3] = SipuadaAudioCodec.SPEEX_32000;
         return myCodecs;
     }
 
