@@ -1,8 +1,6 @@
 package org.github.sipuada.plugins.android.audio;
 
 import android.content.Context;
-import android.media.ToneGenerator;
-import android.net.rtp.AudioStream;
 import android.util.Log;
 
 import java.io.IOException;
