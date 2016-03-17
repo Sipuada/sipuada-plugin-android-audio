@@ -67,6 +67,7 @@ public class SipuadaService extends Service {
     private static final int DECLINE_USER_INVITE = 8;
     private static final int FINISH_CALL = 9;
     private static final int QUERY_OPTIONS = 10;
+    private static final int SEND_MESSAGE = 11;
 
     private final class SipuadaServiceHandler extends Handler {
 
@@ -112,6 +113,9 @@ public class SipuadaService extends Service {
                     break;
                 case QUERY_OPTIONS:
                     doQueryOptions((QueryingOptionsOperation) message.obj);
+                    break;
+                case SEND_MESSAGE:
+                    doSendMessage((SendingMessageOperation) message.obj);
                     break;
                 default:
                     break;
@@ -341,6 +345,62 @@ public class SipuadaService extends Service {
     public void queryOptions(String username, String primaryHost, String remoteUsername, String remoteHost, SipuadaApi.OptionsQueryingCallback callback) {
         Message message = serviceHandler.obtainMessage(QUERY_OPTIONS);
         message.obj = new QueryingOptionsOperation(username, primaryHost, remoteUsername, remoteHost, callback);
+        serviceHandler.sendMessage(message);
+    }
+
+    protected class SendingMessageOperation {
+
+        private final String username;
+        private final String primaryHost;
+        private final String remoteUsername;
+        private final String remoteHost;
+        private final String content;
+        private final ContentTypeHeader contentTypeHeader;
+        private final SipuadaApi.SendingMessageCallback callback;
+
+        public SendingMessageOperation(String username, String primaryHost, String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader, SipuadaApi.SendingMessageCallback callback) {
+            this.username = username;
+            this.primaryHost = primaryHost;
+            this.remoteUsername = remoteUsername;
+            this.remoteHost = remoteHost;
+            this.content = content;
+            this.contentTypeHeader = contentTypeHeader;
+            this.callback = callback;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPrimaryHost() {
+            return primaryHost;
+        }
+
+        public String getRemoteUsername() {
+            return remoteUsername;
+        }
+
+        public String getRemoteHost() {
+            return remoteHost;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public ContentTypeHeader getContentTypeHeader() {
+            return this.contentTypeHeader;
+        }
+
+        public SipuadaApi.SendingMessageCallback getCallback() {
+            return callback;
+        }
+
+    }
+
+    public void sendMessage(String username, String primaryHost, String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader, SipuadaApi.SendingMessageCallback callback) {
+        Message message = serviceHandler.obtainMessage(SEND_MESSAGE);
+        message.obj = new SendingMessageOperation(username, primaryHost, remoteUsername, remoteHost, content, contentTypeHeader, callback);
         serviceHandler.sendMessage(message);
     }
 
@@ -661,6 +721,21 @@ public class SipuadaService extends Service {
         Log.d(SipuadaApplication.TAG, String.format("[doQueryOptions;" +
                 " success:{%s}]", (success ? "True" : "False")));
         eventBus.post(new MainPresenterApi.OptionsQueryingSent(username, primaryHost, remoteUsername, remoteHost));
+    }
+
+    public void doSendMessage(SendingMessageOperation operation) {
+        String username = operation.getUsername();
+        String primaryHost = operation.getPrimaryHost();
+        String remoteUsername = operation.getRemoteUsername();
+        String remoteHost = operation.getRemoteHost();
+        String content = operation.getContent();
+        ContentTypeHeader contentTypeHeader = operation.getContentTypeHeader();
+        Sipuada sipuada = getSipuada(username, primaryHost);
+
+        boolean success = sipuada.sendMessage(remoteUsername, remoteHost, content, contentTypeHeader, operation.getCallback());
+        Log.d(SipuadaApplication.TAG, String.format("[doSendMessage;" +
+                " success:{%s}]", (success ? "True" : "False")));
+        eventBus.post(new MainPresenterApi.MessageSent(username, primaryHost, remoteUsername, remoteHost));
     }
 
     private Sipuada getSipuada(String username, String primaryHost) {

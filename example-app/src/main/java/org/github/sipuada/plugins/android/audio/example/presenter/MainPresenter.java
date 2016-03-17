@@ -1,6 +1,7 @@
 package org.github.sipuada.plugins.android.audio.example.presenter;
 
 import android.javax.sdp.SessionDescription;
+import android.javax.sip.header.ContentTypeHeader;
 import android.util.Log;
 
 import com.google.common.eventbus.Subscribe;
@@ -112,5 +113,46 @@ public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements M
         Log.d(SipuadaApplication.TAG,
                 String.format("[onOptionsQueryingSent...]"));
     }
+
+    @Override
+    public void sendMessage(String username, String primaryHost, String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader, final MessageSendingCallback callback) {
+        sipuadaService.sendMessage(username, primaryHost, remoteUsername, remoteHost, content, contentTypeHeader, new SipuadaApi.SendingMessageCallback() {
+
+            @Override
+            public void onSendingMessageSuccess(final String callId, final String content, final ContentTypeHeader contentTypeHeader) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onSendingMessageSuccess; callId:{%s}, content:{%s}, contentTypeHeader:{%s}]",
+                                callId, content, contentTypeHeader));
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onMessageSendingSuccess(callId, content, contentTypeHeader);
+                    }
+                });
+            }
+
+            @Override
+            public void onSendingMessageFailed(final String reason) {
+                Log.d(SipuadaApplication.TAG,
+                        String.format("[onSendingMessageFailed; reason:{%s}]", reason));
+                mainHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        callback.onMessageSendingFailed(reason);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void onMessageSent(MessageSent event) {
+        Log.d(SipuadaApplication.TAG,
+                String.format("[onMessageSent...]"));
+    }
+
+
 
 }

@@ -1,7 +1,9 @@
 package org.github.sipuada.plugins.android.audio.example.view.renderers;
 
 import android.content.Intent;
+import android.gov.nist.gnjvx.sip.header.ContentType;
 import android.javax.sdp.SessionDescription;
+import android.javax.sip.header.ContentTypeHeader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,10 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
     @Bind(R.id.sipuada_plugin_android_example_OptionsButton) Button optionsButton;
     @Bind(R.id.sipuada_plugin_android_example_OptionsUser) LabelledMarqueeEditText optionsUser;
     @Bind(R.id.sipuada_plugin_android_example_OptionsOutput) TextView optionsOutput;
+    @Bind(R.id.sipuada_plugin_android_example_MessageButton) Button messageButton;
+    @Bind(R.id.sipuada_plugin_android_example_MessageUser) LabelledMarqueeEditText messageUser;
+    @Bind(R.id.sipuada_plugin_android_example_MessageOutput) TextView messageOutput;
+
 
     private final MainPresenterApi presenter;
     private final MainActivity activity;
@@ -85,6 +91,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
         renderRegister(username, primaryHost);
         renderInvite(username, primaryHost);
         renderOptions(username, primaryHost);
+        renderMessage(username, primaryHost);
     }
 
     private void renderRegister(final String username, final String primaryHost) {
@@ -204,6 +211,60 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                         optionsOutput.setText(String.format("Failed: %s", reason));
                         optionsOutput.setSelected(true);
                         optionsButton.setEnabled(true);
+                    }
+                });
+                // TODO - working - END
+
+            }
+
+        });
+
+    }
+
+    private void renderMessage(final String username, final String primaryHost) {
+        messageUser.setEnabled(true);
+        messageButton.setEnabled(true);
+        messageButton.setVisibility(View.VISIBLE);
+        messageButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                final String remoteUser = messageUser.getText();
+                if (remoteUser == null || remoteUser.trim().isEmpty() || !remoteUser.contains("@")) {
+                    return;
+                }
+                String remoteUsername = remoteUser.split("@")[0];
+                String remoteHost = remoteUser.split("@")[1];
+
+                String statusMessage = "Sending message...";
+                messageOutput.setText(statusMessage);
+                messageButton.setEnabled(false);
+
+                // TODO - working - BEGIN
+                String content = "Hello World Info! to " + remoteUsername + "\n";
+                ContentType contentType = new ContentType("text", "plain");
+                presenter.sendMessage(username, primaryHost, remoteUsername, remoteHost, content, (ContentTypeHeader) contentType, new MainPresenterApi.MessageSendingCallback() {
+
+                    @Override
+                    public void onMessageSendingSuccess(String callId, String content, ContentTypeHeader contentTypeHeader) {
+                        StringBuilder output = new StringBuilder();
+                        if (null == content) {
+                            output.append("No message found\n");
+                        } else {
+                            output.append("Message found. \nContent:");
+                            output.append(content + "\n");
+                        }
+
+                        messageOutput.setText(output.toString());
+                        messageOutput.setSelected(true);
+                        messageButton.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onMessageSendingFailed(String reason) {
+                        messageOutput.setText(String.format("Failed: %s\n", reason));
+                        messageOutput.setSelected(true);
+                        messageButton.setEnabled(true);
                     }
                 });
                 // TODO - working - END

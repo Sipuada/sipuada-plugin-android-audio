@@ -128,19 +128,66 @@
             marqueeto:labelledMarqueeEditTextStyle="@style/LabelledMarqueeEditTextAppearanceDark"
             tools:ignore="HardcodedText"/>
 
+        <TextView
+            android:id="@+id/sipuada_plugin_android_example_OptionsOutput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:gravity="center"
+            android:singleLine="true"
+            android:lines="1"
+            android:ellipsize="marquee"
+            android:padding="15dp"/>
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/sipuada_plugin_android_example_OptionsOutput"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:gravity="center"
-        android:singleLine="true"
-        android:lines="1"
-        android:ellipsize="marquee"
-        android:padding="15dp"/>
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/sipuada_plugin_android_example_MessageButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Message"
+            android:textAllCaps="true"
+            android:gravity="start|center_vertical"
+            tools:ignore="HardcodedText"/>
+
+        <com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText
+            android:id="@+id/sipuada_plugin_android_example_MessageUser"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:inputType="text"
+            android:hint="Remote User @ Host:"
+            android:text="192.168.130.207:5060"
+            android:textColor="@android:color/darker_gray"
+            marqueeto:mode="edit"
+            marqueeto:labelledMarqueeEditTextStyle="@style/LabelledMarqueeEditTextAppearanceDark"
+            tools:ignore="HardcodedText"/>
+
+        <TextView
+            android:id="@+id/sipuada_plugin_android_example_MessageOutput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:gravity="center"
+            android:singleLine="true"
+            android:lines="1"
+            android:ellipsize="marquee"
+            android:padding="15dp"/>
+
+    </LinearLayout>
+
 
     <View
         android:layout_width="match_parent"
