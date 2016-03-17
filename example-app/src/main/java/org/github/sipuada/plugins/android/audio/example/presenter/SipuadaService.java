@@ -400,7 +400,7 @@ public class SipuadaService extends Service {
     }
 
     public void sendMessage(String username, String primaryHost, String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader, SipuadaApi.SendingMessageCallback callback) {
-        Message message = serviceHandler.obtainMessage(QUERY_OPTIONS);
+        Message message = serviceHandler.obtainMessage(SEND_MESSAGE);
         message.obj = new SendingMessageOperation(username, primaryHost, remoteUsername, remoteHost, content, contentTypeHeader, callback);
         serviceHandler.sendMessage(message);
     }
