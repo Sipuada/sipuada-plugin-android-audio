@@ -241,7 +241,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                 messageButton.setEnabled(false);
 
                 // TODO - working - BEGIN
-                String content = "Hello World Info!";
+                String content = "Hello World Info! to " + remoteUsername + "\n";
                 ContentType contentType = new ContentType("text", "plain");
                 presenter.sendMessage(username, primaryHost, remoteUsername, remoteHost, content, (ContentTypeHeader) contentType, new MainPresenterApi.MessageSendingCallback() {
 
@@ -255,16 +255,16 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                             output.append(content + "\n");
                         }
 
-                        optionsOutput.setText(output.toString());
-                        optionsOutput.setSelected(true);
-                        optionsButton.setEnabled(true);
+                        messageOutput.setText(output.toString());
+                        messageOutput.setSelected(true);
+                        messageButton.setEnabled(true);
                     }
 
                     @Override
                     public void onMessageSendingFailed(String reason) {
-                        optionsOutput.setText(String.format("Failed: %s\n", reason));
-                        optionsOutput.setSelected(true);
-                        optionsButton.setEnabled(true);
+                        messageOutput.setText(String.format("Failed: %s\n", reason));
+                        messageOutput.setSelected(true);
+                        messageButton.setEnabled(true);
                     }
                 });
                 // TODO - working - END
