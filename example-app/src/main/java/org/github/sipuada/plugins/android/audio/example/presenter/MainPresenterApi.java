@@ -1,6 +1,7 @@
 package org.github.sipuada.plugins.android.audio.example.presenter;
 
 import android.javax.sdp.SessionDescription;
+import android.javax.sip.header.ContentTypeHeader;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -72,5 +73,49 @@ public interface MainPresenterApi extends SipuadaPresenterApi<SipuadaViewApi> {
     }
 
     void queryingOptions(String username, String primaryHost, String remoteUsername, String remoteHost, OptionsQueryingCallback callback);
+
+    class MessageSent {
+
+        private final String username;
+        private final String primaryHost;
+        private final String remoteUsername;
+        private final String remoteHost;
+
+        public MessageSent(String username, String primaryHost, String remoteUsername, String remoteHost) {
+            this.username = username;
+            this.primaryHost = primaryHost;
+            this.remoteUsername = remoteUsername;
+            this.remoteHost = remoteHost;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPrimaryHost() {
+            return primaryHost;
+        }
+
+        public String getRemoteUsername() {
+            return remoteUsername;
+        }
+
+        public String getRemoteHost() {
+            return remoteHost;
+        }
+
+    }
+    @Subscribe
+    void onMessageSent(MessageSent event);
+
+    interface MessageSendingCallback {
+
+        void onMessageSendingSuccess(String callId, String content, ContentTypeHeader contentTypeHeader);
+
+        void onMessageSendingFailed(String reason);
+
+    }
+
+    void sendMessage(String username, String primaryHost, String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader, MessageSendingCallback callback);
 
 }
