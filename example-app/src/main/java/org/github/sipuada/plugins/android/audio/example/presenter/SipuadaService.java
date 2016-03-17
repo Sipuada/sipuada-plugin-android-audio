@@ -48,11 +48,13 @@ import java.util.TimerTask;
 
 public class SipuadaService extends Service {
 
-    private SipuadaServiceHandler serviceHandler;
-    private final IBinder binder = new SipuadaBinder();
+    private static final int NUM_SIPUADA_INSTANCE_CREATION_RETRIES = 2;
 
     private final Map<String, Sipuada> sipuadaInstances = new HashMap<>();
     private final EventBus eventBus = new EventBus();
+
+    private final IBinder binder = new SipuadaBinder();
+    private SipuadaServiceHandler serviceHandler;
 
     private static final int INITIALIZE_SIPUADAS = 0;
     private static final int FETCH_USERS_CREDENTIALS = 1;
@@ -66,7 +68,6 @@ public class SipuadaService extends Service {
     private static final int FINISH_CALL = 9;
     private static final int QUERY_OPTIONS = 10;
 
-    private static final int NUM_SIPUADA_INSTANCE_CREATION_RETRIES = 2;
     private final class SipuadaServiceHandler extends Handler {
 
         public SipuadaServiceHandler(Looper looper) {
@@ -128,7 +129,7 @@ public class SipuadaService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        HandlerThread thread = new HandlerThread("SipuadaService",
+        HandlerThread thread = new HandlerThread(SipuadaService.class.getName(),
                 Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
         Looper serviceLooper = thread.getLooper();
@@ -159,12 +160,10 @@ public class SipuadaService extends Service {
     }
 
     protected void registerSipuadaPresenter(SipuadaPresenterApi presenter) {
-        Log.wtf(SipuadaApplication.TAG, "REGISTER SIPUADA PRESENTER {" + presenter + "} , GO FOR IT!");
         eventBus.register(presenter);
     }
 
     protected void unregisterSipuadaPresenter(SipuadaPresenterApi presenter) {
-        Log.wtf(SipuadaApplication.TAG, "UNREGISTER SIPUADA PRESENTER {" + presenter + "}!");
         eventBus.unregister(presenter);
     }
 
@@ -730,7 +729,7 @@ public class SipuadaService extends Service {
             Log.d(SipuadaApplication.TAG, String.format("[onCallFailure;" +
                     " reason:{%s}, callId:{%s}]", reason, callId));
 //            SipuadaApplication.CURRENTLY_BUSY_FROM_DB = false;
-            eventBus.post(new CallPresenterApi.EstablishedCallFailed(callId));
+            eventBus.post(new CallPresenterApi.EstablishedCallFailed(reason, callId));
         }
 
         @Override

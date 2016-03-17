@@ -40,6 +40,8 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     void finishCall(SipuadaCallData sipuadaCallData);
 
+    void establishedCallFailed(SipuadaCallData sipuadaCallData, String reason);
+
     void closeCall(SipuadaCallData sipuadaCallData);
 
     class CallInvitationSent {
@@ -248,10 +250,16 @@ public interface CallPresenterApi extends SipuadaPresenterApi<CallViewApi> {
 
     class EstablishedCallFailed {
 
+        private final String reason;
         private final String callId;
 
-        public EstablishedCallFailed(String callId) {
+        public EstablishedCallFailed(String reason, String callId) {
+            this.reason = reason;
             this.callId = callId;
+        }
+
+        public String getReason() {
+            return reason;
         }
 
         public String getCallId() {

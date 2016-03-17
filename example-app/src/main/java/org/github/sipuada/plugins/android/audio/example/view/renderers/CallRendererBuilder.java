@@ -46,6 +46,8 @@ public class CallRendererBuilder
                 return CallReceivingDeclineRenderer.class;
             case CALL_IN_PROGRESS:
                 return CallInProgressRenderer.class;
+            case CALL_FAILED:
+                return CallFailedRenderer.class;
             case CALL_FINISHED:
                 return CallFinishedRenderer.class;
         }
@@ -67,6 +69,7 @@ public class CallRendererBuilder
         prototypes.add(new CallReceivingAcceptRenderer(presenter));
         prototypes.add(new CallReceivingDeclineRenderer(presenter));
         prototypes.add(new CallInProgressRenderer(presenter));
+        prototypes.add(new CallFailedRenderer(presenter));
         prototypes.add(new CallFinishedRenderer(presenter));
         return prototypes;
     }
