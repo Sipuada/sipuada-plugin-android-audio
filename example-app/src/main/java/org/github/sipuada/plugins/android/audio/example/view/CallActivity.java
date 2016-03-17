@@ -57,12 +57,16 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     private RingtoneHandler toneHandler;
 
     private static final int INITIALIZE_TONE_STACK = 0;
-    private static final int PLAY_RINGINGTONE = 1;
-    private static final int STOP_RINGINGTONE = 2;
-    private static final int PLAY_RECEIVINGTONE = 3;
-    private static final int STOP_RECEIVINGTONE = 4;
-    private static final int PLAY_BUSYTONE = 5;
-    private static final int PLAY_FAILEDTONE = 6;
+    private static final int PLAY_WAITINGTONE = 1;
+    private static final int PLAY_RINGINGTONE = 2;
+    private static final int PLAY_BUSYTONE = 3;
+    private static final int PLAY_CANCELEDTONE = 4;
+    private static final int PLAY_FAILEDTONE = 5;
+    private static final int PLAY_ESTABLISHEDTONE = 6;
+    private static final int PLAY_FINISHEDTONE = 7;
+    private static final int STOP_OTHERTONES = 8;
+    private static final int PLAY_RECEIVINGTONE = 9;
+    private static final int STOP_RECEIVINGTONE = 10;
 
     private final class RingtoneHandler extends Handler {
 
@@ -76,23 +80,35 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
                 case INITIALIZE_TONE_STACK:
                     initializeToneStack();
                     break;
+                case PLAY_WAITINGTONE:
+                    doPlayWaitingTone();
+                    break;
                 case PLAY_RINGINGTONE:
                     doPlayRingingTone();
                     break;
-                case STOP_RINGINGTONE:
-                    doStopRingingTone();
+                case PLAY_BUSYTONE:
+                    doPlayBusyTone();
+                    break;
+                case PLAY_CANCELEDTONE:
+                    doPlayCanceledTone();
+                    break;
+                case PLAY_FAILEDTONE:
+                    doPlayFailedTone();
+                    break;
+                case PLAY_ESTABLISHEDTONE:
+                    doPlayEstablishedTone();
+                    break;
+                case PLAY_FINISHEDTONE:
+                    doPlayFinishedTone();
+                    break;
+                case STOP_OTHERTONES:
+                    doStopOtherTones();
                     break;
                 case PLAY_RECEIVINGTONE:
                     doPlayReceivingTone();
                     break;
                 case STOP_RECEIVINGTONE:
                     doStopReceivingTone();
-                    break;
-                case PLAY_BUSYTONE:
-                    doPlayBusyTone();
-                    break;
-                case PLAY_FAILEDTONE:
-                    doPlayFailedTone();
                     break;
                 default:
                     break;
@@ -231,6 +247,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     @Override
     public void showMakingCall(SipuadaCallData sipuadaCallData) {
         addSipuadaCall(CallPresenter.SipuadaCallAction.MAKE_CALL, sipuadaCallData);
+        playWaitingTone();
     }
 
     @Override
@@ -246,26 +263,28 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     @Override
     public void showMakingCallCanceled(SipuadaCallData sipuadaCallData, String reason) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_CANCELED, sipuadaCallData, reason);
-        stopRingingTone();
+        stopOtherTones();
+        playCanceledTone();
     }
 
     @Override
     public void showMakingCallFailed(SipuadaCallData sipuadaCallData, String reason) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_FAILED, sipuadaCallData, reason);
-        stopRingingTone();
+        stopOtherTones();
         playFailedTone();
     }
 
     @Override
     public void showMakingCallRinging(SipuadaCallData sipuadaCallData) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_RINGING, sipuadaCallData, null);
+        stopOtherTones();
         playRingingTone();
     }
 
     @Override
     public void showMakingCallDeclined(SipuadaCallData sipuadaCallData) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_MAKING_DECLINED, sipuadaCallData, null);
-        stopRingingTone();
+        stopOtherTones();
         playBusyTone();
     }
 
@@ -279,6 +298,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     public void showReceivingCallCanceled(SipuadaCallData sipuadaCallData, String reason) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_RECEIVING_CANCELED, sipuadaCallData, reason);
         stopReceivingTone();
+        playCanceledTone();
     }
 
     @Override
@@ -304,7 +324,8 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     public void showCallInProgress(SipuadaCallData sipuadaCallData) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_IN_PROGRESS, sipuadaCallData, null);
         stopReceivingTone();
-        stopRingingTone();
+        stopOtherTones();
+        playEstablishedTone();
     }
 
     @Override
@@ -316,6 +337,7 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     @Override
     public void showCallFinished(SipuadaCallData sipuadaCallData) {
         setSipuadaCall(CallViewState.SipuadaCallState.CALL_FINISHED, sipuadaCallData, null);
+        playFinishedTone();
     }
 
     @Override
@@ -437,9 +459,14 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
     }
 
     public void initializeToneStack() {
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100); //or STREAM_DTMF?
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
         ringtone = RingtoneManager.getRingtone(getApplicationContext(),
                 RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
+    }
+
+    public void playWaitingTone() {
+        Message message = toneHandler.obtainMessage(PLAY_WAITINGTONE);
+        toneHandler.sendMessage(message);
     }
 
     public void playRingingTone() {
@@ -447,8 +474,33 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         toneHandler.sendMessage(message);
     }
 
-    public void stopRingingTone() {
-        Message message = toneHandler.obtainMessage(STOP_RINGINGTONE);
+    public void playBusyTone() {
+        Message message = toneHandler.obtainMessage(PLAY_BUSYTONE);
+        toneHandler.sendMessage(message);
+    }
+
+    public void playCanceledTone() {
+        Message message = toneHandler.obtainMessage(PLAY_CANCELEDTONE);
+        toneHandler.sendMessage(message);
+    }
+
+    public void playFailedTone() {
+        Message message = toneHandler.obtainMessage(PLAY_FAILEDTONE);
+        toneHandler.sendMessage(message);
+    }
+
+    public void playEstablishedTone() {
+        Message message = toneHandler.obtainMessage(PLAY_ESTABLISHEDTONE);
+        toneHandler.sendMessage(message);
+    }
+
+    public void playFinishedTone() {
+        Message message = toneHandler.obtainMessage(PLAY_FINISHEDTONE);
+        toneHandler.sendMessage(message);
+    }
+
+    public void stopOtherTones() {
+        Message message = toneHandler.obtainMessage(STOP_OTHERTONES);
         toneHandler.sendMessage(message);
     }
 
@@ -462,21 +514,35 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
         toneHandler.sendMessage(message);
     }
 
-    public void playBusyTone() {
-        Message message = toneHandler.obtainMessage(PLAY_BUSYTONE);
-        toneHandler.sendMessage(message);
-    }
-
-    public void playFailedTone() {
-        Message message = toneHandler.obtainMessage(PLAY_FAILEDTONE);
-        toneHandler.sendMessage(message);
+    public void doPlayWaitingTone() {
+        toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_CALLWAITING);
     }
 
     public void doPlayRingingTone() {
         toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_USA_RINGBACK);
     }
 
-    public void doStopRingingTone() {
+    public void doPlayBusyTone() {
+        toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_BUSY, 3000);
+    }
+
+    public void doPlayCanceledTone() {
+        toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_BUSY_ONE_SHOT, 1000);
+    }
+
+    public void doPlayFailedTone() {
+        toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE, 2000);
+    }
+
+    public void doPlayEstablishedTone() {
+        toneGenerator.startTone(ToneGenerator.TONE_CDMA_ANSWER, 750);
+    }
+
+    public void doPlayFinishedTone() {
+        toneGenerator.startTone(ToneGenerator.TONE_CDMA_CALLDROP_LITE, 2000);
+    }
+
+    public void doStopOtherTones() {
         toneGenerator.stopTone();
     }
 
@@ -486,14 +552,6 @@ public class CallActivity extends SipuadaViewStateActivity<CallViewApi, CallPres
 
     public void doStopReceivingTone() {
         ringtone.stop();
-    }
-
-    public void doPlayBusyTone() {
-        toneGenerator.startTone(ToneGenerator.TONE_CDMA_NETWORK_BUSY, 3000);
-    }
-
-    public void doPlayFailedTone() {
-        toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE, 2000);
     }
 
 }
