@@ -108,9 +108,31 @@ public interface MainPresenterApi extends SipuadaPresenterApi<SipuadaViewApi> {
     @Subscribe
     void onMessageSent(MessageSent event);
 
+    class MessageReceived {
+
+        private final String content;
+        private final ContentTypeHeader contentTypeHeader;
+
+        public MessageReceived(String content, ContentTypeHeader contentTypeHeader) {
+            this.content = content;
+            this.contentTypeHeader = contentTypeHeader;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public ContentTypeHeader getContentTypeHeader() {
+            return contentTypeHeader;
+        }
+
+    }
+    @Subscribe
+    void onMessageReceived(MessageReceived event);
+
     interface MessageSendingCallback {
 
-        void onMessageSendingSuccess(String callId, String content, ContentTypeHeader contentTypeHeader);
+        void onMessageSendingSuccess(String callId);
 
         void onMessageSendingFailed(String reason);
 

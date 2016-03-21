@@ -73,7 +73,6 @@ public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements M
         });
     }
 
-
     @Override
     public void queryingOptions(String username, String primaryHost, String remoteUsername, String remoteHost, final OptionsQueryingCallback callback) {
         sipuadaService.queryOptions(username, primaryHost, remoteUsername, remoteHost, new SipuadaApi.OptionsQueryingCallback() {
@@ -122,12 +121,12 @@ public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements M
             public void onSendingMessageSuccess(final String callId, final String content, final ContentTypeHeader contentTypeHeader) {
                 Log.d(SipuadaApplication.TAG,
                         String.format("[onSendingMessageSuccess; callId:{%s}, content:{%s}, contentTypeHeader:{%s}]",
-                                callId, content, contentTypeHeader));
+                                callId, (null == content ? "Null" : content), (null == contentTypeHeader ? "Null" : contentTypeHeader)));
                 mainHandler.post(new Runnable() {
 
                     @Override
                     public void run() {
-                        callback.onMessageSendingSuccess(callId, content, contentTypeHeader);
+                        callback.onMessageSendingSuccess(callId);
                     }
                 });
             }
@@ -151,8 +150,17 @@ public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements M
     public void onMessageSent(MessageSent event) {
         Log.d(SipuadaApplication.TAG,
                 String.format("[onMessageSent...]"));
+
     }
 
+    @Override
+    public void onMessageReceived(MessageReceived event) {
+        Log.d(SipuadaApplication.TAG,
+                String.format("[onMessageReceived...: contentTypeHeader:{%s}, content:{%s}]",
+                        (null != event.getContentTypeHeader() ? event.getContentTypeHeader().toString() : "Null"), (null != event.getContent() ? event.getContent() : "Null")));
+        Log.d(SipuadaApplication.TAG, "[onMessageReceived...: contentTypeHeader:" + (null != event.getContentTypeHeader() ? event.getContentTypeHeader().toString() : "Null"));
+        Log.d(SipuadaApplication.TAG, "[onMessageReceived...: content:" + (null != event.getContent() ? event.getContent() : "Null"));
+    }
 
 
 }

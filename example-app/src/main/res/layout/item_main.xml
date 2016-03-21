@@ -174,20 +174,19 @@
             marqueeto:labelledMarqueeEditTextStyle="@style/LabelledMarqueeEditTextAppearanceDark"
             tools:ignore="HardcodedText"/>
 
-        <TextView
-            android:id="@+id/sipuada_plugin_android_example_MessageOutput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:gravity="center"
-            android:singleLine="true"
-            android:lines="1"
-            android:ellipsize="marquee"
-            android:padding="15dp"/>
-
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/sipuada_plugin_android_example_MessageOutput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:ellipsize="marquee"
+        android:padding="15dp"/>
 
     <View
         android:layout_width="match_parent"

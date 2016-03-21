@@ -246,15 +246,9 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                 presenter.sendMessage(username, primaryHost, remoteUsername, remoteHost, content, (ContentTypeHeader) contentType, new MainPresenterApi.MessageSendingCallback() {
 
                     @Override
-                    public void onMessageSendingSuccess(String callId, String content, ContentTypeHeader contentTypeHeader) {
+                    public void onMessageSendingSuccess(String callId) {
                         StringBuilder output = new StringBuilder();
-                        if (null == content) {
-                            output.append("No message found\n");
-                        } else {
-                            output.append("Message found. \nContent:");
-                            output.append(content + "\n");
-                        }
-
+                        output.append("Message sent.\n");
                         messageOutput.setText(output.toString());
                         messageOutput.setSelected(true);
                         messageButton.setEnabled(true);
