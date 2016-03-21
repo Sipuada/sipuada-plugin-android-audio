@@ -28,7 +28,7 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
         CALL_MAKING_CANCELED, CALL_MAKING_FAILED, CALL_MAKING_DECLINED,
         CALL_RECEIVING, CALL_RECEIVING_CANCELED, CALL_RECEIVING_FAILED,
         CALL_RECEIVING_ACCEPT, CALL_RECEIVING_DECLINE,
-        CALL_IN_PROGRESS, CALL_FINISHED
+        CALL_IN_PROGRESS, CALL_FAILED, CALL_FINISHED
 
     }
 
@@ -207,6 +207,9 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
                         sipuadaCallView.showMakingCall(sipuadaCallData);
 //                    }
                         break;
+                    case CALL_FAILED:
+                        sipuadaCallView.showCallFailed(sipuadaCallData, information);
+                        break;
                     case CALL_FINISHED:
 //                    if (!notifyInsteadOfShow) {
                         sipuadaCallView.showCallFinished(sipuadaCallData);
@@ -253,6 +256,7 @@ public class CallViewState implements RestoreableViewState<CallViewApi> {
                     SipuadaCallState.CALL_MAKING_CANCEL,
                     SipuadaCallState.CALL_MAKING_CANCELED,
                     SipuadaCallState.CALL_MAKING_FAILED,
+                    SipuadaCallState.CALL_FAILED,
                     SipuadaCallState.CALL_FINISHED
             };
             Collections.sort(callsInformation, new Comparator<SipuadaCall>() {

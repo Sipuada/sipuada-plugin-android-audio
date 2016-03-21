@@ -312,6 +312,21 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     }
 
     @Override
+    public void establishedCallFailed(final SipuadaCallData sipuadaCallData, final String reason) {
+        mainHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                if (isViewAttached()) {
+                    //noinspection ConstantConditions
+                    getView().showCallFailed(sipuadaCallData, reason);
+                }
+            }
+
+        });
+    }
+
+    @Override
     public void finishCall(SipuadaCallData sipuadaCallData) {
         finishCall(sipuadaCallData, true);
     }
@@ -449,7 +464,7 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     public void onEstablishedCallFinishCouldNotBeSent(EstablishedCallFinishCouldNotBeSent event) {
         SipuadaCallData sipuadaCallData = establishedCalls.get(event.getCallId());
         if (sipuadaCallData != null) {
-            finishCall(sipuadaCallData, false);
+            establishedCallFailed(sipuadaCallData, REASON_SEND_FAILED);
         }
     }
 
@@ -458,7 +473,7 @@ public class CallPresenter extends SipuadaPresenter<CallViewApi> implements Call
     public void onCallFailure(EstablishedCallFailed event) {
         SipuadaCallData sipuadaCallData = establishedCalls.get(event.getCallId());
         if (sipuadaCallData != null) {
-            finishCall(sipuadaCallData, false);
+            establishedCallFailed(sipuadaCallData, event.getReason());
         }
     }
 

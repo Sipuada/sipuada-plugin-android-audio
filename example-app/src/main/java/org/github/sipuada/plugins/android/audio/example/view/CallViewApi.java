@@ -32,6 +32,8 @@ public interface CallViewApi extends SipuadaViewApi {
 
     void showCallInProgress(SipuadaCallData sipuadaCallData);
 
+    void showCallFailed(SipuadaCallData sipuadaCallData, String reason);
+
     void showCallFinished(SipuadaCallData sipuadaCallData);
 
     void dismissCall(SipuadaCallData sipuadaCallData);
