@@ -8,12 +8,12 @@ import com.google.common.eventbus.Subscribe;
 
 import org.github.sipuada.SipuadaApi;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
+import org.github.sipuada.plugins.android.audio.example.view.MainViewApi;
 import org.github.sipuada.plugins.android.audio.example.view.SipuadaApplication;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
 
 import java.util.List;
 
-public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements MainPresenterApi {
+public class MainPresenter extends SipuadaPresenter<MainViewApi> implements MainPresenterApi {
 
     @Override
     protected void doUponServiceConnected() {
@@ -154,12 +154,30 @@ public class MainPresenter extends SipuadaPresenter<SipuadaViewApi> implements M
     }
 
     @Override
-    public void onMessageReceived(MessageReceived event) {
+    public void onMessageReceived(final MessageReceived event) {
+
         Log.d(SipuadaApplication.TAG,
                 String.format("[onMessageReceived...: contentTypeHeader:{%s}, content:{%s}]",
                         (null != event.getContentTypeHeader() ? event.getContentTypeHeader().toString() : "Null"), (null != event.getContent() ? event.getContent() : "Null")));
         Log.d(SipuadaApplication.TAG, "[onMessageReceived...: contentTypeHeader:" + (null != event.getContentTypeHeader() ? event.getContentTypeHeader().toString() : "Null"));
         Log.d(SipuadaApplication.TAG, "[onMessageReceived...: content:" + (null != event.getContent() ? event.getContent() : "Null"));
+
+        mainHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                if (isViewAttached()) {
+                    //noinspection ConstantConditions
+                    String remoteUsername = event.getRemoteUsername();
+                    String remoteHost = event.getRemoteHost();
+                    String content = event.getContent();
+                    ContentTypeHeader contentTypeHeader = event.getContentTypeHeader();
+
+                    getView().showMessages(remoteUsername, remoteHost, content, contentTypeHeader);
+                }
+            }
+
+        });
     }
 
 

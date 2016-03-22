@@ -1,6 +1,7 @@
 package org.github.sipuada.plugins.android.audio.example.view;
 
 import android.content.Intent;
+import android.javax.sip.header.ContentTypeHeader;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -28,8 +29,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterApi>
-        implements SipuadaViewApi {
+public class MainActivity extends SipuadaActivity<MainViewApi, MainPresenterApi>
+        implements MainViewApi {
 
     public static final int REQUEST_NEW_USER_CREDENTIALS = 1;
     public static final int REQUEST_UPDATE_USER_CREDENTIALS = 2;
@@ -136,4 +137,8 @@ public class MainActivity extends SipuadaActivity<SipuadaViewApi, MainPresenterA
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void showMessages(String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader) {
+        // TODO IMPLEMENT THIS, PLEASE
+    }
 }

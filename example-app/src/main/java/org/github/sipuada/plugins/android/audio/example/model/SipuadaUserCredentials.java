@@ -14,13 +14,34 @@ public class SipuadaUserCredentials extends Model implements Parcelable {
     @Column(name = "Username") protected String username;
     @Column(name = "PrimaryHost") protected String primaryHost;
     @Column(name = "Password") protected String password;
+    @Column(name = "Message") protected String message;
 
     public SipuadaUserCredentials() {}
+
+    public SipuadaUserCredentials(String username, String primaryHost, String password, String message) {
+        this.username = username;
+        this.primaryHost = primaryHost;
+        this.password = password;
+        this.message = message;
+        SipuadaUserCredentials self = new Select().from(SipuadaUserCredentials.class)
+                .where("Username = ? AND PrimaryHost = ?", username, primaryHost).executeSingle();
+        if (self == null) {
+            this.save();
+        }
+        else {
+            self.username = username;
+            self.primaryHost = primaryHost;
+            self.password = password;
+            self.message = message;
+            self.save();
+        }
+    }
 
     public SipuadaUserCredentials(String username, String primaryHost, String password) {
         this.username = username;
         this.primaryHost = primaryHost;
         this.password = password;
+        this.message = "";
         SipuadaUserCredentials self = new Select().from(SipuadaUserCredentials.class)
                 .where("Username = ? AND PrimaryHost = ?", username, primaryHost).executeSingle();
         if (self == null) {
@@ -38,6 +59,7 @@ public class SipuadaUserCredentials extends Model implements Parcelable {
         username = in.readString();
         primaryHost = in.readString();
         password = in.readString();
+        message = in.readString();
     }
 
     @Override
@@ -50,6 +72,7 @@ public class SipuadaUserCredentials extends Model implements Parcelable {
         dest.writeString(username);
         dest.writeString(primaryHost);
         dest.writeString(password);
+        dest.writeString(message);
     }
 
     public static final Creator<SipuadaUserCredentials> CREATOR = new Creator<SipuadaUserCredentials>() {
@@ -74,6 +97,10 @@ public class SipuadaUserCredentials extends Model implements Parcelable {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     @Override

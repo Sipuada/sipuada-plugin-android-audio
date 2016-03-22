@@ -813,7 +813,7 @@ public class SipuadaService extends Service {
         @Override
         public void onMessageReceived(String callId, ContentTypeHeader contentType, String content) {
             Log.d(SipuadaApplication.TAG, String.format("[onMessageReceived;" +
-                    " callId:{%s}, contentType:{%s}, content:{%s}]", callId,
+                    " callId:{%s}, contentType:{%s}, content:{%s}]", (null != callId ? callId : "Null"),
                     (null != contentType ? contentType.toString() : "Null"),
                     (null != content ? content : "Null")));
             eventBus.post(new MainPresenterApi.MessageReceived(content, contentType));

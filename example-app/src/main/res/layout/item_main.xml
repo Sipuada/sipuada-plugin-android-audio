@@ -177,6 +177,19 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/sipuada_plugin_android_example_LastMessageOutput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:ellipsize="marquee"
+        android:padding="15dp"
+        android:background="#d3d3d3"/>
+
+    <TextView
         android:id="@+id/sipuada_plugin_android_example_MessageOutput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

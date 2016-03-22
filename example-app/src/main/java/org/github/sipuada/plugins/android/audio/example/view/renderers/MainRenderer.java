@@ -38,6 +38,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
     @Bind(R.id.sipuada_plugin_android_example_OptionsButton) Button optionsButton;
     @Bind(R.id.sipuada_plugin_android_example_OptionsUser) LabelledMarqueeEditText optionsUser;
     @Bind(R.id.sipuada_plugin_android_example_OptionsOutput) TextView optionsOutput;
+    @Bind(R.id.sipuada_plugin_android_example_LastMessageOutput) TextView lastMessageInput;
     @Bind(R.id.sipuada_plugin_android_example_MessageButton) Button messageButton;
     @Bind(R.id.sipuada_plugin_android_example_MessageUser) LabelledMarqueeEditText messageUser;
     @Bind(R.id.sipuada_plugin_android_example_MessageOutput) TextView messageOutput;
@@ -69,6 +70,8 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
         final SipuadaUserCredentials userCredentials = getContent();
         final String username = userCredentials.getUsername();
         final String primaryHost = userCredentials.getPrimaryHost();
+        final String lastMessage = userCredentials.getMessage();
+
         user.setText(String.format("%s@%s", username, primaryHost));
         user.setOnLongClickListener(new View.OnLongClickListener() {
 
@@ -81,6 +84,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
             }
 
         });
+        lastMessageInput.setText(lastMessage);
         if (!presenter.sipuadaServiceIsConnected()) {
             registerButton.setEnabled(false);
             String statusMessage = "Please wait...";

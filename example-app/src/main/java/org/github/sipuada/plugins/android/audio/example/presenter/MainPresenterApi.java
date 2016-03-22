@@ -5,14 +5,12 @@ import android.javax.sip.header.ContentTypeHeader;
 
 import com.google.common.eventbus.Subscribe;
 
-import org.github.sipuada.SipuadaApi;
-import org.github.sipuada.plugins.android.audio.example.model.SipuadaCallData;
 import org.github.sipuada.plugins.android.audio.example.model.SipuadaUserCredentials;
-import org.github.sipuada.plugins.android.audio.example.view.SipuadaViewApi;
+import org.github.sipuada.plugins.android.audio.example.view.MainViewApi;
 
 import java.util.List;
 
-public interface MainPresenterApi extends SipuadaPresenterApi<SipuadaViewApi> {
+public interface MainPresenterApi extends SipuadaPresenterApi<MainViewApi> {
 
     void createSipuada(String username, String primaryHost, String password);
 
@@ -110,12 +108,24 @@ public interface MainPresenterApi extends SipuadaPresenterApi<SipuadaViewApi> {
 
     class MessageReceived {
 
+        private final String remoteUsername;
+        private final String remoteHost;
         private final String content;
         private final ContentTypeHeader contentTypeHeader;
 
-        public MessageReceived(String content, ContentTypeHeader contentTypeHeader) {
+        public MessageReceived(String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader) {
+            this.remoteUsername = remoteUsername;
+            this.remoteHost = remoteHost;
             this.content = content;
             this.contentTypeHeader = contentTypeHeader;
+        }
+
+        public String getRemoteUsername() {
+            return remoteUsername;
+        }
+
+        public String getRemoteHost() {
+            return remoteHost;
         }
 
         public String getContent() {
