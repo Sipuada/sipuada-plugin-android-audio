@@ -176,8 +176,50 @@
 
     </LinearLayout>
 
+
     <TextView
-        android:id="@+id/sipuada_plugin_android_example_LastMessageOutput"
+        android:id="@+id/sipuada_plugin_android_example_MessageToSendLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:gravity="left"
+        android:singleLine="true"
+        android:lines="1"
+        android:text="Message to send:"/>
+
+    <com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText
+        android:id="@+id/sipuada_plugin_android_example_MessageToSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:singleLine="true"
+        android:lines="1"
+        android:ellipsize="marquee"
+        android:padding="15dp"
+        android:background="#d3d3d3"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/colorPrimaryDark"/>
+
+    <TextView
+        android:id="@+id/sipuada_plugin_android_example_LastMessageReceivedLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:gravity="left"
+        android:singleLine="true"
+        android:lines="1"
+        android:text="Last message received:"/>
+
+    <TextView
+        android:id="@+id/sipuada_plugin_android_example_LastMessageReceived"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"

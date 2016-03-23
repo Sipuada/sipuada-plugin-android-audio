@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.guilhermesgb.marqueeto.LabelledMarqueeEditText;
@@ -38,7 +39,10 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
     @Bind(R.id.sipuada_plugin_android_example_OptionsButton) Button optionsButton;
     @Bind(R.id.sipuada_plugin_android_example_OptionsUser) LabelledMarqueeEditText optionsUser;
     @Bind(R.id.sipuada_plugin_android_example_OptionsOutput) TextView optionsOutput;
-    @Bind(R.id.sipuada_plugin_android_example_LastMessageOutput) TextView lastMessageInput;
+
+
+    @Bind(R.id.sipuada_plugin_android_example_MessageToSend) LabelledMarqueeEditText messageToSend;
+    @Bind(R.id.sipuada_plugin_android_example_LastMessageReceived) TextView lastMessageReceived;
     @Bind(R.id.sipuada_plugin_android_example_MessageButton) Button messageButton;
     @Bind(R.id.sipuada_plugin_android_example_MessageUser) LabelledMarqueeEditText messageUser;
     @Bind(R.id.sipuada_plugin_android_example_MessageOutput) TextView messageOutput;
@@ -84,7 +88,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
             }
 
         });
-        lastMessageInput.setText(lastMessage);
+        lastMessageReceived.setText(lastMessage);
         if (!presenter.sipuadaServiceIsConnected()) {
             registerButton.setEnabled(false);
             String statusMessage = "Please wait...";
@@ -245,7 +249,7 @@ public class MainRenderer extends Renderer<SipuadaUserCredentials> {
                 messageButton.setEnabled(false);
 
                 // TODO - working - BEGIN
-                String content = "Hello World Info! to " + remoteUsername + "\n";
+                String content = (null != messageToSend.getText() ? messageToSend.getText() : "") + "\n";
                 ContentType contentType = new ContentType("text", "plain");
                 presenter.sendMessage(username, primaryHost, remoteUsername, remoteHost, content, (ContentTypeHeader) contentType, new MainPresenterApi.MessageSendingCallback() {
 

@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -139,6 +140,20 @@ public class MainActivity extends SipuadaActivity<MainViewApi, MainPresenterApi>
 
     @Override
     public void showMessages(String remoteUsername, String remoteHost, String content, ContentTypeHeader contentTypeHeader) {
-        // TODO IMPLEMENT THIS, PLEASE
+        // TODO VERIFY THIS, PLEASE
+        Log.d("MainActivity", "showMessages");
+        Log.d("MainActivity", "showMessages:[ username:{" + remoteUsername + "}, remoteHost:{" + remoteHost + "}]");
+        int itemCount = adapter.getItemCount();
+        for(int i = 0; i < itemCount; i++) {
+            SipuadaUserCredentials sipuadaUserCredentials = adapter.getItem(i);
+            Log.d("....sipuadaUserCredentials[" + i + "]", ":[ username:{" + sipuadaUserCredentials.getUsername() + "}, remoteHost:{" + sipuadaUserCredentials.getPrimaryHost() + "}]");
+
+
+            if(sipuadaUserCredentials.getUsername().equals(remoteUsername) && sipuadaUserCredentials.getPrimaryHost().equals(remoteHost)) {
+                sipuadaUserCredentials.setMessage(content);
+                Log.d("MainActivity", "showMessages:[ username:{" + remoteUsername + "}, remoteHost:{" + remoteHost + "}]");
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 }

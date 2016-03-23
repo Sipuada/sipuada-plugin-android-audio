@@ -103,6 +103,10 @@ public class SipuadaUserCredentials extends Model implements Parcelable {
         return message;
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
         return String.format("%s@%s", username, primaryHost);

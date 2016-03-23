@@ -811,12 +811,12 @@ public class SipuadaService extends Service {
         public void onInfoReceived(String callId, ContentTypeHeader contentType, String content) {}
 
         @Override
-        public void onMessageReceived(String callId, ContentTypeHeader contentType, String content) {
+        public void onMessageReceived(String callId, String remoteUsername, String remoteHost, ContentTypeHeader contentType, String content) {
             Log.d(SipuadaApplication.TAG, String.format("[onMessageReceived;" +
                     " callId:{%s}, contentType:{%s}, content:{%s}]", (null != callId ? callId : "Null"),
                     (null != contentType ? contentType.toString() : "Null"),
                     (null != content ? content : "Null")));
-            eventBus.post(new MainPresenterApi.MessageReceived(content, contentType));
+            eventBus.post(new MainPresenterApi.MessageReceived(remoteUsername, remoteHost, content, contentType));
         }
 
     }
