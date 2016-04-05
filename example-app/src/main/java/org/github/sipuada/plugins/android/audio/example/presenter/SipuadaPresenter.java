@@ -42,7 +42,6 @@ public abstract class SipuadaPresenter<V extends SipuadaViewApi> extends MvpBase
                 getView().sipuadaServiceDisconnected();
             }
         }
-
     };
 
     @Override
